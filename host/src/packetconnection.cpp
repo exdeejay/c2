@@ -8,7 +8,7 @@
 using namespace std;
 
 void PacketConnection::connect() {
-    conn.get()->connect();
+    conn->connect();
 }
 
 SerializedPacket PacketConnection::read_packet() {
@@ -42,11 +42,11 @@ SerializedPacket PacketConnection::read_packet() {
                 }
 
                 int type_offset = 0;
-                if (deflated.get()->size() == 0 && stream.avail_out != sizeof(deflateBuf)) {
+                if (deflated->size() == 0 && stream.avail_out != sizeof(deflateBuf)) {
                     packet_type = deflateBuf[0];
                     type_offset = 1;
                 }
-                deflated.get()->insert(deflated.get()->end(), deflateBuf + type_offset, deflateBuf + (sizeof(deflateBuf) - stream.avail_out));
+                deflated->insert(deflated->end(), deflateBuf + type_offset, deflateBuf + (sizeof(deflateBuf) - stream.avail_out));
             } while (stream.avail_out == 0);
             inflateEnd(&stream);
 
@@ -67,7 +67,7 @@ SerializedPacket PacketConnection::read_packet() {
 void PacketConnection::write_packet_sync(const SerializedPacket& spkt) {
     vector<char> data;
     data.push_back(spkt.type);
-    data.insert(data.end(), spkt.data.get()->begin(), spkt.data.get()->end());
+    data.insert(data.end(), spkt.data->begin(), spkt.data->end());
 	vector<char> out;
     out.resize(4);
 

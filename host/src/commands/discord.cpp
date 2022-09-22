@@ -3,6 +3,7 @@
 #include <fstream>
 #include <snappy.h>
 #include <vector>
+#include <iostream>
 using namespace std;
 
 template <typename T = uint64_t>

@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 
 	try {
 		unique_ptr<PacketConnection> conn = make_unique<PacketConnection>(host, port);
-		conn.get()->connect();
+		conn->connect();
 		cout << "Connected to " << host << ":" << to_string(port).c_str() << endl;
 		Controller controller(move(conn));
 		controller.loop();

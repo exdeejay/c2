@@ -45,13 +45,13 @@ function parseField(buffer, offset, packetObj, field, type) {
             return 4;
 
         case 'str':
-            let ret = parseField(buffer, offset, packetObj, field, 'buf');
-            packetObj[field] = packetObj[field].toString();
-            return ret;
+            let strsize = buffer.readUInt32BE(offset);
+            packetObj[field] = buffer.slice(offset + 4, offset + 4 + strsize).toString();
+            return strsize + 4;
 
         case 'buf':
             let size = buffer.readUInt32BE(offset);
-            packetObj[field] = buffer.slice(offset + 4, offset + 4 + size);
+            packetObj[field] = buffer.slice(offset + 4, offset + 4 + size).toString('base64');
             return size + 4;
     }
 }
@@ -146,8 +146,9 @@ function serializeField(bytesArr, obj, type) {
 
         case 'buf':
             len = Buffer.alloc(4);
-            len.writeUInt32BE(obj.length);
-            buf = Buffer.concat([len, obj]);
+            let unb64 = Buffer.from(obj, 'base64');
+            len.writeUInt32BE(unb64.length);
+            buf = Buffer.concat([len, unb64]);
             break;
     }
 

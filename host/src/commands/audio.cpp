@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <portaudio.h>
-
+using namespace std;
 
 #define CHECK_ERR(fn) status = fn; if (status != paNoError) { ctrl.err_println(Pa_GetErrorText(status)); return status; }
 
@@ -16,7 +16,7 @@ int audioCallback(
 		void* userData) {
 	const char* cInput = (const char*) input;
 	Controller* ctrl = (Controller*) userData;
-	//ctrl->buffer_audio(cInput, frameCount * 2);
+	ctrl->buffer_audio(cInput, frameCount * sizeof(uint16_t));
 	return paContinue;
 }
 
@@ -48,17 +48,17 @@ int audioCommand(Controller& ctrl, AudioCommand cmd) {
 			CHECK_ERR(numDevices);
 		}
 
-		std::string message;
+		string message;
 		const PaDeviceInfo* devInfo;
 		int defaultIn = Pa_GetDefaultInputDevice();
 		int defaultOut = Pa_GetDefaultOutputDevice();
 		for (int i = 0; i < numDevices; i++) {
 			devInfo = Pa_GetDeviceInfo(i);
-			message += std::to_string(i);
+			message += to_string(i);
 			message += ": ";
 			message += devInfo->name;
 			message += " ";
-			message += std::to_string(devInfo->maxInputChannels) + ":" + std::to_string(devInfo->maxOutputChannels);
+			message += to_string(devInfo->maxInputChannels) + ":" + to_string(devInfo->maxOutputChannels);
 			if (i == defaultIn || i == defaultOut) {
 				message += " (*)";
 			}

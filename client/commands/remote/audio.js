@@ -5,6 +5,7 @@ const Speaker = require('speaker');
  */
 let spk = new Speaker({
 	channels: 1,
+	bitDepth: 16,
 	sampleRate: 16000,
 });
 
@@ -50,7 +51,7 @@ async function audio(server, args) {
 
 
 function audioHandler(packet) {
-	if (packet.type.name == 'audio') {
-		spk.write(packet.data);
+	if (packet._ptype.name == 'audio') {
+		spk.write(Buffer.from(packet.data, 'base64'));
 	}
 }

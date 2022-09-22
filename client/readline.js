@@ -91,8 +91,11 @@ async function readline() {
                     }
                     break;
                 case '\x03':
-                    Server.connectedServer.close();
-                    process.exit(0);
+                    process.stdout.write('\n');
+                    process.stdin.setRawMode(false);
+                    process.stdin.removeListener('data', rd);
+                    resolve('');
+                    return;
                 case '\x1b[A': //up
                     if (historyIdx + 1 < history.length) {
                         historyIdx++;

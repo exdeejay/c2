@@ -77,3 +77,12 @@ template<>
 void serialize_field<DiscordCommand>(const DiscordCommand& val, vector<char>& buf) {
 	serialize_field<unsigned char>((unsigned char) val, buf);
 }
+
+template<>
+AudioCommand parse_field<AudioCommand>(iter_t& buf, const iter_t& end) {
+	return static_cast<AudioCommand>(parse_field<unsigned char>(buf, end));
+}
+template<>
+void serialize_field<AudioCommand>(const AudioCommand& val, vector<char>& buf) {
+	serialize_field<unsigned char>((unsigned char) val, buf);
+}

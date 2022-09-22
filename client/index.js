@@ -26,6 +26,9 @@ async function main() {
             while (true) {
                 process.stdout.write('> ');
                 let line = await readline();
+                if (line == '') {
+                    continue;
+                }
                 let args = parseArgs(line);
                 if (!(args[0] in registry.commands)) {
                     console.log('Unknown command.');

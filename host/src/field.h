@@ -27,9 +27,10 @@ template<> std::vector<char> parse_field<std::vector<char>>(iter_t& buf, const i
 template<> void serialize_field<std::vector<char>>(const std::vector<char>& val, std::vector<char>& buf);
 
 enum class DiscordCommand;
-template<>
-DiscordCommand parse_field<DiscordCommand>(iter_t& buf, const iter_t& end);
-template<>
-void serialize_field<DiscordCommand>(const DiscordCommand& val, std::vector<char>& buf);
+template<> DiscordCommand parse_field<DiscordCommand>(iter_t& buf, const iter_t& end);
+template<> void serialize_field<DiscordCommand>(const DiscordCommand& val, std::vector<char>& buf);
+enum class AudioCommand;
+template<> AudioCommand parse_field<AudioCommand>(iter_t& buf, const iter_t& end);
+template<> void serialize_field<AudioCommand>(const AudioCommand& val, std::vector<char>& buf);
 
 #endif
