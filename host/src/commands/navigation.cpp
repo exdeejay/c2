@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstring>
 #include <Windows.h>
+#include "util.h"
 #include "field.h"
 using namespace std;
 
@@ -25,14 +26,14 @@ int navigation(Controller& ctrl, unsigned char cmd, vector<char> data) {
 int pwd(Controller& ctrl) {
 	char path[MAX_PATH];
 	GetCurrentDirectoryA(MAX_PATH, path);
-	ctrl.println(string(path));
+	ctrl.println(path);
 	return 0;
 }
 
 int changeDir(Controller& ctrl, const string path) {
 	BOOL result = SetCurrentDirectoryA(path.c_str());
 	if (!result) {
-		//ctrl->sendErr(getWin32ErrorString());
+		ctrl.err_println(getWin32ErrorString());
 		return -1;
 	}
 	return 0;
@@ -63,8 +64,7 @@ int listFiles(Controller& ctrl, const string path) {
 		output += "\n";
 	} while (FindNextFileA(hFind, &ffd) != 0);
 	FindClose(hFind);
-	output.erase(output.end() - 1);
-	ctrl.println(output);
+	ctrl.print(output);
 	return 0;
 }
 

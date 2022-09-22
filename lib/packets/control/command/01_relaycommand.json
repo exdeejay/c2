@@ -1,8 +1,0 @@
-{
-    "index": 1,
-    "name": "relaycommand",
-    "data": {
-        "id": "int",
-        "command": "buf"
-    }
-}

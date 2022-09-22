@@ -1,6 +1,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
+#include <vector>
 #include <memory>
 #include <string>
 #include "packetconnection.h"
@@ -14,8 +15,10 @@ public:
 	void init();
 	void loop();
 	void ret(char retcode);
+	void print(std::string out);
 	void println(std::string out);
 	void err_println(std::string err);
+	void send_buffer(const std::vector<char> buf);
 private:
 	std::unique_ptr<PacketConnection> conn;
 };

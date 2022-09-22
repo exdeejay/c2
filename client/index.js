@@ -1,5 +1,5 @@
 const net = require('net');
-const { loadPacketTypes } = require('../lib/protocol');
+const { loadPacketTypes } = require('../protocol/protocol');
 const registry = require('./registry');
 const { readline, parseArgs } = require('./readline');
 const Server = require('./server');

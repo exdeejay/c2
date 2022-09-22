@@ -1,5 +1,5 @@
 const net = require('net');
-const { loadPacketTypes } = require('../lib/protocol');
+const { loadPacketTypes } = require('../protocol/protocol');
 const { handleIncomingHost } = require('./host');
 const { handleIncomingController } = require('./control');
 

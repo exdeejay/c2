@@ -1,6 +1,6 @@
 const { Socket } = require('net');
-const { PacketConnection } = require('../lib/connection');
-const { parsePacket, serializePacket } = require('../lib/packet');
+const { PacketConnection } = require('../protocol/connection');
+const { parsePacket, serializePacket } = require('../protocol/packet');
 const host = require('./host');
 
 /**

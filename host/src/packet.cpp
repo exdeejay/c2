@@ -4,6 +4,7 @@
 #include <memory>
 #include <utility>
 #include <functional>
+#include <iostream>
 using namespace std;
 
 unordered_map<unsigned char, function<unique_ptr<Packet>(const vector<char>&)>> Packet::registry;
@@ -27,5 +28,9 @@ void Packet::handle_packet(Controller& ctrl, Packet& pkt) {
 }
 
 unique_ptr<Packet> Packet::parse(const SerializedPacket& spkt) {
-	return registry[spkt.type](*spkt.data.get());
+	auto pktctr = registry.find(spkt.type);
+	if (pktctr == registry.end()) {
+		throw new exception("bad packet");
+	}
+	return pktctr->second(*spkt.data.get());
 }

@@ -1,0 +1,8 @@
+{
+    "index": 137,
+    "name": "uploadfile",
+    "data": {
+        "path": "str",
+        "contents": "buf"
+    }
+}

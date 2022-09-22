@@ -1,8 +1,9 @@
 #include "commands.h"
+#include "util.h"
 #include <Windows.h>
 using namespace std;
 
-int exec(Controller *ctrl, const string cmd, bool wait) {
+int exec(Controller& ctrl, const string cmd, bool wait) {
 	HANDLE inPipe[2];
 	HANDLE outPipe[2];
 
@@ -26,7 +27,7 @@ int exec(Controller *ctrl, const string cmd, bool wait) {
 		nullptr, (char *)cmd.c_str(), nullptr, nullptr, TRUE,
 		/*CREATE_NO_WINDOW*/ 0, nullptr, nullptr, &startupInfo, &pi);
 	if (!status) {
-		//ctrl->sendErr(getWin32ErrorString());
+		ctrl.err_println(getWin32ErrorString());
 		return -1;
 	}
 	CloseHandle(inPipe[0]);
@@ -37,7 +38,7 @@ int exec(Controller *ctrl, const string cmd, bool wait) {
 	if (wait) {
 		string out;
 		while (status) {
-			char buf[1024];
+			char buf[8192];
 			DWORD size;
 			status = ReadFile(outPipe[0], buf, 1024, &size, nullptr);
 			if (!status) {
@@ -45,7 +46,7 @@ int exec(Controller *ctrl, const string cmd, bool wait) {
 			}
 			if (size != (DWORD)-1) {
 				out.assign(buf, size);
-				//ctrl->sendOut(out);
+				ctrl.print(out);
 			}
 		}
 

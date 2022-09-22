@@ -2,8 +2,9 @@
 #include <vector>
 #include <lodepng.h>
 #include <Windows.h>
+using namespace std;
 
-int screenshot(Controller* ctrl) {
+int screenshot(Controller& ctrl) {
 	HDC screenDC = GetDC(nullptr);
 	HDC bitmapDC = CreateCompatibleDC(screenDC);
 	int x = GetSystemMetrics(SM_XVIRTUALSCREEN);
@@ -42,8 +43,8 @@ int screenshot(Controller* ctrl) {
 	unsigned char* png = nullptr;
 	size_t pngSize;
 	lodepng_encode32(&png, &pngSize, pixels, width, height);
-
-	//ctrl->sendBuffer((char*) png, pngSize);
+	vector<char> buf(png, png + pngSize);
+	ctrl.send_buffer(buf);
 	free(png);
 
 	return 0;

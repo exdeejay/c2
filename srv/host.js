@@ -1,8 +1,8 @@
 const { Socket } = require('net');
-const { PacketConnection } = require('../lib/connection');
-const { packet_types } = require('../lib/protocol');
-const { createPacket } = require('../lib/packet');
-const { parsePacket, serializePacket } = require('../lib/packet');
+const { PacketConnection } = require('../protocol/connection');
+const { packet_types } = require('../protocol/protocol');
+const { createPacket } = require('../protocol/packet');
+const { parsePacket, serializePacket } = require('../protocol/packet');
 const { controllers } = require('./control');
 
 const hosts = [];
@@ -17,10 +17,15 @@ class Host {
     }
 
     handleResponse(packet) {
+        let type = null;
+        for (let pkt of packet_types.control.response.values()) {
+            if (pkt.name == 'hostresponse') {
+                type = pkt;
+                break;
+            }
+        }
         let wrappedPkt = {
-            type: packet_types.control.response.find(
-                (pkt) => pkt != null && pkt.name == 'hostresponse'
-            ),
+            type,
             data: packet,
         };
         controllers[0].sendResponse(wrappedPkt);

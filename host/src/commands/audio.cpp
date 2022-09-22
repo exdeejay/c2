@@ -5,7 +5,7 @@
 #include <portaudio.h>
 
 
-#define CHECK_ERR(fn) status = fn; if (status != paNoError) { ctrl->sendErr(Pa_GetErrorText(status)); return status; }
+#define CHECK_ERR(fn) status = fn; if (status != paNoError) { ctrl.err_println(Pa_GetErrorText(status)); return status; }
 
 PaStream* stream = nullptr;
 
@@ -20,32 +20,32 @@ int audioCallback(
 	return paContinue;
 }
 
-int audioCommand(Controller* ctrl, AudioCommand cmd) {
+int audioCommand(Controller& ctrl, AudioCommand cmd) {
 	if (cmd == AudioCommand::start) {
 		if (stream != nullptr) {
 			return -1;
 		}
 
 		int status;
-		//CHECK_ERR(Pa_Initialize());
-		//CHECK_ERR(Pa_OpenDefaultStream(&stream, 1, 0, paInt16, 16000, 256, audioCallback, ctrl));
-		//CHECK_ERR(Pa_StartStream(stream));
+		CHECK_ERR(Pa_Initialize());
+		CHECK_ERR(Pa_OpenDefaultStream(&stream, 1, 0, paInt16, 16000, 256, audioCallback, &ctrl));
+		CHECK_ERR(Pa_StartStream(stream));
 	} else if (cmd == AudioCommand::stop) {
 		if (stream == nullptr) {
 			return -1;
 		}
 		int status;
-		//CHECK_ERR(Pa_StopStream(stream));
-		//CHECK_ERR(Pa_CloseStream(stream));
+		CHECK_ERR(Pa_StopStream(stream));
+		CHECK_ERR(Pa_CloseStream(stream));
 		stream = nullptr;
-		//CHECK_ERR(Pa_Terminate());
+		CHECK_ERR(Pa_Terminate());
 	} else if (cmd == AudioCommand::list) {
 		int status;
 		
-		//CHECK_ERR(Pa_Initialize());
+		CHECK_ERR(Pa_Initialize());
 		int numDevices = Pa_GetDeviceCount();
 		if (numDevices < 0) {
-			//CHECK_ERR(numDevices);
+			CHECK_ERR(numDevices);
 		}
 
 		std::string message;
@@ -65,9 +65,9 @@ int audioCommand(Controller* ctrl, AudioCommand cmd) {
 			message += "\n";
 
 		}
-		//ctrl->sendOut(message);
+		ctrl.println(message);
 
-		//CHECK_ERR(Pa_Terminate());
+		CHECK_ERR(Pa_Terminate());
 	}
 
 	return 0;
