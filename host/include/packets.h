@@ -4,15 +4,15 @@
 #include <string>
 #include <vector>
 
-#define PAK_CASE(type) case (int) type
+#define ECASE(type) case (int) type
 
 enum class Packet {
 	ping,
 	stdIn,
 	getShell,
-	changeDir,
-	listFiles,
-	pwd,
+	navigate,
+	UNUSED0,
+	UNUSED1,
 	screenshot,
 	audioControl,
 	downloadFile,

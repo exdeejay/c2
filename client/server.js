@@ -1,12 +1,13 @@
 const EventEmitter = require('events');
 const { packet_types } = require('../lib/protocol');
-const { serializePacket, parsePacket } = require('../lib/packet');
+const { serializePacket, parsePacket, createPacket } = require('../lib/packet');
 const { PacketConnection } = require('../lib/connection');
-const { once, emit } = require('process');
+
 
 class Server extends EventEmitter {
     constructor(socket) {
         super();
+        this.createPacket = createPacket;
         this.connection = new PacketConnection(socket);
         this.connection.on('packet', (data) => {
             try {
@@ -30,7 +31,6 @@ class Server extends EventEmitter {
             this.emit('hostpacket', parsePacket('host', 'response', packet.data));
         }
     }
-
 
     /**
      * @callback hostCmdCallback
@@ -78,8 +78,4 @@ class Server extends EventEmitter {
     }
 }
 
-/**
- * @type Server
- */
-exports.connectedServer = null;
-exports.Server = Server;
+module.exports = Server;

@@ -1,0 +1,8 @@
+{
+    "index": 3,
+    "name": "navigate",
+    "data": {
+        "command": "byte",
+        "path": "str"
+    }
+}

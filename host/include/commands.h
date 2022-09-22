@@ -6,14 +6,19 @@
 
 #include "controller.h"
 
+enum class NavigateCommand {
+	ls, cd, pwd, rm
+};
+
 enum class AudioCommand {
 	start, stop, list
 };
 
 // navigation
 int pwd(Controller* ctrl);
-int changeDir(Controller* ctrl, const std::string dir);
-int listFiles(Controller* ctrl, const std::string dir);
+int changeDir(Controller* ctrl, const std::string path);
+int listFiles(Controller* ctrl, const std::string path);
+int removeFile(Controller* ctrl, const std::string path);
 
 // files
 int downloadFile(Controller* ctrl, const std::string path);

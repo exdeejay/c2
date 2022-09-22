@@ -1,7 +1,8 @@
+module.exports = function (commands) {
+    commands['exit'] = exit;
+};
 
-const server = require('../../server');
-
-module.exports = function (args) {
-    server.connectedServer.close();
+function exit(server, args) {
+    server.close();
     process.exit(0);
 }

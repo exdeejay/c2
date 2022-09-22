@@ -3,17 +3,11 @@ const fs = require('fs/promises');
 const commands = {};
 
 async function readCommandsIntoArray(categoryName, arr) {
-    let prevDir = process.cwd();
-    process.chdir('client');
-    let dirName = `./commands/${categoryName}`;
+    let dirName = `${__dirname}/commands/${categoryName}`;
     let files = await fs.readdir(dirName);
     for (let file of files) {
-        let command = require(`${dirName}/${file}`);
-        command.category = categoryName;
-        let commandName = file.slice(0, file.lastIndexOf('.'));
-        commands[commandName] = command;
+        require(`${dirName}/${file}`)(commands);
     }
-    process.chdir(prevDir);
 }
 
 async function loadCommands() {

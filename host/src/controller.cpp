@@ -17,25 +17,32 @@ void Controller::handleData(const vector<char>& buf) {
 	
 	int ret;
 	switch (command) {
-		PAK_CASE(Packet::changeDir):
-			ret = changeDir(this, get<string>(buf, &offset));
+		ECASE(Packet::navigate):
+			switch (get<uint8_t>(buf, &offset)) {
+				ECASE(NavigateCommand::ls):
+					ret = listFiles(this, get<string>(buf, &offset));
+					break;
+				ECASE(NavigateCommand::cd):
+					ret = changeDir(this, get<string>(buf, &offset));
+					break;
+				ECASE(NavigateCommand::pwd):
+					ret = pwd(this);
+					break;
+				ECASE(NavigateCommand::rm):
+					ret = removeFile(this, get<string>(buf, &offset));
+					break;
+			}
 			break;
-		PAK_CASE(Packet::listFiles):
-			ret = listFiles(this, get<string>(buf, &offset));
-			break;
-		PAK_CASE(Packet::pwd):
-			ret = pwd(this);
-			break;
-		PAK_CASE(Packet::screenshot):
+		ECASE(Packet::screenshot):
 			ret = screenshot(this);
 			break;
-		PAK_CASE(Packet::audioControl):
+		ECASE(Packet::audioControl):
 			ret = audioControl(this, (AudioCommand) get<uint32_t>(buf, &offset));
 			break;
-		PAK_CASE(Packet::downloadFile):
+		ECASE(Packet::downloadFile):
 			ret = downloadFile(this, get<string>(buf, &offset));
 			break;
-		PAK_CASE(Packet::uploadFile):
+		ECASE(Packet::uploadFile):
 			string& str = get<string>(buf, &offset);
 			size_t size = get<uint32_t>(buf, &offset);
 			ret = uploadFile(this, str, size, &buf[offset]);

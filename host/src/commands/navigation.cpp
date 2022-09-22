@@ -1,7 +1,10 @@
 #include "commands.h"
 
+#include <cstdio>
 #include <cstring>
 #include <Windows.h>
+
+using namespace std;
 
 
 int pwd(Controller* ctrl) {
@@ -11,19 +14,19 @@ int pwd(Controller* ctrl) {
 	return 0;
 }
 
-int changeDir(Controller* ctrl, const std::string dir) {
-	SetCurrentDirectoryA(dir.c_str());
+int changeDir(Controller* ctrl, const string path) {
+	SetCurrentDirectoryA(path.c_str());
 	return 0;
 }
 
-int listFiles(Controller* ctrl, const std::string dir) {
-	std::string output;
+int listFiles(Controller* ctrl, const string path) {
+	string output;
 	WIN32_FIND_DATA ffd;
 	HANDLE hFind;
-	if (dir.size() == 0) {
+	if (path.size() == 0) {
 		hFind = FindFirstFileA("*", &ffd);
 	} else {
-		std::string path = dir + "\\*";
+		string path = path + "\\*";
 		hFind = FindFirstFileA(path.c_str(), &ffd);
 	}
 
@@ -43,4 +46,8 @@ int listFiles(Controller* ctrl, const std::string dir) {
 	output.erase(output.end() - 1);
 	ctrl->sendOut(output.c_str());
 	return 0;
+}
+
+int removeFile(Controller* ctrl, const string path) {
+	return remove(path.c_str());
 }

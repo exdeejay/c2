@@ -1,12 +1,12 @@
-const { createPacket, logOutput } = require("../../../lib/packet");
-const server = require('../../server');
 const fs = require('fs');
-const PNG = require('pngjs').PNG;
 
+module.exports = function (commands) {
+	commands['screenshot'] = screenshot;
+}
 
-module.exports = async function (args) {
-    let packet = createPacket('host', 'command', 'screenshot');
-    await server.connectedServer.sendHostCommand(packet, async (response) => {
+async function screenshot(server, args) {
+    let packet = server.createPacket('host', 'command', 'screenshot');
+    await server.sendHostCommand(packet, async (response) => {
 		if (response.type.name == 'buffer') {
 			fs.writeFileSync('out.png', response.data);
 			console.log('Wrote image to out.png');
