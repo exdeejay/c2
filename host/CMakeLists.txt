@@ -37,4 +37,4 @@ target_include_directories(
 target_link_libraries(payload asio lodepng portaudio)
 #set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
 set_property(TARGET payload PROPERTY WIN32_EXECUTABLE $<IF:$<CONFIG:Debug>,OFF,ON>)
-target_compile_definitions(payload PUBLIC _WIN32_WINNT=0x0601 WIN32_LEAN_AND_MEAN $<$<NOT:$<CONFIG:Debug>>:WINGUI>)
+target_compile_definitions(payload PUBLIC ASIO_SEPARATE_COMPILATION _WIN32_WINNT=0x0601 WIN32_LEAN_AND_MEAN $<$<NOT:$<CONFIG:Debug>>:WINGUI>)
