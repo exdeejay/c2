@@ -1,6 +1,8 @@
-file(GLOB_RECURSE srcs "*.cpp")
+file(GLOB_RECURSE srcs "src/*.cpp")
 add_library(payload ${srcs})
-target_include_directories(payload PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(payload PUBLIC "include")
+set(include_dirs "src" "src/commands" "src/connection" "src/controller")
+target_include_directories(payload PRIVATE ${include_dirs})
 target_link_libraries(payload asio lodepng PortAudio snappy zlib)
 
 set_property(TARGET payload PROPERTY WIN32_EXECUTABLE $<IF:$<CONFIG:Debug>,OFF,ON>)
