@@ -1,10 +1,9 @@
-# Features to be implemented
+# c2
+
+## Features to be implemented
 
 - local tab completion
 - remote tab completion
-- compression of audio
-- compression of screenshots
-- compression of file upload/download
 - desktop video recording
 - process injection
 - remote updater
@@ -16,4 +15,13 @@
 - pipe output to local commands
 - execute remote programs
 - (?) built-in python/lua/other language interpreter
+
+## QoL things to update
+
+- compression of audio
+- compression of screenshots
+- compression of file upload/download
 - SSL encryption on the connection
+- CROSSZ PLATFORM???
+- changing symbols upon pwn
+- fun console stuff?

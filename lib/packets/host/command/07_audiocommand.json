@@ -1,6 +1,6 @@
 {
     "index": 7,
-    "name": "audiocontrol",
+    "name": "audiocommand",
     "data": {
 		"command": "int"
 	}

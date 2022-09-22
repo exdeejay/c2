@@ -5,7 +5,7 @@ module.exports = function (commands) {
 }
 
 async function screenshot(server, args) {
-    let packet = server.createPacket('host', 'command', 'screenshot');
+    let packet = server.createPacket('screenshot');
     await server.sendHostCommand(packet, async (response) => {
 		if (response.type.name == 'buffer') {
 			fs.writeFileSync('out.png', response.data);

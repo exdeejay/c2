@@ -13,8 +13,9 @@ async function lls(server, args) {
     }
     let files = await fs.readdir(path);
     for (let f of files) {
-        console.log(f);
+        process.stdout.write(f + '    ');
     }
+    console.log();
 }
 
 function lcd(server, args) {

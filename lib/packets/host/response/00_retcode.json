@@ -2,6 +2,6 @@
     "index": 0,
     "name": "retcode",
     "data": {
-        "code": "byte"
+        "code": "char"
     }
 }

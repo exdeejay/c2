@@ -16,7 +16,7 @@ async function ls(server, args) {
         return;
     }
 
-    let packet = server.createPacket('host', 'command', 'navigate');
+    let packet = server.createPacket('navigate');
     packet.command = COMMAND_LS;
     if (args.length == 2) {
         packet.path = args[1];
@@ -32,14 +32,14 @@ async function cd(server, args) {
         return;
     }
 
-    let packet = server.createPacket('host', 'command', 'navigate');
+    let packet = server.createPacket('navigate');
     packet.command = COMMAND_CD;
     packet.path = args[1];
     await server.sendHostCommand(packet);
 }
 
 async function pwd(server, args) {
-    let packet = server.createPacket('host', 'command', 'navigate');
+    let packet = server.createPacket('navigate');
 	packet.command = COMMAND_PWD;
 	packet.path = '';
     await server.sendHostCommand(packet);
@@ -51,7 +51,7 @@ async function rm(server, args) {
         return;
     }
 
-    let packet = server.createPacket('host', 'command', 'navigate');
+    let packet = server.createPacket('navigate');
     packet.command = COMMAND_RM;
     packet.path = args[1];
     await server.sendHostCommand(packet);

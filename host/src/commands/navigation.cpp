@@ -1,5 +1,6 @@
 #include "commands.h"
 
+#include <iostream>
 #include <cstdio>
 #include <cstring>
 #include <Windows.h>
@@ -20,19 +21,20 @@ int changeDir(Controller* ctrl, const string path) {
 }
 
 int listFiles(Controller* ctrl, const string path) {
-	string output;
 	WIN32_FIND_DATA ffd;
 	HANDLE hFind;
 	if (path.size() == 0) {
 		hFind = FindFirstFileA("*", &ffd);
 	} else {
-		string path = path + "\\*";
-		hFind = FindFirstFileA(path.c_str(), &ffd);
+		string searchpath = path + "\\*";
+		hFind = FindFirstFileA(searchpath.c_str(), &ffd);
 	}
 
 	if (hFind == INVALID_HANDLE_VALUE) {
 		return 1;
 	}
+	
+	string output;
 	do {
 		if (ffd.cFileName[0] == '.' &&
 				(ffd.cFileName[1] == '\0' ||
@@ -40,10 +42,10 @@ int listFiles(Controller* ctrl, const string path) {
 			continue;
 		}
 		output += reinterpret_cast<char*>(ffd.cFileName);
-		output += '\n';
+		output += "    ";
 	} while (FindNextFile(hFind, &ffd) != 0);
 	FindClose(hFind);
-	output.erase(output.end() - 1);
+	output.erase(output.end() - 4);
 	ctrl->sendOut(output.c_str());
 	return 0;
 }

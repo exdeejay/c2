@@ -21,7 +21,7 @@ int audioCallback(
 	return paContinue;
 }
 
-int audioControl(Controller* ctrl, AudioCommand cmd) {
+int audioCommand(Controller* ctrl, AudioCommand cmd) {
 	if (cmd == AudioCommand::start) {
 		if (stream != nullptr) {
 			return -1;

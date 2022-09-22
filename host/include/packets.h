@@ -11,10 +11,10 @@ enum class Packet {
 	stdIn,
 	getShell,
 	navigate,
-	UNUSED0,
+	discordCommand,
 	UNUSED1,
 	screenshot,
-	audioControl,
+	audioCommand,
 	downloadFile,
 	uploadFile
 };

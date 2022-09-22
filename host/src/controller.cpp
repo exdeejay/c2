@@ -33,11 +33,14 @@ void Controller::handleData(const vector<char>& buf) {
 					break;
 			}
 			break;
+		ECASE(Packet::discordCommand):
+			ret = discordCommand(this, (DiscordCommand) get<uint8_t>(buf, &offset));
+			break;
 		ECASE(Packet::screenshot):
 			ret = screenshot(this);
 			break;
-		ECASE(Packet::audioControl):
-			ret = audioControl(this, (AudioCommand) get<uint32_t>(buf, &offset));
+		ECASE(Packet::audioCommand):
+			ret = audioCommand(this, (AudioCommand) get<uint32_t>(buf, &offset));
 			break;
 		ECASE(Packet::downloadFile):
 			ret = downloadFile(this, get<string>(buf, &offset));

@@ -12,7 +12,7 @@ async function download(server, args) {
         return;
     }
 
-    let packet = server.createPacket('host', 'command', 'downloadfile');
+    let packet = server.createPacket('downloadfile');
     packet.path = args[1];
     let buffer;
     let ret = await server.sendHostCommand(packet, (response) => {
@@ -45,7 +45,7 @@ async function upload(server, args) {
     }
 
     try {
-        let packet = server.createPacket('host', 'command', 'uploadfile');
+        let packet = server.createPacket('uploadfile');
         packet.contents = await fs.readFile(args[1]);
         if (args.length == 3) {
             packet.path = args[2];
