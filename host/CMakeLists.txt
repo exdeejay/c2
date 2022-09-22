@@ -12,9 +12,12 @@ endif()
 
 set (CMAKE_CXX_STANDARD 17)
 add_compile_options(/MT)
+add_link_options(/NODEFAULTLIB:MSVCRT)
+add_compile_definitions(_WIN32_WINNT=0x0601)
 
-add_library(asio INTERFACE)
-target_include_directories(asio INTERFACE "${CMAKE_SOURCE_DIR}/lib/asio")
+add_library(asio "${CMAKE_SOURCE_DIR}/lib/asio/asio.cpp")
+target_include_directories(asio PUBLIC "${CMAKE_SOURCE_DIR}/lib/asio")
+target_compile_definitions(asio PRIVATE ASIO_SEPARATE_COMPILATION)
 
 add_library(lodepng "${CMAKE_SOURCE_DIR}/lib/lodepng/lodepng.cpp")
 target_include_directories(lodepng PUBLIC "${CMAKE_SOURCE_DIR}/lib/lodepng")
@@ -27,6 +30,10 @@ add_library(snappy STATIC IMPORTED)
 set_property(TARGET snappy PROPERTY IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/snappy/snappy.lib")
 target_include_directories(snappy INTERFACE "${CMAKE_SOURCE_DIR}/lib/snappy")
 
+add_library(zlib STATIC IMPORTED)
+set_property(TARGET zlib PROPERTY IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/zlib/zlibstatic.lib")
+target_include_directories(zlib INTERFACE "${CMAKE_SOURCE_DIR}/lib/zlib")
+
 
 file(GLOB_RECURSE srcs "src/*.cpp")
 add_library(payloadlib ${srcs})
@@ -38,8 +45,8 @@ target_include_directories(
     PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
-target_link_libraries(payloadlib asio lodepng portaudio snappy)
-target_compile_definitions(payloadlib PUBLIC ASIO_SEPARATE_COMPILATION _WIN32_WINNT=0x0601 WIN32_LEAN_AND_MEAN)
+target_link_libraries(payloadlib asio lodepng portaudio snappy zlib)
+target_compile_definitions(payloadlib PUBLIC WIN32_LEAN_AND_MEAN)
 
 add_executable(payload "main.cpp")
 target_link_libraries(payload payloadlib)

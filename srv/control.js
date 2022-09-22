@@ -32,7 +32,7 @@ class Controller {
 
     sendResponse(response) {
         let buffer = serializePacket('control', 'response', response);
-        this.connection.socket.write(buffer);
+        this.connection.write(buffer);
     }
 }
 

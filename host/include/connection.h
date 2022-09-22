@@ -1,28 +1,26 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#include <string>
-#include <mutex>
 #include <asio.hpp>
+#include <mutex>
+#include <string>
 
-typedef void (*callback_t)(const std::vector<char>&, void*);
+typedef void (*callback_t)(const std::vector<char> &, void *);
 
 class Connection {
-public:
-	Connection(const std::string host, const int port) : host(host), port(port), sock(ctx) {}
+  public:
+	Connection(const std::string host, const int port)
+		: host(host), port(port), sock(ctx) {}
 
 	void connect();
-	int read(callback_t callback, void* context);
-	void write(std::vector<char>& buf);
+	int read(callback_t callback, void *context);
+	void write(std::vector<char> &buf);
 
-	asio::error_code getLastError() {
-		return ec;
-	}
+	asio::error_code getLastError() { return ec; }
 
-	asio::ip::tcp::socket& getSocket() {
-		return sock;
-	}
-private:
+	asio::ip::tcp::socket &getSocket() { return sock; }
+
+  private:
 	std::string host;
 	int port;
 

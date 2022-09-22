@@ -27,10 +27,11 @@ class Server extends EventEmitter {
     }
 
     handleResponse(packet) {
-        if (typeof packet === 'str' && packet == 'abort') {
+        if (typeof packet === 'string' && packet == 'abort') {
             let abortPkt = _createPacket('host', 'response', 'retcode');
             abortPkt.retcode = -999;
             this.emit('hostpacket', abortPkt);
+            return;
         }
 
         if (packet.type.name == 'newpwn') {
@@ -90,7 +91,7 @@ class Server extends EventEmitter {
 
     sendCommand(packet) {
         let buf = serializePacket('control', 'command', packet);
-        this.connection.socket.write(buf);
+        this.connection.write(buf);
     }
 }
 

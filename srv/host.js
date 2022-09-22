@@ -27,7 +27,7 @@ class Host {
     }
 
     sendCommand(command) {
-        this.connection.socket.write(command);
+        this.connection.write(command);
     }
 }
 

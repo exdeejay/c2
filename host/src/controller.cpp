@@ -12,7 +12,6 @@ using namespace std;
 
 void Controller::handleData(const vector<char>& buf) {
 	int offset = 0;
-	uint32_t size = get<uint32_t>(buf, &offset);
 	uint8_t command = get<uint8_t>(buf, &offset);
 	
 	int ret;
@@ -64,7 +63,6 @@ void Controller::handleData(const vector<char>& buf) {
 
 void Controller::ret(int code) {
 	vector<char> buf;
-	writeUInt32(buf, 2);
 	buf.push_back(0);
 	buf.push_back(code);
 	conn->write(buf);
@@ -72,7 +70,6 @@ void Controller::ret(int code) {
 
 void Controller::sendOut(const string out) {
 	vector<char> buf;
-	writeUInt32(buf, 1 + 4+out.size());
 	buf.push_back(1);
 	writeString(buf, out);
 	conn->write(buf);
@@ -80,7 +77,6 @@ void Controller::sendOut(const string out) {
 
 void Controller::sendErr(const string err) {
 	vector<char> buf;
-	writeUInt32(buf, 1 + 4+err.size());
 	buf.push_back(2);
 	writeString(buf, err);
 	conn->write(buf);
@@ -88,7 +84,6 @@ void Controller::sendErr(const string err) {
 
 void Controller::sendBuffer(const char* data, size_t size) {
 	vector<char> buf;
-	writeUInt32(buf, 1 + 4+size);
 	buf.push_back(3);
 	writeBuffer(buf, data, size);
 	conn->write(buf);
@@ -96,7 +91,6 @@ void Controller::sendBuffer(const char* data, size_t size) {
 
 void Controller::sendBuffer(const vector<char>& data) {
 	vector<char> buf;
-	writeUInt32(buf, 1 + 4+data.size());
 	buf.push_back(3);
 	writeBuffer(buf, data);
 	conn->write(buf);
@@ -113,7 +107,6 @@ void Controller::flushAudioBuffer() {
 		if (audioQueue.size() > 0) {
 			int size = audioQueue.size();
 			vector<char> buf;
-			writeUInt32(buf, 1 + 4+size);
 			buf.push_back(4);
 			writeUInt32(buf, size);
 			for (int i = 0; i < size; i++) {

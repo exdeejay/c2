@@ -18,7 +18,7 @@ async function main() {
 
         server = new Server(sock);
         process.on('SIGINT', () => {
-            server.handleData('abort');
+            server.handleResponse('abort');
         });
 
         if (process.stdin.isTTY) {
