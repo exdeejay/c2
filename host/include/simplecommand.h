@@ -5,6 +5,7 @@
 #include <vector>
 #include <typeinfo>
 #include <functional>
+#include <cstdint>
 #include "controller.h"
 #include "packet.h"
 #include "field.h"
@@ -54,7 +55,7 @@ namespace c2 {
 template<class... Args>
 class CommandPacket : public Packet {
 public:
-    CommandPacket(unsigned char type, int(*proc)(Controller&, Args...), const std::vector<char>& data) : Packet(type) {
+    CommandPacket(uint8_t type, int(*proc)(Controller&, Args...), const std::vector<uint8_t>& data) : Packet(type) {
         bound_proc = c2::FnCaller<Args...>::bind_fn(data.cbegin(), data.cend(), proc);
     }
 
@@ -64,14 +65,11 @@ public:
 
     SerializedPacket serialize() const {
         //TODO: implement this
-        return SerializedPacket(_type, std::move(std::make_unique<std::vector<char>>()));
+        return SerializedPacket(_type, std::vector<uint8_t>>());
     }
 
-    static void build(
-        unsigned char type,
-        int(*proc)(Controller&, Args...)
-    ) {
-        Packet::register_type(type, [type, proc](const std::vector<char>& data) {
+    static void build(uint8_t type, int(*proc)(Controller&, Args...)) {
+        Packet::register_type(type, [type, proc](const std::vector<uint8_t>& data) {
             return std::make_unique<CommandPacket>(type, proc, data);
         });
         Packet::register_handler(type, [](Controller& ctrl, Packet& pkt) {
@@ -85,8 +83,6 @@ private:
     std::function<int(Controller&)> bound_proc;
 };
 
-template<class... Args> void register_command(unsigned char type, int(*command)(Controller&, Args...)) {
-    CommandPacket<Args...>::build(type, command);
-}
+
 
 #endif

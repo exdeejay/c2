@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <thread>
+#include <cstdint>
 #include "controllerimpl.h"
 #include "packet.h"
 #include "simplepacket.h"
@@ -22,7 +23,7 @@ using namespace std;
  * Registers all commands as incoming packet types and handlers.
  */
 void register_all_commands() {
-    register_command(3, navigation);
+	register_command(3, navigation);
 	register_command(4, discordCommand);
 	register_command(5, exec);
 	register_command(6, screenshot);
@@ -34,7 +35,7 @@ void register_all_commands() {
 	register_command(12, showoff);
 }
 
-Controller::Controller(string host, short port) : impl(make_unique<ControllerImpl>()) {
+Controller::Controller(string host, uint16_t port) : impl(make_unique<ControllerImpl>()) {
 	register_all_commands();
 }
 
@@ -47,28 +48,28 @@ void Controller::run() {
 	}
 }
 
-void Controller::ret(char retcode) {
-	SimplePacket<char> pkt(0, retcode);
+void Controller::ret(uint8_t retcode) {
+	SimplePacket<uint8_t> pkt(0, retcode);
 	conn->write_packet_sync(pkt.serialize());
 }
 
 void Controller::print(string out) {
- 	SimplePacket<string> pkt(1, out);
- 	conn->write_packet_sync(pkt.serialize());
+	SimplePacket<string> pkt(1, out);
+	conn->write_packet_sync(pkt.serialize());
 }
 
 void Controller::println(string out) {
 	out += "\n";
- 	print(out);
+	print(out);
 }
 
 void Controller::err_println(string err) {
- 	SimplePacket<string> pkt(2, err);
- 	conn->write_packet_sync(pkt.serialize());
+	SimplePacket<string> pkt(2, err);
+	conn->write_packet_sync(pkt.serialize());
 }
 
-void Controller::send_buffer(const vector<char> buf) {
-	SimplePacket<vector<char>> pkt(3, buf);
+void Controller::send_buffer(const vector<uint8_t> buf) {
+	SimplePacket<vector<uint8_t>> pkt(3, buf);
 	conn->write_packet_sync(pkt.serialize());
 }
 

@@ -1,9 +1,11 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
+#include <cstdint>
 #include <vector>
 #include <memory>
 #include <string>
+#include <functional>
 
 class ControllerImpl;
 
@@ -26,7 +28,7 @@ public:
 	/**
 	 * Sends `ret` packet with `retcode`
 	 */
-	void ret(char retcode);
+	void ret(uint8_t retcode);
 
 	/**
 	 * Sends `out` packet
@@ -46,12 +48,37 @@ public:
 	/**
 	 * Sends `buffer` packet
 	 */
-	void send_buffer(const std::vector<char> buf);
+	void send_buffer(const std::vector<uint8_t> buf);
 
 	// /**
 	//  * Sends `audio` packet
 	//  */
 	// void buffer_audio(const char* buf, size_t size);
+
+	template<class... Args> void register_command(unsigned char type, int(*command)(Controller&, Args...)) {
+		CommandPacket<Args...>::build(type, command);
+	}
+
+
+	void register_type(uint8_t type, std::function<Packet(const std::vector<uint8_t>&)> builder);
+	// {
+	// 	registry[type] = builder;
+	// }
+
+	void register_handler(uint8_t type, std::function<bool(Controller&, Packet&)> handler);
+	// {
+	// 	handlers.insert(make_pair(type, handler));
+	// }
+
+	void handle_packet(Packet& pkt);
+	// {
+	// 	auto range = handlers.equal_range(pkt.type());
+	// 	for (auto i = range.first; i != range.second; i++) {
+	// 		if (!i->second(ctrl, pkt)) {
+	// 			return;
+	// 		}
+	// 	}
+	// }
 
 private:
 	std::unique_ptr<ControllerImpl> impl;

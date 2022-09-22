@@ -2,15 +2,15 @@
 #define CONNECTION_H
 
 #include <asio.hpp>
-#include <mutex>
 #include <string>
+#include <cstdint>
 
 /**
  * Wraps an ASIO TCP connection.
  */
 class Connection {
 public:
-	Connection(const std::string host, int port)
+	Connection(const std::string host, uint16_t port)
 		: host(host), port(port), sock(ctx) {}
 
 	void connect() {
@@ -19,7 +19,7 @@ public:
 		asio::connect(sock, endpoints);
 	}
 
-	int read(char* buf, int len) {
+	int read(uint8_t* buf, int len) {
 		size_t bytes = sock.read_some(asio::buffer(buf, len), ec);
 		if (ec == asio::error::eof) {
 			return -1;
@@ -29,7 +29,7 @@ public:
 		return bytes;
 	}
 
-	int write(const char* buf, int len) {
+	int write(const uint8_t* buf, int len) {
 		return asio::write(sock, asio::buffer(buf, len), ec);
 	}
 
@@ -38,7 +38,7 @@ public:
 
 private:
 	std::string host;
-	int port;
+	uint16_t port;
 
 	asio::io_context ctx;
 	asio::ip::tcp::socket sock;

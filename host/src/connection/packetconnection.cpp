@@ -2,6 +2,7 @@
 #include <vector>
 #include <exception>
 #include <iostream>
+#include <cstdint>
 
 #include <zlib.h>
 #include "packet.h"
@@ -10,7 +11,7 @@
 
 using namespace std;
 
-PacketConnection::PacketConnection(string host, short port) : impl(make_unique<PacketConnectionImpl>(host, port)) {}
+PacketConnection::PacketConnection(string host, uint16_t port) : impl(make_unique<PacketConnectionImpl>(host, port)) {}
 
 void PacketConnection::connect() {
     impl->conn.connect();
@@ -22,8 +23,8 @@ SerializedPacket PacketConnection::read_packet_sync() {
             impl->compressed_len = Field<uint32_t>::parse_field(impl->buf.cbegin(), impl->buf.cend());
         }
         if (impl->compressed_len != -1 && impl->buf.size() >= impl->compressed_len + 4) {
-            unique_ptr<vector<char>> deflated = make_unique<vector<char>>();
-            char deflateBuf[1024];
+            vector<uint8_t> deflated;
+            uint8_t deflateBuf[1024];
 
             z_stream stream;
             stream.zalloc = Z_NULL;
@@ -36,7 +37,7 @@ SerializedPacket PacketConnection::read_packet_sync() {
             stream.avail_in = impl->compressed_len;
             stream.next_in = (Bytef*) impl->buf.data() + 4;
             bool valid = true;
-            unsigned char packet_type = 0;
+            uint8_t packet_type = 0;
             do {
                 stream.avail_out = sizeof(deflateBuf);
                 stream.next_out = (Bytef*) deflateBuf;
@@ -47,11 +48,11 @@ SerializedPacket PacketConnection::read_packet_sync() {
                 }
 
                 int type_offset = 0;
-                if (deflated->size() == 0 && stream.avail_out != sizeof(deflateBuf)) {
+                if (deflated.size() == 0 && stream.avail_out != sizeof(deflateBuf)) {
                     packet_type = deflateBuf[0];
                     type_offset = 1;
                 }
-                deflated->insert(deflated->end(), deflateBuf + type_offset, deflateBuf + (sizeof(deflateBuf) - stream.avail_out));
+                deflated.insert(deflated.end(), deflateBuf + type_offset, deflateBuf + (sizeof(deflateBuf) - stream.avail_out));
             } while (stream.avail_out == 0);
             inflateEnd(&stream);
 
@@ -63,20 +64,20 @@ SerializedPacket PacketConnection::read_packet_sync() {
             }
             return SerializedPacket(packet_type, move(deflated));
         }
-        char pbuf[1024];
+        uint8_t pbuf[1024];
         int bytes = impl->conn.read(pbuf, sizeof(pbuf));
         impl->buf.insert(impl->buf.end(), pbuf, pbuf + bytes);
     }
 }
 
 void PacketConnection::write_packet_sync(const SerializedPacket& spkt) {
-    vector<char> data;
+    vector<uint8_t> data;
     data.push_back(spkt.type);
-    data.insert(data.end(), spkt.data->begin(), spkt.data->end());
-	vector<char> out;
+    data.insert(data.end(), spkt.data.begin(), spkt.data.end());
+	vector<uint8_t> out;
     out.resize(4);
 
-	char buf[1024];
+	uint8_t buf[1024];
 	z_stream stream;
 	stream.zalloc = Z_NULL;
 	stream.zfree = Z_NULL;
@@ -92,7 +93,7 @@ void PacketConnection::write_packet_sync(const SerializedPacket& spkt) {
 	} while (stream.avail_out == 0);
 	deflateEnd(&stream);
 
-	unsigned int size = byteswap32(out.size() - 4);
+	uint32_t size = byteswap32(out.size() - 4);
 	out[0] = size & 0xFF;
 	out[1] = (size >> 8) & 0xFF;
 	out[2] = (size >> 16) & 0xFF;

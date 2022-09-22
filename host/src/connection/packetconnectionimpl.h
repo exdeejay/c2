@@ -5,12 +5,11 @@
 #include <vector>
 #include <mutex>
 #include <string>
-
-class Connection
+#include "connection.h"
 
 class PacketConnectionImpl {
 public:
-    PacketConnectionImpl(std::string host, short port) : conn(host, port) {}
+    PacketConnectionImpl(std::string host, uint16_t port) : conn(host, port) {}
 
     Connection conn;
     int compressed_len = -1;

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include <cstdint>
 #include "packet.h"
 
 class SerializedPacket;
@@ -18,7 +19,7 @@ public:
      * Creates a wrapped Connection object, but does not attempt connection.
      * Call `connect()` to connect to host.
      */
-    PacketConnection(const std::string host, int port);
+    PacketConnection(const std::string host, uint16_t port);
 
     /**
      * Calls `connect()` on wrapped connection object.
