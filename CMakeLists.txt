@@ -26,3 +26,6 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/host/src
 )
 target_link_libraries(payload asio)
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
+target_compile_options(payload PUBLIC /MT)
+target_link_options(payload PUBLIC /INCREMENTAL:NO /NODEFAULTLIB:MSVCRT)

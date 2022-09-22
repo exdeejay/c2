@@ -21,11 +21,11 @@ class Host {
     handleResponse(packet) {
         let wrappedPkt = {
             type: packet_types.control.response.find(
-                (pkt) => pkt.name == 'hostresponse'
+                (pkt) => pkt != null && pkt.name == 'hostresponse'
             ),
             data: JSON.stringify(packet),
         };
-        controllers[0].sendCommand(wrappedPkt);
+        controllers[0].sendResponse(wrappedPkt);
     }
 
     sendCommand(command) {
@@ -41,10 +41,14 @@ function handleIncomingHost(socket) {
     let host = new Host(socket);
     let index = hosts.push(host) - 1;
     socket.on('close', () => {
-        hosts.slice(index, 1);
+        console.log(`Host ${index} disconnected`);
+        hosts.splice(index, 1);
+    });
+    socket.on('error', () => {
+        console.log(`Host ${index} forcibly exited`);
     });
     console.log(`Pwned ${socket.address().address} ;)`);
 }
 
-exports.Host = Host;
+exports.hosts = hosts;
 exports.handleIncomingHost = handleIncomingHost;

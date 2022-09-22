@@ -1,14 +1,15 @@
-const { Server } = require('http');
 const net = require('net');
 const readline = require('readline');
+const { loadPacketTypes } = require('../lib/protocol');
 const registry = require('./registry');
 const server = require('./server');
 const Server = server.Server;
 
 async function main() {
+    await loadPacketTypes();
     await registry.loadCommands();
 
-    let sock = net.connect(6997);
+    let sock = net.connect(5678);
     sock.on('connect', () => {
         console.log(
             `Connected to ${sock.address().address}:${sock.address().port}`
@@ -19,7 +20,7 @@ async function main() {
         const rl = readline.createInterface(process.stdin, process.stdout);
     
         rl.prompt();
-        rl.on('line', (line) => {
+        rl.on('line', async (line) => {
             let args = line.split(' ');
             if (!(args[0] in registry.commands)) {
                 console.log('Unknown command.');
@@ -31,7 +32,7 @@ async function main() {
     });
 
     sock.on('error', (err) => {
-        console.err(`ERR -- error while connecting to host: ${err}`);
+        console.error(`ERR -- error while connecting to host: ${err}`);
     });
 
     sock.on('timeout', () => {

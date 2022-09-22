@@ -6,6 +6,7 @@ const { once, emit } = require('process');
 
 class Server extends EventEmitter {
     constructor(socket) {
+        super();
         this.connection = new PacketConnection(socket);
         this.connection.on('packet', (data) => {
             let packet = parsePacket('control', 'response', data);
@@ -16,22 +17,27 @@ class Server extends EventEmitter {
         });
     }
 
+    close() {
+        this.connection.socket.destroy();
+    }
+
     handleResponse(packet) {
         if (packet.type.name == 'hostresponse') {
-            emit('hostresponse', packet);
+            this.emit('hostresponse', packet);
         }
     }
 
     async sendHostCommand(packet) {
         let wrappedPkt = {
             type: packet_types.control.command.find(
-                (pkt) => pkt.name == 'relaycommand'
+                (pkt) => pkt != null && pkt.name == 'relaycommand'
             ),
-            data: JSON.stringify(packet),
+            id: 0, // TODO: fill in host id
+            command: JSON.stringify(packet),
         };
         return new Promise((resolve) => {
-            sendCommand(wrappedPkt).then((response) => {
-                resolve(response.data);
+            this.sendCommand(wrappedPkt).then((response) => {
+                resolve(JSON.parse(response.data));
             });
         });
     }
@@ -39,7 +45,7 @@ class Server extends EventEmitter {
     async sendCommand(packet) {
         let buf = serializePacket('control', 'command', packet);
         return new Promise((resolve) => {
-            once('hostresponse', resolve);
+            this.once('hostresponse', resolve);
             this.connection.socket.write(buf);
         });
     }
@@ -49,3 +55,4 @@ class Server extends EventEmitter {
  * @type Server
  */
 exports.connectedServer = null;
+exports.Server = Server;
