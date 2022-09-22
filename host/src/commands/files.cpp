@@ -1,4 +1,5 @@
-#include "commands.h"
+#include "basecommand.h"
+#include "field.h"
 #include <vector>
 #include <iostream>
 #include <fstream>

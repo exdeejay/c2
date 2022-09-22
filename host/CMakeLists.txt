@@ -50,4 +50,4 @@ set_property(TARGET payload PROPERTY WIN32_EXECUTABLE $<IF:$<CONFIG:Debug>,OFF,O
 target_compile_definitions(payload PUBLIC $<$<NOT:$<CONFIG:Debug>>:WINGUI>)
 
 add_executable(test "test/test.cpp")
-target_link_libraries(test payloadlib)
+#target_link_libraries(test payloadlib)

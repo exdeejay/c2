@@ -11,8 +11,16 @@
 #include "commands.h"
 using namespace std;
 
+/**
+ * Lock-free queue to hold audio data from mic.
+ * Used to store data without processing it in the high-priority audio thread.
+ * Flushed every so often to the server.
+ */
 boost::lockfree::spsc_queue<char, boost::lockfree::capacity<8192>> audio_buf;
 
+/**
+ * Registers all commands as incoming packet types and handlers.
+ */
 void register_all_commands() {
     register_command(3, navigation);
 	register_command(4, discordCommand);
@@ -26,7 +34,7 @@ void register_all_commands() {
 	register_command(12, showoff);
 }
 
-void Controller::init() {
+Controller::Controller(unique_ptr<PacketConnection> conn) : conn(std::move(conn)) {
 	register_all_commands();
 }
 
@@ -49,7 +57,7 @@ void Controller::flush_audio_buffer() {
 void Controller::loop() {
 	thread audio_flush_thread(&Controller::flush_audio_buffer, this);
 	while (true) {
-		SerializedPacket spkt = conn->read_packet();
+		SerializedPacket spkt = conn->read_packet_sync();
 		Packet::handle_packet(*this, *Packet::parse(spkt).get());
 	}
 }

@@ -5,6 +5,9 @@
 #include <mutex>
 #include <string>
 
+/**
+ * Wraps an ASIO TCP connection.
+ */
 class Connection {
 public:
 	Connection(const std::string host, int port)

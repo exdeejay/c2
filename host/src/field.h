@@ -4,7 +4,7 @@
 #include <vector>
 #include <cstdint>
 #include <string>
-#include "commands.h"
+#include "commandtypes.h"
 
 using iter_t = std::vector<char>::const_iterator;
 
@@ -60,23 +60,22 @@ public:
 	static void serialize_field(const std::string& val, std::vector<char>& buf);
 };
 
-enum class DiscordCommand;
-template<> class Field<DiscordCommand> {
-public:
-	static DiscordCommand parse_field(iter_t& buf, const iter_t& end);
-	static void serialize_field(const DiscordCommand& val, std::vector<char>& buf);
-};
-enum class AudioCommand;
-template<> class Field<AudioCommand> {
-public:
-	static AudioCommand parse_field(iter_t& buf, const iter_t& end);
-	static void serialize_field(const AudioCommand& val, std::vector<char>& buf);
-};
-enum class ShowoffCommand;
-template<> class Field<ShowoffCommand> {
-public:
-	static AudioCommand parse_field(iter_t& buf, const iter_t& end);
-	static void serialize_field(const ShowoffCommand& val, std::vector<char>& buf);
-};
+
+#define PARSE_ENUM(x) \
+	enum class x; \
+	template<> class Field<x> { \
+		public: \
+			static x parse_field(iter_t& buf, const iter_t& end) { \
+				return static_cast<x>(Field<unsigned char>::parse_field(buf, end)); \
+			} \
+			static void serialize_field(const x& val, std::vector<char>& buf) { \
+				Field<unsigned char>::serialize_field((unsigned char) val, buf); \
+			} \
+	};
+
+PARSE_ENUM(DiscordCommand)
+PARSE_ENUM(AudioCommand)
+PARSE_ENUM(ShowoffCommand)
+
 
 #endif

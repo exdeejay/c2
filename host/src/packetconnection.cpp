@@ -11,7 +11,7 @@ void PacketConnection::connect() {
     conn->connect();
 }
 
-SerializedPacket PacketConnection::read_packet() {
+SerializedPacket PacketConnection::read_packet_sync() {
     while (true) {
         if (compressed_len == -1 && buf.size() >= 4) {
             compressed_len = Field<uint32_t>::parse_field(buf.cbegin(), buf.cend());

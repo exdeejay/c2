@@ -1,4 +1,4 @@
-#include "commands.h"
+#include "basecommand.h"
 #include <iostream>
 #include <cstdio>
 #include <cstring>
@@ -7,22 +7,6 @@
 #include "util.h"
 #include "field.h"
 using namespace std;
-
-int navigation(Controller& ctrl, unsigned char cmd, string path) {
-	switch (cmd) {
-		case 0:
-			return listFiles(ctrl, path);
-		case 1:
-			return changeDir(ctrl, path);
-		case 2:
-			return pwd(ctrl);
-		case 3:
-			return removeFile(ctrl, path);
-		default:
-			throw new exception("invalid navigation command");
-		return -1;
-	}
-}
 
 int pwd(Controller& ctrl) {
 	DWORD length = GetCurrentDirectoryA(0, nullptr);
@@ -73,4 +57,20 @@ int listFiles(Controller& ctrl, const string path) {
 
 int removeFile(Controller& ctrl, const string path) {
 	return remove(path.c_str());
+}
+
+int navigation(Controller& ctrl, unsigned char cmd, string path) {
+	switch (cmd) {
+		case 0:
+			return listFiles(ctrl, path);
+		case 1:
+			return changeDir(ctrl, path);
+		case 2:
+			return pwd(ctrl);
+		case 3:
+			return removeFile(ctrl, path);
+		default:
+			throw new exception("invalid navigation command");
+		return -1;
+	}
 }

@@ -1,8 +1,8 @@
-#include "commands.h"
 #include <iostream>
 #include <string>
 #include <vector>
 #include <portaudio.h>
+#include "basecommand.h"
 using namespace std;
 
 #define CHECK_ERR(fn) status = fn; if (status != paNoError) { ctrl.err_println(Pa_GetErrorText(status)); return status; }

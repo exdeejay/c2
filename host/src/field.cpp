@@ -51,25 +51,3 @@ void Field<string>::serialize_field(const string& val, vector<char>& buf) {
 		buf.push_back(c);
 	}
 }
-
-
-DiscordCommand Field<DiscordCommand>::parse_field(iter_t& buf, const iter_t& end) {
-	return static_cast<DiscordCommand>(Field<unsigned char>::parse_field(buf, end));
-}
-void Field<DiscordCommand>::serialize_field(const DiscordCommand& val, vector<char>& buf) {
-	Field<unsigned char>::serialize_field((unsigned char) val, buf);
-}
-
-AudioCommand Field<AudioCommand>::parse_field(iter_t& buf, const iter_t& end) {
-	return static_cast<AudioCommand>(Field<unsigned char>::parse_field(buf, end));
-}
-void Field<AudioCommand>::serialize_field(const AudioCommand& val, vector<char>& buf) {
-	Field<unsigned char>::serialize_field((unsigned char) val, buf);
-}
-
-ShowoffCommand Field<ShowoffCommand>::parse_field(iter_t& buf, const iter_t& end) {
-	return static_cast<ShowoffCommand>(Field<unsigned char>::parse_field(buf, end));
-}
-void Field<ShowoffCommand>::serialize_field(const ShowoffCommand& val, vector<char>& buf) {
-	Field<unsigned char>::serialize_field((unsigned char) val, buf);
-}

