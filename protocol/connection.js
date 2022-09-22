@@ -2,7 +2,7 @@ const zlib = require('zlib');
 const { Socket } = require('net');
 const EventEmitter = require('events');
 
-class PacketConnection extends EventEmitter {
+class ZlibConnection extends EventEmitter {
     /**
      * @param {Socket} socket
      */
@@ -15,7 +15,7 @@ class PacketConnection extends EventEmitter {
     }
 
     /**
-     * @event packet
+     * @event data
      * @type {Buffer}
      */
     /**
@@ -36,8 +36,8 @@ class PacketConnection extends EventEmitter {
                 let compressed = data.slice(0, this.nextPacketSize + 4);
                 compressed = compressed.slice(4);
                 data = data.slice(this.nextPacketSize + 4);
-                let packet = zlib.inflateSync(compressed);
-                this.emit('packet', packet);
+                let decompressed = zlib.inflateSync(compressed);
+                this.emit('data', decompressed);
                 this.nextPacketSize = -1;
             } else {
                 this.buffer = Buffer.from(data);
@@ -46,6 +46,10 @@ class PacketConnection extends EventEmitter {
         }
     }
 
+    /**
+     * Write data to connection
+     * @param {Buffer} data
+     */
     write(data) {
         let compressed = zlib.deflateSync(data);
         let lengthBuf = Buffer.alloc(4);
@@ -55,4 +59,4 @@ class PacketConnection extends EventEmitter {
     }
 }
 
-exports.PacketConnection = PacketConnection;
+exports.ZlibConnection = ZlibConnection;

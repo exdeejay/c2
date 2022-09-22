@@ -1,5 +1,5 @@
 const { Socket } = require('net');
-const { PacketConnection } = require('../protocol/connection');
+const { ZlibConnection } = require('../protocol/connection');
 const { createPacket, parsePacket, serializePacket } = require('../protocol/packet');
 const host = require('./host');
 
@@ -13,8 +13,8 @@ class Controller {
      * @param {Socket} socket
      */
     constructor(socket) {
-        this.connection = new PacketConnection(socket);
-        this.connection.on('packet', (data) => {
+        this.connection = new ZlibConnection(socket);
+        this.connection.on('data', (data) => {
             //TODO: validate json-parsed packet
             this.handleCommand(JSON.parse(data.toString()));
         });
