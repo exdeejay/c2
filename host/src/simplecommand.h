@@ -4,31 +4,46 @@
 #include <memory>
 #include <vector>
 #include <typeinfo>
+#include <functional>
 #include "controller.h"
 #include "packet.h"
 
 
 namespace c2 {
-    template<class...> struct FnCaller;
-    template<class T, class... Args> struct FnCaller<T, Args...> {
-        template<class... Accum> static int call_fn(
+    template<class...> class FnCaller;
+    template<class T, class... Args> class FnCaller<T, Args...> {
+    public:
+        static std::function<int(Controller&)> bind_fn(
+            std::vector<char>& data,
+            int(*fn)(Controller&, T, Args...)
+        ) {
+            return FnCaller<Args...>::bind_fn(data, (void*)fn);
+        }
+    private:
+        template<class... Accum> static std::function<int(Controller&)> bind_fn(
             std::vector<char>& data,
             void* fn,
-            Controller& ctrl,
             Accum... accumulated_args
         ) {
-            return FnCaller<Args...>::call_fn(data, fn, ctrl, accumulated_args..., parse_field<T>(data));
+            return FnCaller<Args...>::bind_fn(data, fn, accumulated_args..., parse_field<T>(data));
         }
     };
-    template<> struct FnCaller<> {
-        template<class... Accum> static int call_fn(
+    template<> class FnCaller<> {
+    public:
+        static std::function<int(Controller&)> bind_fn(
+            std::vector<char>& data,
+            int(*fn)(Controller&)
+        ) {
+            return FnCaller<>::bind_fn(data, (void*)fn);
+        }
+    private:
+        template<class... Accum> static std::function<int(Controller&)> bind_fn(
             std::vector<char>& data,
             void* fn,
-            Controller& ctrl,
             Accum... accumulated_args
         ) {
-            int(*proc)(Accum...) = (int(*)(Controller&, Accum...)) fn;
-            return proc(ctrl, accumulated_args...);
+            int(*proc)(Controller&, Accum...) = (int(*)(Controller&, Accum...)) fn;
+            return std::bind(proc, std::placeholders::_1, accumulated_args...);
         }
     };
 }
@@ -36,26 +51,40 @@ namespace c2 {
 template<class... Args>
 class CommandPacket : public Packet {
 public:
-    CommandPacket(int(*proc)(Args...)) : proc(proc) {
-
+    CommandPacket(unsigned char type, int(*proc)(Args...)) : _type(type) {
+        bound_proc = c2::FnCaller<Args...>::bind_fn(data, proc);
     }
 
-    static std::unique_ptr<Packet> build(
+    int execute(Controller& ctrl) {
+        return bound_proc(ctrl);
+    }
+
+    unsigned char type() {
+        return _type;
+    }
+
+    static std::function<std::unique_ptr<Packet>(const std::vector<char>&)> build(
         unsigned char type,
-        int(*proc)(Controller&, Args...),
-        Controller& ctrl,
-        std::vector<char>& data
+        int(*proc)(Controller&, Args...)
     ) {
-        return std::make_unique<CommandPacket>();
-        c2::FnCaller<Args...>::call_fn(data, (void*) proc, ctrl);
+
+        Packet::register_type(type, [type, proc](const std::vector<char>&) {
+            return make_unique<CommandPacket>(type, proc);
+        });
+        Packet::register_handler(type, [](Controller& ctrl, Packet& pkt) {
+            CommandPacket& cmdpkt = dynamic_cast<CommandPacket>(pkt);
+            cmdpkt.execute(ctrl);
+            return true;
+        });
     }
 
 private:
-    int(*proc)(Args...);
+    unsigned char _type;
+    std::function<int(Controller&)> bound_proc;
 };
 
 template<class... Args> void register_command(unsigned char type, std::unique_ptr<Packet>(*command)(Args...)) {
-    Packet::register_type(type, std::bind(CommandPacket::build, type, command, _1, _2));
+    Packet::register_type(type, CommandPacket::build(type, command));
 }
 
 #endif

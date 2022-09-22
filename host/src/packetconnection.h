@@ -7,6 +7,7 @@
 #include "packet.h"
 #include "connection.h"
 
+class SerializedPacket;
 class PacketConnection {
 public:
     PacketConnection(const std::string host, int port) {
