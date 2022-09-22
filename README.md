@@ -9,7 +9,6 @@
 - remote updater
 - crypter to bypass AV
 - GUI in general
-- grab discord token
 - keylogging
 - coreutils replacements
 - pipe output to local commands

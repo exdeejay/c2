@@ -5,6 +5,8 @@
 #include <cstring>
 #include <Windows.h>
 
+#include "util.h"
+
 using namespace std;
 
 
@@ -16,7 +18,11 @@ int pwd(Controller* ctrl) {
 }
 
 int changeDir(Controller* ctrl, const string path) {
-	SetCurrentDirectoryA(path.c_str());
+	BOOL result = SetCurrentDirectoryA(path.c_str());
+	if (!result) {
+		ctrl->sendErr(getWin32ErrorString());
+		return -1;
+	}
 	return 0;
 }
 
@@ -42,10 +48,10 @@ int listFiles(Controller* ctrl, const string path) {
 			continue;
 		}
 		output += reinterpret_cast<char*>(ffd.cFileName);
-		output += "    ";
+		output += "\n";
 	} while (FindNextFile(hFind, &ffd) != 0);
 	FindClose(hFind);
-	output.erase(output.end() - 4);
+	output.erase(output.end() - 1);
 	ctrl->sendOut(output.c_str());
 	return 0;
 }

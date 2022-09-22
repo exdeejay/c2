@@ -1,0 +1,8 @@
+{
+    "index": 5,
+    "name": "exec",
+    "data": {
+        "cmd": "str",
+        "wait": "byte"
+    }
+}

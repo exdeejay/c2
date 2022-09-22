@@ -34,6 +34,6 @@ void writeUInt32(std::vector<char>& buf, uint32_t val);
 void writeString(std::vector<char>& buf, const std::string& str);
 void writeBuffer(std::vector<char>& buf, const char* data, size_t size);
 void writeBuffer(std::vector<char>& buf, const std::vector<char>& data);
-
+std::string getWin32ErrorString();
 
 #endif

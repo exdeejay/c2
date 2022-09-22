@@ -60,7 +60,9 @@ async function readline() {
                     buf.splice(idx, 0, String(char));
                     idx++;
                     if (idx != buf.length) {
-                        process.stdout.write(buf.slice(idx, buf.length).join(''));
+                        process.stdout.write(
+                            buf.slice(idx, buf.length).join('')
+                        );
                         process.stdout.moveCursor(idx - buf.length, 0);
                     }
             }
@@ -70,7 +72,7 @@ async function readline() {
 }
 
 /**
- * @param {string} line 
+ * @param {string} line
  * @returns array
  */
 function parseArgs(line) {
@@ -79,20 +81,22 @@ function parseArgs(line) {
     let collecting = false;
     let collect = [];
     for (let w of words) {
-
-        if (collecting) {
-            collect.push(w);
-            if (w.endsWith('"')) {
-                args.push(collect.join(' ').slice(1, -1));
+        if (w.length != 0) {
+            if (collecting) {
+                collect.push(w);
+                if (w.endsWith('"')) {
+                    args.push(collect.join(' ').slice(1, -1));
+                }
+                continue;
             }
-            continue;
+            if (w.startsWith('"')) {
+                collecting = true;
+                collect.push(w);
+                continue;
+            }
+
+            args.push(w);
         }
-        if (w.startsWith('"')) {
-            collecting = true;
-            collect.push(w);
-            continue;
-        }
-        args.push(w);
     }
     return args;
 }
