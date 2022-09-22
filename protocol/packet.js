@@ -7,25 +7,17 @@ const { packet_types } = require('./protocol');
  */
 function createPacket(category, direction, name) {
     if (!(category in packet_types)) {
-        throw 'invalid packet category';
+        throw new Error('invalid packet category');
     }
     if (!(direction in packet_types[category])) {
-        throw 'invalid packet direction';
+        throw new Error('invalid packet direction');
     }
 
-
-    let type = null;
-    for (let pkt of packet_types[category][direction].values()) {
-        if (pkt.name == name) {
-            type = pkt;
-            break;
-        }
-    }
-    if (type == null) {
-        throw 'invalid packet name';
+    if (!packet_types[category][direction].has(name)) {
+        throw new Error('invalid packet name');
     }
 
-    return { _ptype: type };
+    return { _ptype: packet_types[category][direction].get(name) };
 }
 
 /**
@@ -71,23 +63,30 @@ function parseField(buffer, offset, packetObj, field, type) {
  */
 function parsePacket(category, direction, buffer) {
     if (!(category in packet_types)) {
-        throw 'invalid packet category';
+        throw new Error('invalid packet category');
     }
     if (!(direction in packet_types[category])) {
-        throw 'invalid packet direction';
+        throw new Error('invalid packet direction');
     }
     if (buffer == null || buffer.length == 0) {
-        throw 'empty buffer';
+        throw new Error('empty buffer');
     }
 
     let offset = 0;
     let commandNum = buffer.readUInt8(offset);
     offset += 1;
-    if (commandNum >= packet_types[category][direction].length) {
-        throw 'command not specified';
+
+    let packetType = null;
+    for (let [key, val] of packet_types[category][direction]) {
+        if (val.index == commandNum) {
+            packetType = val;
+            break;
+        }
+    }
+    if (packetType == null) {
+        throw new Error('command not specified');
     }
 
-    let packetType = packet_types[category][direction].get(commandNum);
     let packet = {
         _ptype: packetType,
     };
@@ -162,14 +161,7 @@ function serializeField(bytesArr, obj, type) {
  * @param {string} category
  * @param {string} direction
  */
-function serializePacket(category, direction, packet) {
-    if (!(category in packet_types)) {
-        throw 'invalid packet category';
-    }
-    if (!(direction in packet_types[category])) {
-        throw 'invalid packet direction';
-    }
-
+function serializePacket(packet) {
     let bytesArr = [ packet._ptype.index ];
     for (let field in packet._ptype.data) {
         serializeField(bytesArr, packet[field], packet._ptype.data[field]);

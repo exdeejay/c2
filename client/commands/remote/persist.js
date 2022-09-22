@@ -3,7 +3,7 @@ module.exports = function (commands) {
 };
 
 async function persist(server, args) {
-	let packet = server.createPacket('persist');
+	let packet = server.commandPacket('persist');
 	let ret = await server.sendHostCommand(packet);
 	if (ret != 0) {
 		console.error(`ERROR: Something went wrong (${ret})`);

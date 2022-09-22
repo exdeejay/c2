@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "speaker": "^0.5.3"
+    "speaker": "^0.5.3",
+    "yargs": "^17.2.1"
   }
 }

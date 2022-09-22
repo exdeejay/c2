@@ -18,37 +18,36 @@ const control_response = new Map();
 /**
  * @param {string} categoryName
  * @param {string} direction
- * @param {string} dirName
- * @param {Map<number, IPacket>} arr
+ * @param {Map<string, IPacket>} map
  */
-async function readPacketTypesIntoArray(categoryName, direction, arr) {
+async function readPacketTypesIntoMap(categoryName, direction, map) {
     let dirName = `${__dirname}/packets/${categoryName}/${direction}`;
     let files = await fs.readdir(dirName);
     for (const file of files) {
         let packetType = require(`${dirName}/${file}`);
         packetType.category = categoryName;
         packetType.direction = direction;
-        arr.set(packetType.index, packetType);
+        map.set(packetType.name, packetType);
     }
 }
 
 async function loadPacketTypes() {
-    await readPacketTypesIntoArray(
+    await readPacketTypesIntoMap(
         'host',
         'command',
         host_command
     );
-    await readPacketTypesIntoArray(
+    await readPacketTypesIntoMap(
         'host',
         'response',
         host_response
     );
-    await readPacketTypesIntoArray(
+    await readPacketTypesIntoMap(
         'control',
         'command',
         control_command
     );
-    await readPacketTypesIntoArray(
+    await readPacketTypesIntoMap(
         'control',
         'response',
         control_response
@@ -57,8 +56,8 @@ async function loadPacketTypes() {
 
 /**
  * @typedef {Object} DuplexPacketTypes
- * @property {Map<number, IPacket>} command
- * @property {Map<number, IPacket>} response
+ * @property {Map<string, IPacket>} command
+ * @property {Map<string, IPacket>} response
  */
 
 /**

@@ -15,6 +15,10 @@ class PacketConnection extends EventEmitter {
     }
 
     /**
+     * @event packet
+     * @type {Buffer}
+     */
+    /**
      * @param {Buffer} data
      */
     handleData(data) {

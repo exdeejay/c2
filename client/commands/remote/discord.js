@@ -11,7 +11,7 @@ async function discord(server, args) {
         return;
     }
 
-    let packet = server.createPacket('discordcommand');
+    let packet = server.commandPacket('discordcommand');
     if (args[1] == 'check') {
         packet.command = COMMAND_CHECK;
 		if (await server.sendHostCommand(packet) == 0) {

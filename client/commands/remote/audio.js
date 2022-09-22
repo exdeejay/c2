@@ -18,7 +18,7 @@ async function audio(server, args) {
         return;
     }
 
-	let packet = server.createPacket('audiocommand');
+	let packet = server.commandPacket('audiocommand');
 	let status;
 	switch (args[1]) {
 		case 'start':

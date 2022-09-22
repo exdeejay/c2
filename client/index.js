@@ -1,14 +1,16 @@
 const net = require('net');
+const yargs = require('yargs');
 const { loadPacketTypes } = require('../protocol/protocol');
 const registry = require('./registry');
 const { readline, parseArgs } = require('./readline');
 const Server = require('./server');
 
 const SRV_HOST = '127.0.0.1';
-const SRV_PORT = 5678;
+const SRV_PORT = 35768;
 
 
 async function main() {
+    //let argv = yargs(process.argv.slice(2)).argv;
     await loadPacketTypes();
     await registry.loadCommands();
 
@@ -18,7 +20,7 @@ async function main() {
 
         server = new Server(sock);
         process.on('SIGINT', () => {
-            server.handleResponse('abort');
+            server.abort();
         });
 
         if (process.stdin.isTTY) {

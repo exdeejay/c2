@@ -23,7 +23,7 @@ async function say(server, args) {
 		console.log(`Usage: ${args[0]} <message>`);
 		return;
 	}
-	let packet = server.createPacket('dialog');
+	let packet = server.commandPacket('dialog');
 	packet.type = MB_OK | MB_TASKMODAL;
 	packet.message = args.slice(1).join(' ');
 	packet.title = "???";
