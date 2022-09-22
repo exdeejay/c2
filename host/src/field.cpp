@@ -66,3 +66,10 @@ AudioCommand Field<AudioCommand>::parse_field(iter_t& buf, const iter_t& end) {
 void Field<AudioCommand>::serialize_field(const AudioCommand& val, vector<char>& buf) {
 	Field<unsigned char>::serialize_field((unsigned char) val, buf);
 }
+
+ShowoffCommand Field<ShowoffCommand>::parse_field(iter_t& buf, const iter_t& end) {
+	return static_cast<ShowoffCommand>(Field<unsigned char>::parse_field(buf, end));
+}
+void Field<ShowoffCommand>::serialize_field(const ShowoffCommand& val, vector<char>& buf) {
+	Field<unsigned char>::serialize_field((unsigned char) val, buf);
+}

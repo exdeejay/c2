@@ -72,5 +72,11 @@ public:
 	static AudioCommand parse_field(iter_t& buf, const iter_t& end);
 	static void serialize_field(const AudioCommand& val, std::vector<char>& buf);
 };
+enum class ShowoffCommand;
+template<> class Field<ShowoffCommand> {
+public:
+	static AudioCommand parse_field(iter_t& buf, const iter_t& end);
+	static void serialize_field(const ShowoffCommand& val, std::vector<char>& buf);
+};
 
 #endif

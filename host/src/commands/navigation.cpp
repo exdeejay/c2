@@ -2,23 +2,24 @@
 #include <iostream>
 #include <cstdio>
 #include <cstring>
+#include <exception>
 #include <Windows.h>
 #include "util.h"
 #include "field.h"
 using namespace std;
 
-int navigation(Controller& ctrl, unsigned char cmd, vector<char> data) {
+int navigation(Controller& ctrl, unsigned char cmd, string path) {
 	switch (cmd) {
 		case 0:
-			return listFiles(ctrl, Field<string>::parse_field(data.cbegin(), data.cend()));
+			return listFiles(ctrl, path);
 		case 1:
-			return changeDir(ctrl, Field<string>::parse_field(data.cbegin(), data.cend()));
+			return changeDir(ctrl, path);
 		case 2:
 			return pwd(ctrl);
 		case 3:
-			return removeFile(ctrl, Field<string>::parse_field(data.cbegin(), data.cend()));
+			return removeFile(ctrl, path);
 		default:
-			//TODO error msg
+			throw new exception("invalid navigation command");
 		return -1;
 	}
 }

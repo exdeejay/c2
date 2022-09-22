@@ -30,19 +30,6 @@ namespace c2 {
             return FnCaller<Args...>::bind_fn(data, end, fn, accumulated_args..., Field<T>::parse_field(data, end));
         }
     };
-    template<> class FnCaller<std::vector<char>> {
-    public:
-        template<class... Accum> static std::function<int(Controller&)> bind_fn(
-            std::vector<char>::const_iterator data,
-            const std::vector<char>::const_iterator& end,
-            void* fn,
-            Accum... accumulated_args
-        ) {
-            int(*proc)(Controller&, Accum..., std::vector<char>) = (int(*)(Controller&, Accum..., std::vector<char>)) fn;
-            std::vector<char> copy(data, end);
-            return std::bind(proc, std::placeholders::_1, accumulated_args..., std::move(copy));
-        }
-    };
     template<> class FnCaller<> {
     public:
     //     static std::function<int(Controller&)> bind_fn(

@@ -23,6 +23,7 @@ void register_all_commands() {
 	register_command(9, uploadFile);
 	register_command(10, persist);
 	register_command(11, dialog);
+	register_command(12, showoff);
 }
 
 void Controller::init() {
