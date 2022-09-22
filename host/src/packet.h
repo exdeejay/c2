@@ -18,12 +18,27 @@ public:
 class Controller;
 class Packet {
 public:
-	static void register_type(unsigned char type, std::function<std::unique_ptr<Packet>(const std::vector<char>&)>);
+	Packet(unsigned char type) : _type(type) {}
+	static void register_type(
+		unsigned char type,
+		std::function<std::unique_ptr<Packet>(const std::vector<char>&)> parser
+	);
+	template<class T> static void register_type() {
+		register_type(T::typenum, [](const std::vector<char>& data) {
+			return std::make_unique<T>(data);
+		});
+	}
 	static void register_handler(unsigned char type, std::function<bool(Controller&, Packet&)>);
 	static void handle_packet(Controller& ctrl, Packet& pkt);
 	static std::unique_ptr<Packet> parse(const SerializedPacket& spkt);
-	//virtual std::unique_ptr<SerializedPacket> serialize() const = 0;
-	virtual unsigned char type() const = 0;
+	virtual SerializedPacket serialize() const = 0;
+	unsigned char type() const {
+		return _type;
+	}
+	
+protected:
+	unsigned char _type;
+
 private:
 	static std::unordered_map<unsigned char, std::function<std::unique_ptr<Packet>(const std::vector<char>&)>> registry;
 	static std::multimap<unsigned char, std::function<bool(Controller&, Packet&)>> handlers;

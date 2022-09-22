@@ -3,6 +3,7 @@
 
 #include "simplecommand.h"
 #include "controller.h"
+#include <vector>
 
 enum class NavigateCommand {
     ls, cd, pwd, rm
@@ -17,10 +18,11 @@ enum class DiscordCommand {
 };
 
 // navigation
-//int pwd(Controller* ctrl);
-//int changeDir(Controller* ctrl, const std::string path);
-int listFiles(Controller& ctrl, unsigned char abyte, const std::string path);
-//int removeFile(Controller* ctrl, const std::string path);
+int navigation(Controller& ctrl, unsigned char cmd, std::vector<char> data);
+int listFiles(Controller& ctrl, const std::string path);
+int changeDir(Controller& ctrl, const std::string path);
+int pwd(Controller& ctrl);
+int removeFile(Controller& ctrl, const std::string path);
 
 // files
 //int downloadFile(Controller* ctrl, const std::string path);

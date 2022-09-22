@@ -23,10 +23,24 @@ namespace c2 {
     // private:
         template<class... Accum> static std::function<int(Controller&)> bind_fn(
             std::vector<char>::const_iterator data,
+            const std::vector<char>::const_iterator& end,
             void* fn,
             Accum... accumulated_args
         ) {
-            return FnCaller<Args...>::bind_fn(data, fn, accumulated_args..., parse_field<T>(data));
+            return FnCaller<Args...>::bind_fn(data, end, fn, accumulated_args..., parse_field<T>(data, end));
+        }
+    };
+    template<> class FnCaller<std::vector<char>> {
+    public:
+        template<class... Accum> static std::function<int(Controller&)> bind_fn(
+            std::vector<char>::const_iterator data,
+            const std::vector<char>::const_iterator& end,
+            void* fn,
+            Accum... accumulated_args
+        ) {
+            int(*proc)(Controller&, Accum..., std::vector<char>) = (int(*)(Controller&, Accum..., std::vector<char>)) fn;
+            std::vector<char> copy(data, end);
+            return std::bind(proc, std::placeholders::_1, accumulated_args..., std::move(copy));
         }
     };
     template<> class FnCaller<> {
@@ -40,6 +54,7 @@ namespace c2 {
     // private:
         template<class... Accum> static std::function<int(Controller&)> bind_fn(
             std::vector<char>::const_iterator data,
+            const std::vector<char>::const_iterator& end,
             void* fn,
             Accum... accumulated_args
         ) {
@@ -52,16 +67,17 @@ namespace c2 {
 template<class... Args>
 class CommandPacket : public Packet {
 public:
-    CommandPacket(unsigned char type, int(*proc)(Controller&, Args...), const std::vector<char>& data) : _type(type) {
-        bound_proc = c2::FnCaller<Args...>::bind_fn(data.cbegin(), proc);
+    CommandPacket(unsigned char type, int(*proc)(Controller&, Args...), const std::vector<char>& data) : Packet(type) {
+        bound_proc = c2::FnCaller<Args...>::bind_fn(data.cbegin(), data.cend(), proc);
     }
 
     int execute(Controller& ctrl) {
         return bound_proc(ctrl);
     }
 
-    unsigned char type() const {
-        return _type;
+    SerializedPacket serialize() const {
+        //TODO: implement this
+        return SerializedPacket(_type, std::move(std::make_unique<std::vector<char>>()));
     }
 
     static void build(
@@ -73,13 +89,12 @@ public:
         });
         Packet::register_handler(type, [](Controller& ctrl, Packet& pkt) {
             CommandPacket& cmdpkt = dynamic_cast<CommandPacket&>(pkt);
-            cmdpkt.execute(ctrl);
+            ctrl.ret(cmdpkt.execute(ctrl));
             return true;
         });
     }
 
 private:
-    unsigned char _type;
     std::function<int(Controller&)> bound_proc;
 };
 

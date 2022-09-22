@@ -14,7 +14,7 @@ void PacketConnection::connect() {
 SerializedPacket PacketConnection::read_packet() {
     while (true) {
         if (compressed_len == -1 && buf.size() >= 4) {
-            compressed_len = parse_field<uint32_t>(buf.cbegin());
+            compressed_len = parse_field<uint32_t>(buf.cbegin(), buf.cend());
         }
         if (compressed_len != -1 && buf.size() >= compressed_len + 4) {
             unique_ptr<vector<char>> deflated = make_unique<vector<char>>();
@@ -94,5 +94,5 @@ void PacketConnection::write_packet_sync(const SerializedPacket& spkt) {
 	out[3] = (size >> 24) & 0xFF;
 
 	lock_guard<mutex> guard(writeMutex);
-    conn->write(data.data(), data.size());
+    conn->write(out.data(), out.size());
 }

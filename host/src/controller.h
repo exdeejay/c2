@@ -2,6 +2,7 @@
 #define CONTROLLER_H
 
 #include <memory>
+#include <string>
 #include "packetconnection.h"
 
 class PacketConnection;
@@ -12,6 +13,9 @@ public:
 	}
 	void init();
 	void loop();
+	void ret(char retcode);
+	void println(std::string out);
+	void err_println(std::string err);
 private:
 	std::unique_ptr<PacketConnection> conn;
 };

@@ -3,16 +3,33 @@
 #include <cstdio>
 #include <cstring>
 #include <Windows.h>
+#include "field.h"
 using namespace std;
 
-int pwd(Controller* ctrl) {
+int navigation(Controller& ctrl, unsigned char cmd, vector<char> data) {
+	switch (cmd) {
+		case 0:
+			return listFiles(ctrl, parse_field<string>(data.cbegin(), data.cend()));
+		case 1:
+			return changeDir(ctrl, parse_field<string>(data.cbegin(), data.cend()));
+		case 2:
+			return pwd(ctrl);
+		case 3:
+			return removeFile(ctrl, parse_field<string>(data.cbegin(), data.cend()));
+		default:
+			//TODO error msg
+		return -1;
+	}
+}
+
+int pwd(Controller& ctrl) {
 	char path[MAX_PATH];
 	GetCurrentDirectoryA(MAX_PATH, path);
-	//ctrl->sendOut(path);
+	ctrl.println(string(path));
 	return 0;
 }
 
-int changeDir(Controller* ctrl, const string path) {
+int changeDir(Controller& ctrl, const string path) {
 	BOOL result = SetCurrentDirectoryA(path.c_str());
 	if (!result) {
 		//ctrl->sendErr(getWin32ErrorString());
@@ -21,7 +38,7 @@ int changeDir(Controller* ctrl, const string path) {
 	return 0;
 }
 
-int listFiles(Controller& ctrl, unsigned char abyte, const string path) {
+int listFiles(Controller& ctrl, const string path) {
 	WIN32_FIND_DATA ffd;
 	HANDLE hFind;
 	if (path.size() == 0) {
@@ -44,14 +61,13 @@ int listFiles(Controller& ctrl, unsigned char abyte, const string path) {
 		}
 		output += reinterpret_cast<char*>(ffd.cFileName);
 		output += "\n";
-	} while (FindNextFile(hFind, &ffd) != 0);
+	} while (FindNextFileA(hFind, &ffd) != 0);
 	FindClose(hFind);
 	output.erase(output.end() - 1);
-	cout << output.c_str() << endl;
-	//ctrl->sendOut(output.c_str());
+	ctrl.println(output);
 	return 0;
 }
 
-int removeFile(Controller* ctrl, const string path) {
+int removeFile(Controller& ctrl, const string path) {
 	return remove(path.c_str());
 }
