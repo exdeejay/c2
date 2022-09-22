@@ -10,4 +10,19 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
   message(FATAL_ERROR "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there.\n")
 endif()
 
-add_subdirectory(host)
+
+add_library(asio INTERFACE)
+target_include_directories(asio INTERFACE host/lib/asio-1.18.1/include)
+
+
+file(GLOB srcs host/src/*.cpp)
+add_executable(payload ${srcs})
+target_include_directories(
+    payload
+    PUBLIC
+        $<INSTALL_INTERFACE:host/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/host/include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/host/src
+)
+target_link_libraries(payload asio)
