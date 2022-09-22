@@ -19,6 +19,7 @@ class Server extends EventEmitter {
         socket.on('close', () => {
             console.log('Connection to host closed.');
         });
+        Server.connectedServer = this;
     }
 
     close() {
@@ -26,6 +27,15 @@ class Server extends EventEmitter {
     }
 
     handleResponse(packet) {
+        if (typeof packet === 'str' && packet == 'abort') {
+            let abortPkt = _createPacket('host', 'response', 'retcode');
+            abortPkt.retcode = -999;
+            this.emit('hostpacket', abortPkt);
+        }
+
+        if (packet.type.name == 'newpwn') {
+            console.log(`[!] Pwned ${packet.ip}`);
+        }
         if (packet.type.name == 'hostresponse') {
             this.emit('hostpacket', parsePacket('host', 'response', packet.data));
         }

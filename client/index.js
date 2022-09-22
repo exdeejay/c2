@@ -8,6 +8,7 @@ const Server = require('./server');
 const SRV_HOST = '127.0.0.1';
 const SRV_PORT = 5678;
 
+
 async function main() {
     await loadPacketTypes();
     await registry.loadCommands();
@@ -16,7 +17,10 @@ async function main() {
     sock.on('connect', async () => {
         console.log(`Connected to ${sock.remoteAddress}:${sock.remotePort}`);
 
-        let server = new Server(sock);
+        server = new Server(sock);
+        process.on('SIGINT', () => {
+            server.handleData('abort');
+        });
 
         if (process.stdin.isTTY) {
             while (true) {

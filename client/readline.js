@@ -1,3 +1,5 @@
+const Server = require('./server');
+
 /**
  * @type {Array}
  */
@@ -80,6 +82,7 @@ async function readline() {
                     }
                     break;
                 case '\x03':
+                    Server.connectedServer.close();
                     process.exit(0);
                 case '\x1b[A': //up
                     if (historyIdx + 1 < history.length) {
