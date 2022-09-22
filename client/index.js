@@ -33,6 +33,7 @@ async function main() {
 
     sock.on('error', (err) => {
         console.error(`ERR -- error while connecting to host: ${err}`);
+        process.exit(1);
     });
 
     sock.on('timeout', () => {

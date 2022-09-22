@@ -12,10 +12,7 @@ class Host {
      */
     constructor(socket) {
         this.connection = new PacketConnection(socket);
-        this.connection.on('packet', (data) => {
-            let packet = parsePacket('host', 'response', data);
-            this.handleResponse(packet);
-        });
+        this.connection.on('packet', this.handleResponse);
     }
 
     handleResponse(packet) {
@@ -23,7 +20,7 @@ class Host {
             type: packet_types.control.response.find(
                 (pkt) => pkt != null && pkt.name == 'hostresponse'
             ),
-            data: JSON.stringify(packet),
+            data: packet,
         };
         controllers[0].sendResponse(wrappedPkt);
     }
@@ -41,13 +38,13 @@ function handleIncomingHost(socket) {
     let host = new Host(socket);
     let index = hosts.push(host) - 1;
     socket.on('close', () => {
-        console.log(`Host ${index} disconnected`);
+        console.log(`- Host ${index} disconnected`);
         hosts.splice(index, 1);
     });
     socket.on('error', () => {
-        console.log(`Host ${index} forcibly exited`);
+        console.log(`! Host ${index} forcibly exited`);
     });
-    console.log(`Pwned ${socket.address().address} ;)`);
+    console.log(`+ Pwned ${socket.remoteAddress} ;)`);
 }
 
 exports.hosts = hosts;

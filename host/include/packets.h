@@ -11,7 +11,9 @@ enum class Packet {
 	stdIn,
 	getShell,
 	changeDir,
-	listFiles
+	listFiles,
+	pwd,
+	screenshot
 };
 
 void handleCommand(std::vector<char>& buf);

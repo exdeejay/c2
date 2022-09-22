@@ -44,13 +44,13 @@ function handleIncomingController(socket) {
     let controller = new Controller(socket);
     let index = controllers.push(controller) - 1;
     socket.on('close', () => {
-        console.log(`Controller ${index} disconnected`);
+        console.log(`- Controller ${index} disconnected`);
         controllers.splice(index, 1);
     });
     socket.on('error', () => {
-        console.log(`Controller ${index} forcibly exited`);
+        console.log(`! Controller ${index} forcibly exited`);
     });
-    console.log(`Now controlling the herd from ${socket.address().address}`);
+    console.log(`+ Now controlling the herd from ${socket.remoteAddress}`);
 }
 
 exports.Controller = Controller;

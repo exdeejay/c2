@@ -13,7 +13,10 @@ public:
 	}
 
 	void handleData(std::vector<char>& buf);
+	void ret(int code);
 	void sendOut(std::string out);
+	void sendErr(std::string err);
+	void sendBuffer(std::vector<char>& data);
 
 	void loop();
 

@@ -9,8 +9,12 @@ class Server extends EventEmitter {
         super();
         this.connection = new PacketConnection(socket);
         this.connection.on('packet', (data) => {
-            let packet = parsePacket('control', 'response', data);
-            this.handleResponse(packet);
+            try {
+                let packet = parsePacket('control', 'response', data);
+                this.handleResponse(packet);
+            } catch (err) {
+                console.error(err);
+            }
         });
         socket.on('close', () => {
             console.log('Connection to host closed.');
@@ -27,7 +31,17 @@ class Server extends EventEmitter {
         }
     }
 
-    async sendHostCommand(packet) {
+
+    /**
+     * @callback hostCmdCallback
+     * @param {*} response
+     */
+    /** 
+     * @param {*} packet 
+     * @param {hostCmdCallback} callback 
+     * @returns 
+     */
+    async sendHostCommand(packet, callback) {
         let wrappedPkt = {
             type: packet_types.control.command.find(
                 (pkt) => pkt != null && pkt.name == 'relaycommand'
@@ -35,19 +49,31 @@ class Server extends EventEmitter {
             id: 0, // TODO: fill in host id
             command: JSON.stringify(packet),
         };
+        
         return new Promise((resolve) => {
-            this.sendCommand(wrappedPkt).then((response) => {
-                resolve(JSON.parse(response.data));
-            });
+            let handler = (response) => {
+                let responsePkt = parsePacket('host', 'response', response.data);
+                if (responsePkt.type.name == 'retcode') {
+                    this.removeListener('hostresponse', handler);
+                    resolve(responsePkt.code);
+                } else {
+                    if (callback == null) {
+                        if (responsePkt.type.name == 'out') {
+                            console.log(responsePkt.out);
+                        }
+                    } else {
+                        callback(responsePkt);
+                    }
+                }
+            };
+            this.on('hostresponse', handler);
+            this.sendCommand(wrappedPkt);
         });
     }
 
-    async sendCommand(packet) {
+    sendCommand(packet) {
         let buf = serializePacket('control', 'command', packet);
-        return new Promise((resolve) => {
-            this.once('hostresponse', resolve);
-            this.connection.socket.write(buf);
-        });
+        this.connection.socket.write(buf);
     }
 }
 
