@@ -21,7 +21,7 @@ class Server extends EventEmitter {
      * Close server connection.
      */
     close() {
-        this.connection.socket.destroy();
+        this.connection.socket().destroy();
     }
 
     /**

@@ -8,10 +8,29 @@ class ZlibConnection extends EventEmitter {
      */
     constructor(socket) {
         super();
-        this.socket = socket;
+        this._socket = socket;
         this.buffer = null;
         this.nextPacketSize = -1;
-        this.socket.on('data', this.handleData.bind(this));
+        this._socket.on('data', this.handleData.bind(this));
+    }
+
+    /**
+     * @returns {Socket}
+     */
+    socket() {
+        return this._socket;
+    }
+
+    /**
+     * @param {string} eventName 
+     * @param {*} listener 
+     */
+    on(eventName, listener) {
+        if (eventName == 'data') {
+            this.on(eventName, listener);
+        } else {
+            this._socket.on(eventName, listener);
+        }
     }
 
     /**
@@ -55,7 +74,7 @@ class ZlibConnection extends EventEmitter {
         let lengthBuf = Buffer.alloc(4);
         lengthBuf.writeUInt32BE(compressed.length);
         let finalBuf = Buffer.concat([lengthBuf, compressed]);
-        this.socket.write(finalBuf);
+        this._socket.write(finalBuf);
     }
 }
 
