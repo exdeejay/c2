@@ -1,4 +1,3 @@
-const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 const net = require('net');
 const { loadPacketTypes } = require('../lib/protocol');
 const registry = require('./registry');
