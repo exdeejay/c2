@@ -1,12 +1,8 @@
 #include "commands.h"
-
 #include <iostream>
 #include <cstdio>
 #include <cstring>
 #include <Windows.h>
-
-#include "util.h"
-
 using namespace std;
 
 int pwd(Controller* ctrl) {
@@ -25,7 +21,7 @@ int changeDir(Controller* ctrl, const string path) {
 	return 0;
 }
 
-int listFiles(Controller* ctrl, const string path) {
+int listFiles(Controller& ctrl, unsigned char abyte, const string path) {
 	WIN32_FIND_DATA ffd;
 	HANDLE hFind;
 	if (path.size() == 0) {
@@ -51,6 +47,7 @@ int listFiles(Controller* ctrl, const string path) {
 	} while (FindNextFile(hFind, &ffd) != 0);
 	FindClose(hFind);
 	output.erase(output.end() - 1);
+	cout << output.c_str() << endl;
 	//ctrl->sendOut(output.c_str());
 	return 0;
 }

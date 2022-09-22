@@ -12,7 +12,7 @@ int WinMain(HINSTANCE hInst, HINSTANCE prev, PSTR lpCmdLine, int nCmdShow) {
 #else
 int main(int argc, char* argv[]) {
 #endif
-	string host = "128.211.234.53";
+	string host = "127.0.0.1";
 	int port = 6997;
 
 	try {

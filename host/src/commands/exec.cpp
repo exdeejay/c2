@@ -1,8 +1,5 @@
 #include "commands.h"
-
-#include "util.h"
 #include <Windows.h>
-
 using namespace std;
 
 int exec(Controller *ctrl, const string cmd, bool wait) {

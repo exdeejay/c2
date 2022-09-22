@@ -1,9 +1,7 @@
 #include "commands.h"
-
 #include <vector>
 #include <lodepng.h>
 #include <Windows.h>
-
 
 int screenshot(Controller* ctrl) {
 	HDC screenDC = GetDC(nullptr);

@@ -7,7 +7,10 @@
 class PacketConnection;
 class Controller {
 public:
-	Controller(std::unique_ptr<PacketConnection> conn) : conn(std::move(conn)) {}
+	Controller(std::unique_ptr<PacketConnection> conn) : conn(std::move(conn)) {
+		init();
+	}
+	void init();
 	void loop();
 private:
 	std::unique_ptr<PacketConnection> conn;

@@ -19,7 +19,7 @@ enum class DiscordCommand {
 // navigation
 //int pwd(Controller* ctrl);
 //int changeDir(Controller* ctrl, const std::string path);
-//int listFiles(Controller* ctrl, const std::string path);
+int listFiles(Controller& ctrl, unsigned char abyte, const std::string path);
 //int removeFile(Controller* ctrl, const std::string path);
 
 // files
