@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <boost/circular_buffer.hpp>
 #include "packetconnection.h"
 
 class PacketConnection;

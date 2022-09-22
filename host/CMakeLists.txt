@@ -34,11 +34,14 @@ add_library(zlib STATIC IMPORTED)
 set_property(TARGET zlib PROPERTY IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/zlib/zlibstatic.lib")
 target_include_directories(zlib INTERFACE "${CMAKE_SOURCE_DIR}/lib/zlib")
 
+add_library(boost INTERFACE)
+target_include_directories(boost INTERFACE "${CMAKE_SOURCE_DIR}/lib/boost_1_77_0")
+
 
 file(GLOB_RECURSE srcs "src/*.cpp")
 add_library(payloadlib ${srcs})
 target_include_directories(payloadlib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
-target_link_libraries(payloadlib asio lodepng portaudio snappy zlib)
+target_link_libraries(payloadlib asio lodepng portaudio snappy zlib boost)
 target_compile_definitions(payloadlib PUBLIC WIN32_LEAN_AND_MEAN)
 
 add_executable(payload "main.cpp")
