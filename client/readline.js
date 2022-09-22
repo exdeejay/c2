@@ -1,5 +1,3 @@
-const Server = require('./server');
-
 /**
  * @type {Array}
  */
@@ -66,10 +64,7 @@ async function readline() {
                     process.stdin.setRawMode(false);
                     process.stdin.removeListener('data', rd);
                     let line = buf.join('');
-                    if (
-                        history.length == 0 ||
-                        history[history.length - 1] != line
-                    ) {
+                    if (history.length == 0 || history[history.length - 1] != line) {
                         history.push(line);
                     }
                     resolve(line);
@@ -80,9 +75,7 @@ async function readline() {
                         buf.splice(idx, 1);
                         process.stdout.write('\b');
                         if (idx != buf.length) {
-                            process.stdout.write(
-                                buf.slice(idx, buf.length).join('')
-                            );
+                            process.stdout.write(buf.slice(idx, buf.length).join(''));
                             process.stdout.write(' ');
                             process.stdout.moveCursor(idx - buf.length - 1, 0);
                         } else {
@@ -108,9 +101,7 @@ async function readline() {
                         if (historyIdx == -1) {
                             replaceLine('');
                         } else {
-                            replaceLine(
-                                history[history.length - historyIdx - 1]
-                            );
+                            replaceLine(history[history.length - historyIdx - 1]);
                         }
                     }
                     break;
@@ -131,9 +122,7 @@ async function readline() {
                     buf.splice(idx, 0, String(char));
                     idx++;
                     if (idx != buf.length) {
-                        process.stdout.write(
-                            buf.slice(idx, buf.length).join('')
-                        );
+                        process.stdout.write(buf.slice(idx, buf.length).join(''));
                         process.stdout.moveCursor(idx - buf.length, 0);
                     }
             }
@@ -173,11 +162,7 @@ function parseArgs(line) {
                     // \xNN
                     if (i + 2 < line.length) {
                         // TODO
-                        current.push(
-                            String.fromCharCode(
-                                parseInt(`${line[i + 1]}${line[i + 2]}`, 16)
-                            )
-                        );
+                        current.push(String.fromCharCode(parseInt(`${line[i + 1]}${line[i + 2]}`, 16)));
                         i += 2;
                     } else {
                         current.push('\\x');

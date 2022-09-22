@@ -14,7 +14,7 @@ void PacketConnection::connect() {
 SerializedPacket PacketConnection::read_packet() {
     while (true) {
         if (compressed_len == -1 && buf.size() >= 4) {
-            compressed_len = parse_field<uint32_t>(buf.cbegin(), buf.cend());
+            compressed_len = Field<uint32_t>::parse_field(buf.cbegin(), buf.cend());
         }
         if (compressed_len != -1 && buf.size() >= compressed_len + 4) {
             unique_ptr<vector<char>> deflated = make_unique<vector<char>>();

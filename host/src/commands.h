@@ -29,7 +29,7 @@ int downloadFile(Controller& ctrl, const std::string path);
 int uploadFile(Controller& ctrl, const std::string path, std::vector<char> data);
 
 // exec
-int exec(Controller& ctrl, const std::string cmd, bool wait);
+int exec(Controller& ctrl, const std::string cmd, const std::vector<std::string> args, bool wait);
 
 // screen
 int screenshot(Controller& ctrl);

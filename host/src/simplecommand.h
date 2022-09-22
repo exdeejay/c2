@@ -27,7 +27,7 @@ namespace c2 {
             void* fn,
             Accum... accumulated_args
         ) {
-            return FnCaller<Args...>::bind_fn(data, end, fn, accumulated_args..., parse_field<T>(data, end));
+            return FnCaller<Args...>::bind_fn(data, end, fn, accumulated_args..., Field<T>::parse_field(data, end));
         }
     };
     template<> class FnCaller<std::vector<char>> {

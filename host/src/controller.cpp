@@ -4,11 +4,14 @@
 #include <string>
 #include <vector>
 #include <thread>
+#include <boost/lockfree/spsc_queue.hpp>
 #include "packet.h"
 #include "simplepacket.h"
 #include "simplecommand.h"
 #include "commands.h"
 using namespace std;
+
+boost::lockfree::spsc_queue<char, boost::lockfree::capacity<8192>> audio_buf;
 
 void register_all_commands() {
     register_command(3, navigation);
@@ -27,11 +30,15 @@ void Controller::init() {
 }
 
 void Controller::flush_audio_buffer() {
+	vector<char> bufcpy;
+	bufcpy.resize(4096);
+	int len = 0;
 	while (true) {
-		if (audio_buf.size() > 4096) {
-			SimplePacket<vector<char>> pkt(4, audio_buf);
+		len += audio_buf.pop(&bufcpy[len], 4096 - len);
+		if (len >= 4096) {
+			SimplePacket<vector<char>> pkt(4, bufcpy);
 			conn->write_packet_sync(pkt.serialize());
-			audio_buf.clear();
+			len = 0;
 		}
 		this_thread::sleep_for(chrono::milliseconds(10));
 	}
@@ -72,5 +79,5 @@ void Controller::send_buffer(const vector<char> buf) {
 }
 
 void Controller::buffer_audio(const char* buf, size_t size) {
-	audio_buf.insert(audio_buf.end(), buf, buf + size);
+	audio_buf.push(buf, size);
 }

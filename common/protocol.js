@@ -1,5 +1,6 @@
 const fs = require('fs/promises');
 
+let loaded = false;
 const host_command = new Map();
 const host_response = new Map();
 const control_command = new Map();
@@ -31,10 +32,13 @@ async function readPacketTypesIntoMap(categoryName, direction, map) {
 }
 
 async function loadPacketTypes() {
-    await readPacketTypesIntoMap('host', 'command', host_command);
-    await readPacketTypesIntoMap('host', 'response', host_response);
-    await readPacketTypesIntoMap('control', 'command', control_command);
-    await readPacketTypesIntoMap('control', 'response', control_response);
+    if (!loaded) {
+        await readPacketTypesIntoMap('host', 'command', host_command);
+        await readPacketTypesIntoMap('host', 'response', host_response);
+        await readPacketTypesIntoMap('control', 'command', control_command);
+        await readPacketTypesIntoMap('control', 'response', control_response);
+        loaded = true;
+    }
 }
 
 /**

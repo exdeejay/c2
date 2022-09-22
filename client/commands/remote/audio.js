@@ -26,14 +26,14 @@ async function audio(server, args) {
 			packet.command = 0;
 			status = await server.sendHostCommand(packet);
 			if (status == 0) {
-				server.on('hostpacket', audioHandler);
+				server.registerHostListener(audioHandler);
 				console.log('Audio server started');
 			}
 			return;
 		case 'stop':
 			packet.command = 1;
 			status = await server.sendHostCommand(packet);
-			server.removeListener('hostpacket', audioHandler);
+			server.removeHostListener(audioHandler);
 			if (status == 0) {
 				console.log('Audio server stopped');
 			}
@@ -45,7 +45,7 @@ async function audio(server, args) {
 		case 'save':
 			return;
 		default:
-			console.log(`Usage: ${args[0]} <start|stop|save>`);
+			console.log(`Usage: ${args[0]} <start|stop|list>`);
 	}
 }
 

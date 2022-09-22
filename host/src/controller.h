@@ -4,7 +4,6 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include <boost/circular_buffer.hpp>
 #include "packetconnection.h"
 
 class PacketConnection;
@@ -26,7 +25,6 @@ public:
 
 private:
 	std::unique_ptr<PacketConnection> conn;
-	std::vector<char> audio_buf;
 };
 
 #endif

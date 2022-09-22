@@ -7,8 +7,8 @@ module.exports = function (commands) {
 async function screenshot(server, args) {
     let packet = server.commandPacket('screenshot');
     await server.sendHostCommand(packet, async (response) => {
-		if (response.type.name == 'buffer') {
-			fs.writeFileSync('out.png', response.data);
+		if (response._ptype.name == 'buffer') {
+			fs.writeFileSync('out.png', Buffer.from(response.data, 'base64'));
 			console.log('Wrote image to out.png');
 		}
 	});

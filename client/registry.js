@@ -1,5 +1,6 @@
 const fs = require('fs/promises');
 
+let loaded = false;
 const commands = {};
 
 async function readCommandsIntoArray(categoryName, arr) {
@@ -11,8 +12,11 @@ async function readCommandsIntoArray(categoryName, arr) {
 }
 
 async function loadCommands() {
-    await readCommandsIntoArray('local', commands);
-    await readCommandsIntoArray('remote', commands);
+    if (!loaded) {
+        await readCommandsIntoArray('local', commands);
+        await readCommandsIntoArray('remote', commands);
+        loaded = true;
+    }
 }
 
 exports.commands = commands;

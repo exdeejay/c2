@@ -2,6 +2,7 @@
     "index": 1,
     "name": "newpwn",
     "data": {
+        "id": "int",
         "ip": "str"
     }
 }

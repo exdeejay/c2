@@ -13,7 +13,7 @@ namespace c2 {
             std::vector<char>::const_iterator data,
             const std::vector<char>::const_iterator& end
         ) {
-            return std::tuple_cat(std::make_tuple<T>(parse_field<T>(data, end)), Parser<Args...>::parse_tuple(data, end));
+            return std::tuple_cat(std::make_tuple<T>(Field<T>::parse_field(data, end)), Parser<Args...>::parse_tuple(data, end));
         }
     };
     template<> class Parser<> {
@@ -31,7 +31,7 @@ namespace c2 {
     public:
         template<class... TupArgs>
         static void serialize_tuple(const std::tuple<TupArgs...>& vals, std::vector<char>& buf) {
-            serialize_field<T>(std::get<I>(vals), buf);
+            Field<T>::serialize_field(std::get<I>(vals), buf);
             Serializer<I + 1, Args...>::serialize_tuple(vals, buf);
         }
     };

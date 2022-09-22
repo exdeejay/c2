@@ -3,6 +3,5 @@ module.exports = function (commands) {
 };
 
 function exit(server, args) {
-    server.close();
     process.exit(0);
 }

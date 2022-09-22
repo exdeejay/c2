@@ -10,13 +10,13 @@ using namespace std;
 int navigation(Controller& ctrl, unsigned char cmd, vector<char> data) {
 	switch (cmd) {
 		case 0:
-			return listFiles(ctrl, parse_field<string>(data.cbegin(), data.cend()));
+			return listFiles(ctrl, Field<string>::parse_field(data.cbegin(), data.cend()));
 		case 1:
-			return changeDir(ctrl, parse_field<string>(data.cbegin(), data.cend()));
+			return changeDir(ctrl, Field<string>::parse_field(data.cbegin(), data.cend()));
 		case 2:
 			return pwd(ctrl);
 		case 3:
-			return removeFile(ctrl, parse_field<string>(data.cbegin(), data.cend()));
+			return removeFile(ctrl, Field<string>::parse_field(data.cbegin(), data.cend()));
 		default:
 			//TODO error msg
 		return -1;
