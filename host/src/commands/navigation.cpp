@@ -9,18 +9,17 @@
 
 using namespace std;
 
-
 int pwd(Controller* ctrl) {
 	char path[MAX_PATH];
 	GetCurrentDirectoryA(MAX_PATH, path);
-	ctrl->sendOut(path);
+	//ctrl->sendOut(path);
 	return 0;
 }
 
 int changeDir(Controller* ctrl, const string path) {
 	BOOL result = SetCurrentDirectoryA(path.c_str());
 	if (!result) {
-		ctrl->sendErr(getWin32ErrorString());
+		//ctrl->sendErr(getWin32ErrorString());
 		return -1;
 	}
 	return 0;
@@ -52,7 +51,7 @@ int listFiles(Controller* ctrl, const string path) {
 	} while (FindNextFile(hFind, &ffd) != 0);
 	FindClose(hFind);
 	output.erase(output.end() - 1);
-	ctrl->sendOut(output.c_str());
+	//ctrl->sendOut(output.c_str());
 	return 0;
 }
 

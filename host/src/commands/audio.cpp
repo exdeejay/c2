@@ -17,7 +17,7 @@ int audioCallback(
 		void* userData) {
 	const char* cInput = (const char*) input;
 	Controller* ctrl = (Controller*) userData;
-	ctrl->bufferAudio(cInput, frameCount * 2);
+	//ctrl->bufferAudio(cInput, frameCount * 2);
 	return paContinue;
 }
 
@@ -28,25 +28,25 @@ int audioCommand(Controller* ctrl, AudioCommand cmd) {
 		}
 
 		int status;
-		CHECK_ERR(Pa_Initialize());
-		CHECK_ERR(Pa_OpenDefaultStream(&stream, 1, 0, paInt16, 16000, 256, audioCallback, ctrl));
-		CHECK_ERR(Pa_StartStream(stream));
+		//CHECK_ERR(Pa_Initialize());
+		//CHECK_ERR(Pa_OpenDefaultStream(&stream, 1, 0, paInt16, 16000, 256, audioCallback, ctrl));
+		//CHECK_ERR(Pa_StartStream(stream));
 	} else if (cmd == AudioCommand::stop) {
 		if (stream == nullptr) {
 			return -1;
 		}
 		int status;
-		CHECK_ERR(Pa_StopStream(stream));
-		CHECK_ERR(Pa_CloseStream(stream));
+		//CHECK_ERR(Pa_StopStream(stream));
+		//CHECK_ERR(Pa_CloseStream(stream));
 		stream = nullptr;
-		CHECK_ERR(Pa_Terminate());
+		//CHECK_ERR(Pa_Terminate());
 	} else if (cmd == AudioCommand::list) {
 		int status;
 		
-		CHECK_ERR(Pa_Initialize());
+		//CHECK_ERR(Pa_Initialize());
 		int numDevices = Pa_GetDeviceCount();
 		if (numDevices < 0) {
-			CHECK_ERR(numDevices);
+			//CHECK_ERR(numDevices);
 		}
 
 		std::string message;
@@ -66,9 +66,9 @@ int audioCommand(Controller* ctrl, AudioCommand cmd) {
 			message += "\n";
 
 		}
-		ctrl->sendOut(message);
+		//ctrl->sendOut(message);
 
-		CHECK_ERR(Pa_Terminate());
+		//CHECK_ERR(Pa_Terminate());
 	}
 
 	return 0;

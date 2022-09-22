@@ -45,7 +45,7 @@ int screenshot(Controller* ctrl) {
 	size_t pngSize;
 	lodepng_encode32(&png, &pngSize, pixels, width, height);
 
-	ctrl->sendBuffer((char*) png, pngSize);
+	//ctrl->sendBuffer((char*) png, pngSize);
 	free(png);
 
 	return 0;

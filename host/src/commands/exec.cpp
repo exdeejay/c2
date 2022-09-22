@@ -29,7 +29,7 @@ int exec(Controller *ctrl, const string cmd, bool wait) {
 		nullptr, (char *)cmd.c_str(), nullptr, nullptr, TRUE,
 		/*CREATE_NO_WINDOW*/ 0, nullptr, nullptr, &startupInfo, &pi);
 	if (!status) {
-		ctrl->sendErr(getWin32ErrorString());
+		//ctrl->sendErr(getWin32ErrorString());
 		return -1;
 	}
 	CloseHandle(inPipe[0]);
@@ -48,7 +48,7 @@ int exec(Controller *ctrl, const string cmd, bool wait) {
 			}
 			if (size != (DWORD)-1) {
 				out.assign(buf, size);
-				ctrl->sendOut(out);
+				//ctrl->sendOut(out);
 			}
 		}
 

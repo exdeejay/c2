@@ -37,14 +37,7 @@ target_include_directories(zlib INTERFACE "${CMAKE_SOURCE_DIR}/lib/zlib")
 
 file(GLOB_RECURSE srcs "src/*.cpp")
 add_library(payloadlib ${srcs})
-target_include_directories(
-    payloadlib
-    PUBLIC
-        "$<INSTALL_INTERFACE:include>"
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-    PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/src"
-)
+target_include_directories(payloadlib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 target_link_libraries(payloadlib asio lodepng portaudio snappy zlib)
 target_compile_definitions(payloadlib PUBLIC WIN32_LEAN_AND_MEAN)
 

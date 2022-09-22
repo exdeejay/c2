@@ -20,7 +20,7 @@ int downloadFile(Controller* ctrl, const string path) {
 	if (!file) {
 		return -2;
 	}
-	ctrl->sendBuffer(buf);
+	//ctrl->sendBuffer(buf);
 	return 0;
 }
 

