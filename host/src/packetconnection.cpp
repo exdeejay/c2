@@ -64,7 +64,34 @@ unique_ptr<SerializedPacket> PacketConnection::read_packet() {
 }
 
 void PacketConnection::write_packet_sync(const SerializedPacket& spkt) {
+    vector<char> data;
+    data.push_back(spkt.type);
+    data.insert(data.end(), spkt.data.get()->begin(), spkt.data.get()->end());
+	vector<char> out;
+    out.resize(4);
+
+	char buf[1024];
+	z_stream stream;
+	stream.zalloc = Z_NULL;
+	stream.zfree = Z_NULL;
+	stream.opaque = Z_NULL;
+	deflateInit(&stream, Z_DEFAULT_COMPRESSION);
+	stream.avail_in = data.size();
+	stream.next_in = (Bytef*) data.data();
+	do {
+		stream.avail_out = sizeof(buf);
+		stream.next_out = (Bytef*) buf;
+		deflate(&stream, Z_FINISH);
+		out.insert(out.end(), buf, buf + (sizeof(buf) - stream.avail_out));
+	} while (stream.avail_out == 0);
+	deflateEnd(&stream);
+
+	unsigned int size = byteswap32(out.size() - 4);
+	out[0] = size & 0xFF;
+	out[1] = (size >> 8) & 0xFF;
+	out[2] = (size >> 16) & 0xFF;
+	out[3] = (size >> 24) & 0xFF;
+
 	lock_guard<mutex> guard(writeMutex);
-    conn->write((const char*) &spkt.type, sizeof(SerializedPacket::type));
-    conn->write(spkt.data.get()->data(), spkt.data.get()->size());
+    conn->write(data.data(), data.size());
 }

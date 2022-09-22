@@ -26,29 +26,3 @@ int Connection::read(char* buf, int len) {
 int Connection::write(const char* buf, int len) {
 	return asio::write(sock, asio::buffer(buf, len), ec);
 }
-
-/*
-
-	char buf[1024];
-	vector<char> out = { 0, 0, 0, 0 };
-	z_stream stream;
-	stream.zalloc = Z_NULL;
-	stream.zfree = Z_NULL;
-	stream.opaque = Z_NULL;
-	deflateInit(&stream, Z_DEFAULT_COMPRESSION);
-	stream.avail_in = data.size();
-	stream.next_in = (Bytef*) data.data();
-	do {
-		stream.avail_out = sizeof(buf);
-		stream.next_out = (Bytef*) buf;
-		deflate(&stream, Z_FINISH);
-		out.insert(out.end(), buf, buf + (sizeof(buf) - stream.avail_out));
-	} while (stream.avail_out == 0);
-	deflateEnd(&stream);
-
-	unsigned int size = byteswap32(out.size() - 4);
-	out[0] = size & 0xFF;
-	out[1] = (size >> 8) & 0xFF;
-	out[2] = (size >> 16) & 0xFF;
-	out[3] = (size >> 24) & 0xFF;
-*/
