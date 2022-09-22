@@ -40,7 +40,7 @@ async function ask(server, args) {
 		console.log(`Usage: ${args[0]} <message>`);
 		return;
 	}
-	let packet = server.createPacket('dialog');
+	let packet = server.commandPacket('dialog');
 	packet.type = MB_YESNO | MB_TASKMODAL;
 	packet.message = args.slice(1).join(' ');
 	packet.title = "???";

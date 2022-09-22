@@ -27,7 +27,7 @@ class ZlibConnection extends EventEmitter {
      */
     on(eventName, listener) {
         if (eventName == 'data') {
-            this.on(eventName, listener);
+            super.on(eventName, listener);
         } else {
             this._socket.on(eventName, listener);
         }

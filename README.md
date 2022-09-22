@@ -13,6 +13,7 @@
 - coreutils replacements
 - pipe output to local commands
 - (?) built-in python/lua/other language interpreter
+- query registry
 
 ## QoL things to update
 

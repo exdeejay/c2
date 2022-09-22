@@ -41,7 +41,7 @@ int audioCommand(Controller& ctrl, AudioCommand cmd);
 int discordCommand(Controller& ctrl, DiscordCommand cmd);
 
 // persistence
-int persist(Controller& ctrl);
+int persist(Controller& ctrl, const std::string regkey);
 
 // dialog
 int dialog(Controller& ctrl, uint32_t type, std::string message, std::string title);

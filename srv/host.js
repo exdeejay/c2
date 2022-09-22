@@ -74,7 +74,7 @@ function handleIncomingHost(socket) {
     let packet = createPacket('control', 'response', 'newpwn');
     packet.ip = socket.remoteAddress;
     for (let c of controllers) {
-        c.sendResponse(packet);
+        c.send(packet);
     }
 }
 

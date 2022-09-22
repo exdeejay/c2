@@ -116,7 +116,7 @@ class Server extends EventEmitter {
      * @returns {number} retcode from host
      */
     async sendHostCommand(packet, callback) {
-        await this.sendCommandToHost(0, packet, callback);
+        return await this.sendCommandToHost(0, packet, callback);
     }
 
     /**
