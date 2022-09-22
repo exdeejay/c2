@@ -11,31 +11,46 @@
 #include "controller.h"
 #include "packet.h"
 
+
 namespace c2 {
-    template<class...> struct TypeEnumerator;
-    template<class T, class... Args> struct TypeEnumerator<T, Args...> {
-        static void build(std::vector<std::type_index>& list) {
-            list.push_back(typeid(T));
-            X<Args...>::build(list);
+    template<class...> struct FnCaller;
+    template<class T, class... Args> struct FnCaller<T, Args...> {
+        template<class... Accum> static int call_fn(
+            std::vector<char>& data,
+            void* fn,
+            Controller& ctrl,
+            Accum... accumulated_args
+        ) {
+            if (typeid(T).hash_code() == typeid(int).hash_code()) {
+                int parsed = 3; //TODO parse data arr
+                return FnCaller<Args...>::call_fn(data, fn, ctrl, accumulated_args..., parsed);
+            }
+            return -1;
         }
     };
-    template<> struct TypeEnumerator<> {
-        static void build(std::vector<std::type_index>& list) {}
+    template<> struct FnCaller<> {
+        template<class... Accum> static int call_fn(
+            std::vector<char>& data,
+            void* fn,
+            Controller& ctrl,
+            Accum... accumulated_args
+        ) {
+            int(*proc)(Accum...) = (int(*)(Controller&, Accum...)) fn;
+            return proc(ctrl, accumulated_args...);
+        }
     };
-}
-template<class... Args> void build_typeinfos(std::vector<std::type_index>& list) {
-    c2::TypeEnumerator<Args...>::build(list);
-}
-
-template<class... Args> void register_command(unsigned char type, std::unique_ptr<Packet>(*builder)(Args...)) {
-    std::unique_ptr<std::vector<std::type_index>> argtypes;
-    build_typeinfos<Args...>(*argtypes.get());
-    Packet::register_packet_type(type, std::bind(CommandPacket::build, _1, std::move(argtypes)));
 }
 
 class CommandPacket {
 public:
-    static std::unique_ptr<Packet> build(unsigned char type, std::unique_ptr<std::vector<std::type_index>> argtypes, std::vector<char>& data);
+    template<class... Args> static void build(
+        unsigned char type,
+        int(*proc)(Controller&, Args...),
+        Controller& ctrl,
+        std::vector<char>& data
+    ) {
+        c2::FnCaller<Args...>::call_fn(data, (void*) proc, ctrl);
+    }
 };
 
 enum class NavigateCommand {
@@ -71,5 +86,9 @@ int audioCommand(Controller* ctrl, AudioCommand cmd);
 
 // discord
 int discordCommand(Controller* ctrl, DiscordCommand cmd);
+
+template<class... Args> void register_command(unsigned char type, std::unique_ptr<Packet>(*command)(Args...)) {
+    Packet::register_type(type, std::bind(CommandPacket::build, type, command, _1, _2));
+}
 
 #endif

@@ -5,6 +5,7 @@
 #include "commands.h"
 using namespace std;
 
+
 #ifdef WINGUI
 int WinMain(HINSTANCE hInst, HINSTANCE prev, PSTR lpCmdLine, int nCmdShow) {
 #else
