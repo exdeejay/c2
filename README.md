@@ -12,7 +12,6 @@
 - keylogging
 - coreutils replacements
 - pipe output to local commands
-- execute remote programs
 - (?) built-in python/lua/other language interpreter
 
 ## QoL things to update
