@@ -14,7 +14,7 @@ endif()
 add_compile_options(/MT)
 
 add_library(asio INTERFACE)
-target_include_directories(asio INTERFACE "${CMAKE_SOURCE_DIR}/lib/asio-1.18.1/include")
+target_include_directories(asio INTERFACE "${CMAKE_SOURCE_DIR}/lib/asio")
 
 add_library(lodepng "${CMAKE_SOURCE_DIR}/lib/lodepng/lodepng.cpp")
 target_include_directories(lodepng PUBLIC "${CMAKE_SOURCE_DIR}/lib/lodepng")
