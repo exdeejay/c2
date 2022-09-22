@@ -23,18 +23,28 @@ add_library(portaudio STATIC IMPORTED)
 set_property(TARGET portaudio PROPERTY IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/portaudio/portaudio_static_x64.lib")
 target_include_directories(portaudio INTERFACE "${CMAKE_SOURCE_DIR}/lib/portaudio/include")
 
+add_library(snappy STATIC IMPORTED)
+set_property(TARGET snappy PROPERTY IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/snappy/snappy.lib")
+target_include_directories(snappy INTERFACE "${CMAKE_SOURCE_DIR}/lib/snappy")
+
 
 file(GLOB_RECURSE srcs "src/*.cpp")
-add_executable(payload ${srcs}) # WIN32
+add_library(payloadlib ${srcs})
 target_include_directories(
-    payload
+    payloadlib
     PUBLIC
         "$<INSTALL_INTERFACE:include>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
-target_link_libraries(payload asio lodepng portaudio)
-#set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
+target_link_libraries(payloadlib asio lodepng portaudio snappy)
+target_compile_definitions(payloadlib PUBLIC ASIO_SEPARATE_COMPILATION _WIN32_WINNT=0x0601 WIN32_LEAN_AND_MEAN)
+
+add_executable(payload "main.cpp")
+target_link_libraries(payload payloadlib)
 set_property(TARGET payload PROPERTY WIN32_EXECUTABLE $<IF:$<CONFIG:Debug>,OFF,ON>)
-target_compile_definitions(payload PUBLIC ASIO_SEPARATE_COMPILATION _WIN32_WINNT=0x0601 WIN32_LEAN_AND_MEAN $<$<NOT:$<CONFIG:Debug>>:WINGUI>)
+target_compile_definitions(payload PUBLIC $<$<NOT:$<CONFIG:Debug>>:WINGUI>)
+
+add_executable(test "test/test.cpp")
+target_link_libraries(test payloadlib)
