@@ -10,13 +10,13 @@ void PacketConnection::connect() {
     conn.get()->connect();
 }
 
-unique_ptr<SerializedPacket> PacketConnection::read_packet() {
+SerializedPacket PacketConnection::read_packet() {
     while (true) {
         if (compressed_len == -1 && buf.size() >= 4) {
             compressed_len = get<uint32_t>(buf.data());
         }
         if (compressed_len != -1 && buf.size() >= compressed_len + 4) {
-            vector<char>* deflated = new vector<char>;
+            unique_ptr<vector<char>> deflated = make_unique<vector<char>>();
             char deflateBuf[1024];
 
             z_stream stream;
@@ -41,11 +41,11 @@ unique_ptr<SerializedPacket> PacketConnection::read_packet() {
                 }
 
                 int type_offset = 0;
-                if (deflated->size() == 0 && stream.avail_out != sizeof(deflateBuf)) {
+                if (deflated.get()->size() == 0 && stream.avail_out != sizeof(deflateBuf)) {
                     packet_type = deflateBuf[0];
                     type_offset = 1;
                 }
-                deflated->insert(deflated->end(), deflateBuf + type_offset, deflateBuf + (sizeof(deflateBuf) - stream.avail_out));
+                deflated.get()->insert(deflated.get()->end(), deflateBuf + type_offset, deflateBuf + (sizeof(deflateBuf) - stream.avail_out));
             } while (stream.avail_out == 0);
             inflateEnd(&stream);
 
@@ -55,7 +55,7 @@ unique_ptr<SerializedPacket> PacketConnection::read_packet() {
             if (!valid) {
                 throw new exception("invalid zlib");
             }
-            return make_unique<SerializedPacket>(packet_type, unique_ptr<vector<char>>(deflated));
+            return SerializedPacket(packet_type, move(deflated));
         }
         char pbuf[1024];
         int bytes = conn->read(pbuf, sizeof(pbuf));

@@ -5,8 +5,8 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include <iostream>
 
-class Packet;
 class SerializedPacket {
 public:
 	SerializedPacket(unsigned char type, std::unique_ptr<std::vector<char>> data) : type(type), data(std::move(data)) {}

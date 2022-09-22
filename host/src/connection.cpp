@@ -1,5 +1,4 @@
 #include "connection.h"
-
 #include <iostream>
 using namespace std;
 using asio::ip::tcp;

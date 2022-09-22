@@ -12,9 +12,8 @@ public:
     PacketConnection(const std::string host, int port) {
         conn = std::make_unique<Connection>(host, port);
     }
-
     void connect();
-    std::unique_ptr<SerializedPacket> read_packet();
+    SerializedPacket read_packet();
     void write_packet_sync(const SerializedPacket& spkt);
 
 private:

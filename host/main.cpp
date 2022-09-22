@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <iostream>
+#include <memory>
 #include "packetconnection.h"
 #include "controller.h"
 #include "commands.h"
@@ -15,11 +16,10 @@ int main(int argc, char* argv[]) {
 	int port = 6997;
 
 	try {
-		PacketConnection conn(host, port);
-		conn.connect();
-		cout << "Connected to " << host << ":"
-			<< to_string(port).c_str() << endl;
-		Controller controller(conn);
+		unique_ptr<PacketConnection> conn = make_unique<PacketConnection>(host, port);
+		conn.get()->connect();
+		cout << "Connected to " << host << ":" << to_string(port).c_str() << endl;
+		Controller controller(move(conn));
 		controller.loop();
 	} catch (asio::system_error& ex) {
 		cerr << "Something went wrong: " << ex.what() << endl;

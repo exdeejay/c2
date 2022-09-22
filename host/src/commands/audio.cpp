@@ -1,5 +1,4 @@
 #include "commands.h"
-
 #include <iostream>
 #include <string>
 #include <vector>
