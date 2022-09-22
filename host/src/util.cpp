@@ -1,21 +1,35 @@
 #include "util.h"
 
+#include <iostream>
 
 using namespace std;
 
+
 template<>
-uint32_t get<uint32_t>(const char* buf, int offset) {
-	return byteswap32(*((uint32_t*)(buf + offset)));
+uint32_t get<uint32_t>(const char* buf, int* offset) {
+	if (offset == nullptr) {
+		return byteswap32(*((uint32_t*)buf));
+	} else {
+		uint32_t retVal = byteswap32(*((uint32_t*)(buf + *offset)));
+		*offset += sizeof(uint32_t);
+		return retVal;
+	}
 }
 
 template<>
-string get<string>(const char* buf, int offset) {
-	uint32_t size = get<uint32_t>(buf);
-	string str;
-	for (int i = 0; i < size; i++) {
-		str += buf[i + 4];
+string get<string>(const char* buf, int* offset) {
+	if (offset == nullptr) {
+		uint32_t size = get<uint32_t>(buf);
+		string str;
+		str.insert(str.begin(), buf, buf + size);
+		return str;
+	} else {
+		uint32_t size = get<uint32_t>(buf, offset);
+		string str;
+		str.insert(str.begin(), buf + *offset, buf + *offset + size);
+		*offset += size;
+		return str;
 	}
-	return str;
 }
 
 

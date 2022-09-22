@@ -25,8 +25,7 @@ class Controller {
     handleCommand(packet) {
         switch (packet.type.name) {
             case 'relaycommand':
-                let command = JSON.parse(packet.command);
-                host.hosts[packet.id].sendCommand(command);
+                host.hosts[packet.id].sendCommand(packet.command);
                 break;
         }
     }

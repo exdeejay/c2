@@ -5,7 +5,7 @@
 #include <mutex>
 #include <asio.hpp>
 
-typedef void (*callback_t)(std::vector<char>&, void*);
+typedef void (*callback_t)(const std::vector<char>&, void*);
 
 class Connection {
 public:

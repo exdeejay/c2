@@ -10,7 +10,7 @@ using asio::ip::tcp;
 void Connection::connect() {
 	tcp::resolver resolver(ctx);
 	tcp::resolver::results_type endpoints = resolver.resolve(host.c_str(), std::to_string(port).c_str(), ec);
-	asio::connect(sock, endpoints, ec);
+	asio::connect(sock, endpoints);
 }
 
 using std::vector;

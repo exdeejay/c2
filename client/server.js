@@ -47,7 +47,7 @@ class Server extends EventEmitter {
                 (pkt) => pkt != null && pkt.name == 'relaycommand'
             ),
             id: 0, // TODO: fill in host id
-            command: JSON.stringify(packet),
+            command: serializePacket('host', 'command', packet),
         };
         
         return new Promise((resolve) => {

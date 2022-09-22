@@ -14,7 +14,9 @@ enum class Packet {
 	listFiles,
 	pwd,
 	screenshot,
-	audioControl
+	audioControl,
+	downloadFile,
+	uploadFile
 };
 
 void handleCommand(std::vector<char>& buf);

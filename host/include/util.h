@@ -8,14 +8,25 @@
 
 
 template<typename T>
-T get(const char* buf, int offset = 0) {
-	return *((T*)(buf + offset));
+T get(const std::vector<char>& buf, int* offset = nullptr) {
+	return get<T>(buf.data(), offset);
+}
+
+template<typename T>
+T get(const char* buf, int* offset = nullptr) {
+	if (offset == nullptr) {
+		return *((T*) buf);
+	} else {
+		T retVal = *((T*)(buf + *offset));
+		*offset += sizeof(T);
+		return retVal;
+	}
 }
 
 template<>
-uint32_t get<uint32_t>(const char* buf, int offset);
+uint32_t get<uint32_t>(const char* buf, int* offset);
 template<>
-std::string get<std::string>(const char* buf, int offset);
+std::string get<std::string>(const char* buf, int* offset);
 
 
 uint32_t byteswap32(uint32_t val);

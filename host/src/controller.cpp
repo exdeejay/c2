@@ -7,18 +7,21 @@
 #include "commands.h"
 #include "util.h"
 
+using namespace std;
 
-void Controller::handleData(const std::vector<char>& buf) {
-	uint32_t size = get<uint32_t>(&buf[0]);
-	uint8_t command = get<uint8_t>(&buf[4]);
+
+void Controller::handleData(const vector<char>& buf) {
+	int offset = 0;
+	uint32_t size = get<uint32_t>(buf, &offset);
+	uint8_t command = get<uint8_t>(buf, &offset);
 	
-	int ret = -1;
+	int ret;
 	switch (command) {
 		PAK_CASE(Packet::changeDir):
-			ret = changeDir(this, get<std::string>(&buf[5]));
+			ret = changeDir(this, get<string>(buf, &offset));
 			break;
 		PAK_CASE(Packet::listFiles):
-			ret = listFiles(this, get<std::string>(&buf[5]));
+			ret = listFiles(this, get<string>(buf, &offset));
 			break;
 		PAK_CASE(Packet::pwd):
 			ret = pwd(this);
@@ -27,30 +30,39 @@ void Controller::handleData(const std::vector<char>& buf) {
 			ret = screenshot(this);
 			break;
 		PAK_CASE(Packet::audioControl):
-			ret = audioControl(this, (AudioCommand) get<uint32_t>(&buf[5]));
+			ret = audioControl(this, (AudioCommand) get<uint32_t>(buf, &offset));
+			break;
+		PAK_CASE(Packet::downloadFile):
+			ret = downloadFile(this, get<string>(buf, &offset));
+			break;
+		PAK_CASE(Packet::uploadFile):
+			string& str = get<string>(buf, &offset);
+			size_t size = get<uint32_t>(buf, &offset);
+			ret = uploadFile(this, str, size, &buf[offset]);
+			break;
 	}
 
 	this->ret(ret);
 }
 
 void Controller::ret(int code) {
-	std::vector<char> buf;
+	vector<char> buf;
 	writeUInt32(buf, 2);
 	buf.push_back(0);
 	buf.push_back(code);
 	conn->write(buf);
 }
 
-void Controller::sendOut(const std::string out) {
-	std::vector<char> buf;
+void Controller::sendOut(const string out) {
+	vector<char> buf;
 	writeUInt32(buf, 1 + 4+out.size());
 	buf.push_back(1);
 	writeString(buf, out);
 	conn->write(buf);
 }
 
-void Controller::sendErr(const std::string err) {
-	std::vector<char> buf;
+void Controller::sendErr(const string err) {
+	vector<char> buf;
 	writeUInt32(buf, 1 + 4+err.size());
 	buf.push_back(2);
 	writeString(buf, err);
@@ -58,15 +70,15 @@ void Controller::sendErr(const std::string err) {
 }
 
 void Controller::sendBuffer(const char* data, size_t size) {
-	std::vector<char> buf;
+	vector<char> buf;
 	writeUInt32(buf, 1 + 4+size);
 	buf.push_back(3);
 	writeBuffer(buf, data, size);
 	conn->write(buf);
 }
 
-void Controller::sendBuffer(const std::vector<char>& data) {
-	std::vector<char> buf;
+void Controller::sendBuffer(const vector<char>& data) {
+	vector<char> buf;
 	writeUInt32(buf, 1 + 4+data.size());
 	buf.push_back(3);
 	writeBuffer(buf, data);
@@ -83,7 +95,7 @@ void Controller::flushAudioBuffer() {
 	while (true) {
 		if (audioQueue.size() > 0) {
 			int size = audioQueue.size();
-			std::vector<char> buf;
+			vector<char> buf;
 			writeUInt32(buf, 1 + 4+size);
 			buf.push_back(4);
 			writeUInt32(buf, size);
@@ -93,12 +105,12 @@ void Controller::flushAudioBuffer() {
 			}
 			conn->write(buf);
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		this_thread::sleep_for(chrono::milliseconds(10));
 	}
 }
 
 void Controller::loop() {
-	std::thread audioFlushThread(&Controller::flushAudioBuffer, this);
+	thread audioFlushThread(&Controller::flushAudioBuffer, this);
 	while (true) {
 		conn->read(Controller::handleDataCallback, this);
 	}

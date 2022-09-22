@@ -10,7 +10,7 @@ class Controller {
 public:
 	Controller(Connection& conn) : conn(&conn) {}
 	
-	static void handleDataCallback(std::vector<char>& buf, void* context) {
+	static void handleDataCallback(const std::vector<char>& buf, void* context) {
 		reinterpret_cast<Controller*>(context)->handleData(buf);
 	}
 

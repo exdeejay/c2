@@ -3,6 +3,6 @@
     "name": "relaycommand",
     "data": {
         "id": "int",
-        "command": "str"
+        "command": "buf"
     }
 }

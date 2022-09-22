@@ -26,8 +26,7 @@ class Host {
     }
 
     sendCommand(command) {
-        let buffer = serializePacket('host', 'command', command);
-        this.connection.socket.write(buffer);
+        this.connection.socket.write(command);
     }
 }
 
