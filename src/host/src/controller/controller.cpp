@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <thread>
+#include "controllerimpl.h"
 #include "packet.h"
 #include "simplepacket.h"
 #include "simplecommand.h"
@@ -33,28 +34,13 @@ void register_all_commands() {
 	register_command(12, showoff);
 }
 
-Controller::Controller(unique_ptr<PacketConnection> conn) : conn(std::move(conn)) {
+Controller::Controller(string host, short port) : impl(make_unique<ControllerImpl>()) {
 	register_all_commands();
 }
 
-void Controller::flush_audio_buffer() {
-	vector<char> bufcpy;
-	bufcpy.resize(4096);
-	int len = 0;
-	while (true) {
-		len += audio_buf.pop(&bufcpy[len], 4096 - len);
-		if (len >= 4096) {
-			SimplePacket<vector<char>> pkt(4, bufcpy);
-			conn->write_packet_sync(pkt.serialize());
-			len = 0;
-		}
-		this_thread::sleep_for(chrono::milliseconds(10));
-	}
-}
 
-
-void Controller::loop() {
-	thread audio_flush_thread(&Controller::flush_audio_buffer, this);
+void Controller::run() {
+	// thread audio_flush_thread(&Controller::flush_audio_buffer, this);
 	while (true) {
 		SerializedPacket spkt = conn->read_packet_sync();
 		Packet::handle_packet(*this, *Packet::parse(spkt).get());
@@ -86,6 +72,21 @@ void Controller::send_buffer(const vector<char> buf) {
 	conn->write_packet_sync(pkt.serialize());
 }
 
-void Controller::buffer_audio(const char* buf, size_t size) {
-	audio_buf.push(buf, size);
-}
+// void Controller::flush_audio_buffer() {
+// 	vector<char> bufcpy;
+// 	bufcpy.resize(4096);
+// 	int len = 0;
+// 	while (true) {
+// 		len += audio_buf.pop(&bufcpy[len], 4096 - len);
+// 		if (len >= 4096) {
+// 			SimplePacket<vector<char>> pkt(4, bufcpy);
+// 			conn->write_packet_sync(pkt.serialize());
+// 			len = 0;
+// 		}
+// 		this_thread::sleep_for(chrono::milliseconds(10));
+// 	}
+// }
+
+// void Controller::buffer_audio(const char* buf, size_t size) {
+// 	audio_buf.push(buf, size);
+// }

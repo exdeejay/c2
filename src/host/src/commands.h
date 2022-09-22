@@ -1,10 +1,26 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
+#include <string>
 #include <vector>
-#include "simplecommand.h"
+
 #include "controller.h"
-#include "commandtypes.h"
+
+enum class NavigateCommand {
+    ls, cd, pwd, rm
+};
+
+enum class AudioCommand {
+    start, stop, list
+};
+
+enum class DiscordCommand {
+    check, grab
+};
+
+enum class ShowoffCommand {
+    gethacked, hi
+};
 
 // navigation
 int navigation(Controller& ctrl, unsigned char cmd, const std::string path);

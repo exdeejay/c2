@@ -1,22 +1,27 @@
 #include "packetconnection.h"
 #include <vector>
 #include <exception>
+#include <iostream>
+
 #include <zlib.h>
 #include "packet.h"
 #include "field.h"
-#include <iostream>
+#include "packetconnectionimpl.h"
+
 using namespace std;
 
+PacketConnection::PacketConnection(string host, short port) : impl(make_unique<PacketConnectionImpl>(host, port)) {}
+
 void PacketConnection::connect() {
-    conn->connect();
+    impl->conn.connect();
 }
 
 SerializedPacket PacketConnection::read_packet_sync() {
     while (true) {
-        if (compressed_len == -1 && buf.size() >= 4) {
-            compressed_len = Field<uint32_t>::parse_field(buf.cbegin(), buf.cend());
+        if (impl->compressed_len == -1 && impl->buf.size() >= 4) {
+            impl->compressed_len = Field<uint32_t>::parse_field(impl->buf.cbegin(), impl->buf.cend());
         }
-        if (compressed_len != -1 && buf.size() >= compressed_len + 4) {
+        if (impl->compressed_len != -1 && impl->buf.size() >= impl->compressed_len + 4) {
             unique_ptr<vector<char>> deflated = make_unique<vector<char>>();
             char deflateBuf[1024];
 
@@ -28,8 +33,8 @@ SerializedPacket PacketConnection::read_packet_sync() {
             stream.next_in = Z_NULL;
             inflateInit(&stream);
 
-            stream.avail_in = compressed_len;
-            stream.next_in = (Bytef*) buf.data() + 4;
+            stream.avail_in = impl->compressed_len;
+            stream.next_in = (Bytef*) impl->buf.data() + 4;
             bool valid = true;
             unsigned char packet_type = 0;
             do {
@@ -51,16 +56,16 @@ SerializedPacket PacketConnection::read_packet_sync() {
             inflateEnd(&stream);
 
 
-            buf.erase(buf.begin(), buf.begin() + compressed_len + 4);
-            compressed_len = -1;
+            impl->buf.erase(impl->buf.begin(), impl->buf.begin() + impl->compressed_len + 4);
+            impl->compressed_len = -1;
             if (!valid) {
                 throw new exception("invalid zlib");
             }
             return SerializedPacket(packet_type, move(deflated));
         }
         char pbuf[1024];
-        int bytes = conn->read(pbuf, sizeof(pbuf));
-        buf.insert(buf.end(), pbuf, pbuf + bytes);
+        int bytes = impl->conn.read(pbuf, sizeof(pbuf));
+        impl->buf.insert(impl->buf.end(), pbuf, pbuf + bytes);
     }
 }
 
@@ -93,6 +98,6 @@ void PacketConnection::write_packet_sync(const SerializedPacket& spkt) {
 	out[2] = (size >> 16) & 0xFF;
 	out[3] = (size >> 24) & 0xFF;
 
-	lock_guard<mutex> guard(writeMutex);
-    conn->write(out.data(), out.size());
+	lock_guard<mutex> guard(impl->writeMutex);
+    impl->conn.write(out.data(), out.size());
 }

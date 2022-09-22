@@ -12,9 +12,7 @@ endif()
 
 set (CMAKE_CXX_STANDARD 17)
 add_compile_options(/MT)
-add_link_options(/NODEFAULTLIB:MSVCRT)
 add_compile_definitions(_WIN32_WINNT=0x0601)
 
 add_subdirectory("third_party")
 add_subdirectory("src/host")
-# add_subdirectory("test")
