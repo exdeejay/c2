@@ -13,7 +13,8 @@ enum class Packet {
 	changeDir,
 	listFiles,
 	pwd,
-	screenshot
+	screenshot,
+	audioControl
 };
 
 void handleCommand(std::vector<char>& buf);

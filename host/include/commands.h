@@ -6,12 +6,19 @@
 
 #include "controller.h"
 
+enum class AudioCommand {
+	start, stop, list
+};
+
 // navigation
-int pwd(Controller* controller);
-int changeDir(Controller* controller, const std::string dir);
-int listFiles(Controller* controller, const std::string dir);
+int pwd(Controller* ctrl);
+int changeDir(Controller* ctrl, const std::string dir);
+int listFiles(Controller* ctrl, const std::string dir);
 
 // screen
-int screenshot(Controller* controller);
+int screenshot(Controller* ctrl);
+
+// audio
+int audioControl(Controller* ctrl, AudioCommand cmd);
 
 #endif

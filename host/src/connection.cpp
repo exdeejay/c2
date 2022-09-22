@@ -28,7 +28,7 @@ int Connection::read(callback_t callback, void* context) {
 	currentBuf.insert(currentBuf.end(), buf, buf + bytes);
 
 	if (currentBuf.size() >= 4 && currentLen == -1) {
-		currentLen = byteswap32(get<uint32_t>(&currentBuf[0]));
+		currentLen = get<uint32_t>(&currentBuf[0]);
 	}
 	if (currentBuf.size() >= currentLen) {
 		vector<char> newBuf;
@@ -42,5 +42,6 @@ int Connection::read(callback_t callback, void* context) {
 }
 
 void Connection::write(std::vector<char> &buf) {
+	std::lock_guard<std::mutex> guard(writeMutex);
 	asio::write(sock, asio::buffer(buf), ec);
 }

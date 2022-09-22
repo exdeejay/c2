@@ -2,6 +2,7 @@
 #define CONNECTION_H
 
 #include <string>
+#include <mutex>
 #include <asio.hpp>
 
 typedef void (*callback_t)(std::vector<char>&, void*);
@@ -31,6 +32,8 @@ private:
 
 	int currentLen = -1;
 	std::vector<char> currentBuf;
+
+	std::mutex writeMutex;
 };
 
 #endif

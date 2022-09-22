@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "pngjs": "^6.0.0"
+    "pngjs": "^6.0.0",
+    "speaker": "^0.5.3",
+    "wav": "^1.0.2"
   }
 }

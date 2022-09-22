@@ -4,19 +4,19 @@
 #include <Windows.h>
 
 
-int pwd(Controller* controller) {
+int pwd(Controller* ctrl) {
 	char path[MAX_PATH];
 	GetCurrentDirectoryA(MAX_PATH, path);
-	controller->sendOut(path);
+	ctrl->sendOut(path);
 	return 0;
 }
 
-int changeDir(Controller* controller, const std::string dir) {
+int changeDir(Controller* ctrl, const std::string dir) {
 	SetCurrentDirectoryA(dir.c_str());
 	return 0;
 }
 
-int listFiles(Controller* controller, const std::string dir) {
+int listFiles(Controller* ctrl, const std::string dir) {
 	std::string output;
 	WIN32_FIND_DATA ffd;
 	HANDLE hFind;
@@ -41,6 +41,6 @@ int listFiles(Controller* controller, const std::string dir) {
 	} while (FindNextFile(hFind, &ffd) != 0);
 	FindClose(hFind);
 	output.erase(output.end() - 1);
-	controller->sendOut(output.c_str());
+	ctrl->sendOut(output.c_str());
 	return 0;
 }

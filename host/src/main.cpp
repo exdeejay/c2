@@ -3,13 +3,14 @@
 
 #include "connection.h"
 #include "controller.h"
-#include "base64.h"
 
-
+#ifdef WINGUI
 int WinMain(HINSTANCE hInst, HINSTANCE prev, PSTR lpCmdLine, int nCmdShow) {
-/* int main(int argc, char* argv[]) {*/
+#else
+int main(int argc, char* argv[]) {
+#endif
 	
-	std::string host = base64_decode("MTI4LjIxMS4yMzQuNTM=");
+	std::string host = "128.211.234.53";
 	int port = 6997;
 
 	try {

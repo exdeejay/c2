@@ -5,7 +5,7 @@
 #include <Windows.h>
 
 
-int screenshot(Controller* controller) {
+int screenshot(Controller* ctrl) {
 	HDC screenDC = GetDC(nullptr);
 	HDC bitmapDC = CreateCompatibleDC(screenDC);
 	int x = GetSystemMetrics(SM_XVIRTUALSCREEN);
@@ -45,12 +45,8 @@ int screenshot(Controller* controller) {
 	size_t pngSize;
 	lodepng_encode32(&png, &pngSize, pixels, width, height);
 
-	std::vector<char> data;
-	data.resize(pngSize);
-	data.insert(data.begin(), png, png + pngSize);
+	ctrl->sendBuffer((char*) png, pngSize);
 	free(png);
-
-	controller->sendBuffer(data);
 
 	return 0;
 }

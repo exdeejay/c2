@@ -8,19 +8,21 @@
 
 
 template<typename T>
-T get(char* buf, int offset = 0) {
+T get(const char* buf, int offset = 0) {
 	return *((T*)(buf + offset));
 }
 
 template<>
-std::string get<std::string>(char* buf, int offset);
+uint32_t get<uint32_t>(const char* buf, int offset);
+template<>
+std::string get<std::string>(const char* buf, int offset);
 
 
 uint32_t byteswap32(uint32_t val);
-void writeUInt32(std::vector<char>& buf, int val);
-void writeString(std::vector<char>& buf, std::string& str);
-void writeBuffer(std::vector<char>& buf, std::vector<char>& data);
-
+void writeUInt32(std::vector<char>& buf, uint32_t val);
+void writeString(std::vector<char>& buf, const std::string& str);
+void writeBuffer(std::vector<char>& buf, const char* data, size_t size);
+void writeBuffer(std::vector<char>& buf, const std::vector<char>& data);
 
 
 #endif

@@ -27,7 +27,7 @@ class Server extends EventEmitter {
 
     handleResponse(packet) {
         if (packet.type.name == 'hostresponse') {
-            this.emit('hostresponse', packet);
+            this.emit('hostpacket', parsePacket('host', 'response', packet.data));
         }
     }
 
@@ -51,22 +51,23 @@ class Server extends EventEmitter {
         };
         
         return new Promise((resolve) => {
-            let handler = (response) => {
-                let responsePkt = parsePacket('host', 'response', response.data);
+            let handler = (responsePkt) => {
                 if (responsePkt.type.name == 'retcode') {
-                    this.removeListener('hostresponse', handler);
+                    this.removeListener('hostpacket', handler);
                     resolve(responsePkt.code);
                 } else {
                     if (callback == null) {
                         if (responsePkt.type.name == 'out') {
                             console.log(responsePkt.out);
+                        } else if (responsePkt.type.name == 'err') {
+                            console.error(`ERROR: ${responsePkt.err}`);
                         }
                     } else {
                         callback(responsePkt);
                     }
                 }
             };
-            this.on('hostresponse', handler);
+            this.on('hostpacket', handler);
             this.sendCommand(wrappedPkt);
         });
     }
