@@ -1,5 +1,4 @@
 .vscode/
 build/
-host/build/
 **/node_modules/
 out.*
