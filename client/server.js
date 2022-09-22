@@ -34,10 +34,10 @@ class Server extends EventEmitter {
             return;
         }
 
-        if (packet.type.name == 'newpwn') {
+        if (packet._ptype.name == 'newpwn') {
             console.log(`\n[!] Pwned ${packet.ip}`);
         }
-        if (packet.type.name == 'hostresponse') {
+        if (packet._ptype.name == 'hostresponse') {
             this.emit('hostpacket', parsePacket('host', 'response', packet.data));
         }
     }
@@ -67,21 +67,21 @@ class Server extends EventEmitter {
             }
         }
         let wrappedPkt = {
-            type,
+            _ptype: type,
             id: 0, // TODO: fill in host id
             command: serializePacket('host', 'command', packet),
         };
         
         return new Promise((resolve) => {
             let handler = (responsePkt) => {
-                if (responsePkt.type.name == 'retcode') {
+                if (responsePkt._ptype.name == 'retcode') {
                     this.removeListener('hostpacket', handler);
                     resolve(responsePkt.code);
                 } else {
                     if (callback == null) {
-                        if (responsePkt.type.name == 'out') {
+                        if (responsePkt._ptype.name == 'out') {
                             process.stdout.write(responsePkt.out);
-                        } else if (responsePkt.type.name == 'err') {
+                        } else if (responsePkt._ptype.name == 'err') {
                             console.error(`ERROR: ${responsePkt.err}`);
                         }
                     } else {

@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <iostream>
 #include <memory>
+#include <exception>
 #include "packetconnection.h"
 #include "controller.h"
 #include "commands.h"
@@ -22,6 +23,8 @@ int main(int argc, char* argv[]) {
 		Controller controller(move(conn));
 		controller.loop();
 	} catch (asio::system_error& ex) {
+		cerr << "Something went wrong: " << ex.what() << endl;
+	} catch (std::exception& ex) {
 		cerr << "Something went wrong: " << ex.what() << endl;
 	}
 }

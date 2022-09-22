@@ -1,0 +1,9 @@
+{
+    "index": 139,
+    "name": "dialog",
+    "data": {
+		"type": "uint",
+		"message": "str",
+		"title": "str"
+	}
+}

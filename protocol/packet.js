@@ -25,7 +25,7 @@ function createPacket(category, direction, name) {
         throw 'invalid packet name';
     }
 
-    return { type };
+    return { _ptype: type };
 }
 
 /**
@@ -46,6 +46,10 @@ function parseField(buffer, offset, packetObj, field, type) {
 
         case 'int':
             packetObj[field] = buffer.readInt32BE(offset);
+            return 4;
+        
+        case 'uint':
+            packetObj[field] = buffer.readUInt32BE(offset);
             return 4;
 
         case 'str':
@@ -85,7 +89,7 @@ function parsePacket(category, direction, buffer) {
 
     let packetType = packet_types[category][direction].get(commandNum);
     let packet = {
-        type: packetType,
+        _ptype: packetType,
     };
 
     for (let field in packetType.data) {
@@ -130,6 +134,11 @@ function serializeField(bytesArr, obj, type) {
             buf.writeInt32BE(obj);
             break;
 
+        case 'uint':
+            buf = Buffer.alloc(4);
+            buf.writeUInt32BE(obj);
+            break;
+
         case 'str':
             len = Buffer.alloc(4);
             len.writeUInt32BE(obj.length);
@@ -161,9 +170,9 @@ function serializePacket(category, direction, packet) {
         throw 'invalid packet direction';
     }
 
-    let bytesArr = [ packet.type.index ];
-    for (let field in packet.type.data) {
-        serializeField(bytesArr, packet[field], packet.type.data[field]);
+    let bytesArr = [ packet._ptype.index ];
+    for (let field in packet._ptype.data) {
+        serializeField(bytesArr, packet[field], packet._ptype.data[field]);
     }
 
     return Buffer.from(bytesArr);

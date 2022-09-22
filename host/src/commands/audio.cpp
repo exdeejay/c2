@@ -16,7 +16,7 @@ int audioCallback(
 		void* userData) {
 	const char* cInput = (const char*) input;
 	Controller* ctrl = (Controller*) userData;
-	//ctrl->bufferAudio(cInput, frameCount * 2);
+	//ctrl->buffer_audio(cInput, frameCount * 2);
 	return paContinue;
 }
 

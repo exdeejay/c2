@@ -25,7 +25,7 @@ class Host {
             }
         }
         let wrappedPkt = {
-            type,
+            _ptype: type,
             data: packet,
         };
         controllers[0].sendResponse(wrappedPkt);

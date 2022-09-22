@@ -24,9 +24,11 @@ int navigation(Controller& ctrl, unsigned char cmd, vector<char> data) {
 }
 
 int pwd(Controller& ctrl) {
-	char path[MAX_PATH];
-	GetCurrentDirectoryA(MAX_PATH, path);
+	DWORD length = GetCurrentDirectoryA(0, nullptr);
+	char* path = new char[length + 1];
+	GetCurrentDirectoryA(length+1, path);
 	ctrl.println(path);
+	delete[] path;
 	return 0;
 }
 

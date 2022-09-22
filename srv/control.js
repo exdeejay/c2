@@ -23,7 +23,7 @@ class Controller {
     }
 
     handleCommand(packet) {
-        switch (packet.type.name) {
+        switch (packet._ptype.name) {
             case 'relaycommand':
                 host.hosts[packet.id].sendCommand(packet.command);
                 break;

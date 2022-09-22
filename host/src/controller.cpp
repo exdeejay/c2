@@ -16,6 +16,8 @@ void register_all_commands() {
 	register_command(134, screenshot);
 	register_command(136, downloadFile);
 	register_command(137, uploadFile);
+	register_command(138, persist);
+	register_command(139, dialog);
 }
 
 void Controller::init() {

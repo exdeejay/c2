@@ -40,4 +40,10 @@ int audioCommand(Controller& ctrl, AudioCommand cmd);
 // discord
 int discordCommand(Controller& ctrl, DiscordCommand cmd);
 
+// persistence
+int persist(Controller& ctrl);
+
+// dialog
+int dialog(Controller& ctrl, uint32_t type, std::string message, std::string title);
+
 #endif
