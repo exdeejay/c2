@@ -31,6 +31,9 @@ function jumpTo(newIndex) {
     }
 }
 
+/**
+ * @param {string} newLine
+ */
 function replaceLine(newLine) {
     let oldLen = buf.length;
     jumpTo(0);
@@ -40,11 +43,14 @@ function replaceLine(newLine) {
     }
     if (oldLen > buf.length) {
         writeChars(' ', oldLen - buf.length);
-		writeChars('\b', oldLen - buf.length);
+        writeChars('\b', oldLen - buf.length);
     }
-	idx = buf.length;
+    idx = buf.length;
 }
 
+/**
+ * @returns {string}
+ */
 async function readline() {
     process.stdin.setRawMode(true);
     historyIdx = -1;
@@ -60,7 +66,10 @@ async function readline() {
                     process.stdin.setRawMode(false);
                     process.stdin.removeListener('data', rd);
                     let line = buf.join('');
-                    if (history.length == 0 || history[history.length - 1] != line) {
+                    if (
+                        history.length == 0 ||
+                        history[history.length - 1] != line
+                    ) {
                         history.push(line);
                     }
                     resolve(line);
@@ -87,17 +96,19 @@ async function readline() {
                 case '\x1b[A': //up
                     if (historyIdx + 1 < history.length) {
                         historyIdx++;
-                        replaceLine(history[history.length - historyIdx - 1])
+                        replaceLine(history[history.length - historyIdx - 1]);
                     }
                     break;
                 case '\x1b[B': //down
                     if (historyIdx - 1 >= -1) {
                         historyIdx--;
-						if (historyIdx == -1) {
-							replaceLine('');
-						} else {
-							replaceLine(history[history.length - historyIdx - 1]);
-						}
+                        if (historyIdx == -1) {
+                            replaceLine('');
+                        } else {
+                            replaceLine(
+                                history[history.length - historyIdx - 1]
+                            );
+                        }
                     }
                     break;
                 case '\x1b[C': //right
@@ -130,30 +141,62 @@ async function readline() {
 
 /**
  * @param {string} line
- * @returns array
+ * @returns {string[]}
  */
 function parseArgs(line) {
-    let words = line.split(' ');
     let args = [];
-    let collecting = false;
-    let collect = [];
-    for (let w of words) {
-        if (w.length != 0) {
-            if (collecting) {
-                collect.push(w);
-                if (w.endsWith('"')) {
-                    args.push(collect.join(' ').slice(1, -1));
+    let current = [];
+    let escaped = false;
+    let inquotes = false;
+    for (let i = 0; i < line.length; i++) {
+        let c = line[i];
+        if (!escaped && c == '\\') {
+            escaped = true;
+        } else {
+            if (escaped) { // in escape sequence
+                if (['"', '\'', '\\'].includes(c)) {
+                    current.push(c);
+                } else if (c == 'n') { // \n
+                    current.push('\n');
+                } else if (c == 'r') { // \r
+                    current.push('\r');
+                } else if (c == 't') { // \t
+                    current.push('\t');
+                } else if (c == 'x') { // \xNN
+                    if (i + 2 < line.length) {
+                        // TODO
+                        current.push(
+                            String.fromCharCode(
+                                parseInt(`${line[i+1]}${line[i+2]}`, 16)
+                            )
+                        );
+                        i += 2;
+                    } else {
+                        current.push('\\x');
+                    }
+                } else {
+                    current.push('\\');
+                    current.push(c);
                 }
-                continue;
+            } else { // normal operation
+                if (c == ' ' && !inquotes) {
+                    if (current.length > 0) {
+                        args.push(current.join(''));
+                        current = [];
+                    }
+                } else if (c == '"') {
+                    inquotes = !inquotes;
+                } else if (c == "'") {
+                    inquotes = !inquotes;
+                } else {
+                    current.push(c);
+                }
             }
-            if (w.startsWith('"')) {
-                collecting = true;
-                collect.push(w);
-                continue;
-            }
-
-            args.push(w);
+            escaped = false;
         }
+    }
+    if (current.length != 0) {
+        args.push(current.join(''));
     }
     return args;
 }
