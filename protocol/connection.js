@@ -22,8 +22,8 @@ class ZlibConnection extends EventEmitter {
     }
 
     /**
-     * @param {string} eventName 
-     * @param {*} listener 
+     * @param {string} eventName
+     * @param {*} listener
      */
     on(eventName, listener) {
         if (eventName == 'data') {

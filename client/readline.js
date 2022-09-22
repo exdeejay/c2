@@ -153,21 +153,26 @@ function parseArgs(line) {
         if (!escaped && c == '\\') {
             escaped = true;
         } else {
-            if (escaped) { // in escape sequence
-                if (['"', '\'', '\\'].includes(c)) {
+            if (escaped) {
+                // in escape sequence
+                if (['"', "'", '\\'].includes(c)) {
                     current.push(c);
-                } else if (c == 'n') { // \n
+                } else if (c == 'n') {
+                    // \n
                     current.push('\n');
-                } else if (c == 'r') { // \r
+                } else if (c == 'r') {
+                    // \r
                     current.push('\r');
-                } else if (c == 't') { // \t
+                } else if (c == 't') {
+                    // \t
                     current.push('\t');
-                } else if (c == 'x') { // \xNN
+                } else if (c == 'x') {
+                    // \xNN
                     if (i + 2 < line.length) {
                         // TODO
                         current.push(
                             String.fromCharCode(
-                                parseInt(`${line[i+1]}${line[i+2]}`, 16)
+                                parseInt(`${line[i + 1]}${line[i + 2]}`, 16)
                             )
                         );
                         i += 2;
@@ -178,7 +183,8 @@ function parseArgs(line) {
                     current.push('\\');
                     current.push(c);
                 }
-            } else { // normal operation
+            } else {
+                // normal operation
                 if (c == ' ' && !inquotes) {
                     if (current.length > 0) {
                         args.push(current.join(''));

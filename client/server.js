@@ -3,7 +3,6 @@ const { packet_types } = require('../protocol/protocol');
 const { createPacket } = require('../protocol/packet');
 const { ZlibConnection } = require('../protocol/connection');
 
-
 class Server extends EventEmitter {
     constructor(socket) {
         super();
@@ -27,7 +26,7 @@ class Server extends EventEmitter {
     /**
      * Abort any command currently waiting for a host response
      */
-    abort() {
+    abortCurrentCommand() {
         let abortPkt = createPacket('host', 'response', 'retcode');
         abortPkt.retcode = -999;
         this.emit('hostpacket', abortPkt);
@@ -40,8 +39,10 @@ class Server extends EventEmitter {
     handleResponse(packet) {
         switch (packet['_ptype'].name) {
             case 'servererror':
-                console.log(`ERROR: Server encountered error (${packet.message})`);
-                this.abort();
+                console.log(
+                    `ERROR: Server encountered error (${packet.message})`
+                );
+                this.abortCurrentCommand();
                 break;
             case 'newpwn':
                 console.log(`\n[!] Pwned ${packet.ip}`);
@@ -57,7 +58,7 @@ class Server extends EventEmitter {
 
     /**
      * Alias to create host command packet.
-     * @param {string} name 
+     * @param {string} name
      */
     commandPacket(name) {
         return createPacket('host', 'command', name);
@@ -67,23 +68,23 @@ class Server extends EventEmitter {
      * @callback hostCmdCallback
      * @param {*} response
      */
-    /** 
+    /**
      * Sends packet as a command to a given host.
-     * 
+     *
      * The passed-in callback co-handles any packets that arrive during the command,
      * and it is deregistered once a retcode is received. If it is null, out and err
      * packets are handled automatically.
-     * 
+     *
      * @param {number} hostID
      * @param {*} packet
-     * @param {hostCmdCallback} callback 
+     * @param {hostCmdCallback} callback
      * @returns {number} retcode from host
      */
     async sendCommandToHost(hostID, packet, callback) {
         let wrappedPkt = createPacket('control', 'command', 'relaycommand');
         wrappedPkt.id = hostID;
         wrappedPkt.command = packet;
-        
+
         return new Promise((resolve) => {
             let handler = (responsePkt) => {
                 if (responsePkt._ptype.name == 'retcode') {
@@ -106,12 +107,12 @@ class Server extends EventEmitter {
         });
     }
 
-    /** 
+    /**
      * Sends packet to the currently selected host.
      * See `sendCommandToHost()` for more details.
-     * 
+     *
      * @param {*} packet
-     * @param {hostCmdCallback} callback 
+     * @param {hostCmdCallback} callback
      * @returns {number} retcode from host
      */
     async sendHostCommand(packet, callback) {

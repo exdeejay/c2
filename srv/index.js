@@ -11,15 +11,16 @@ const DEFAULT_CONTROL_PORT = 35768;
 
 async function main() {
     let argv = yargs(process.argv.slice(2))
-        .usage('Usage: $0 [-h ip] [-p port] [--control-host ip] [--control-host port]')
+        .usage(
+            'Usage: $0 [-h ip] [-p port] [--control-host ip] [--control-host port]'
+        )
         .default('host', DEFAULT_HOST)
         .alias('host', 'h')
         .default('port', DEFAULT_PORT)
         .alias('port', 'p')
         .default('control-host', DEFAULT_CONTROL_HOST)
         .default('control-port', DEFAULT_CONTROL_PORT)
-        .help('help')
-        .argv;
+        .help('help').argv;
 
     await loadPacketTypes();
 
@@ -27,7 +28,9 @@ async function main() {
     const controlServer = net.createServer(handleIncomingController);
 
     server.listen(argv.port, argv.host, () => {
-        console.log(`Listening for incoming connections at ${argv.host}:${argv.port}`);
+        console.log(
+            `Listening for incoming connections at ${argv.host}:${argv.port}`
+        );
     });
     controlServer.listen(argv['control-port'], argv['control-host'], () => {
         console.log(

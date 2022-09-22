@@ -39,7 +39,7 @@ function parseField(buffer, offset, packetObj, field, type) {
         case 'int':
             packetObj[field] = buffer.readInt32BE(offset);
             return 4;
-        
+
         case 'uint':
             packetObj[field] = buffer.readUInt32BE(offset);
             return 4;
@@ -100,7 +100,7 @@ function parsePacket(category, direction, buffer) {
             packetType.data[field]
         );
     }
-    
+
     if (offset != buffer.length) {
         throw "parsed packet didn't match buffer length";
     }
@@ -150,7 +150,7 @@ function serializeField(bytesArr, obj, type) {
             buf = Buffer.concat([len, obj]);
             break;
     }
-    
+
     for (let i = 0; i < buf.length; i++) {
         bytesArr.push(buf[i]);
     }
@@ -162,7 +162,7 @@ function serializeField(bytesArr, obj, type) {
  * @param {string} direction
  */
 function serializePacket(packet) {
-    let bytesArr = [ packet._ptype.index ];
+    let bytesArr = [packet._ptype.index];
     for (let field in packet._ptype.data) {
         serializeField(bytesArr, packet[field], packet._ptype.data[field]);
     }

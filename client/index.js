@@ -8,7 +8,6 @@ const Server = require('./server');
 const SRV_HOST = '127.0.0.1';
 const SRV_PORT = 35768;
 
-
 async function main() {
     //let argv = yargs(process.argv.slice(2)).argv;
     await loadPacketTypes();
@@ -20,7 +19,7 @@ async function main() {
 
         server = new Server(sock);
         process.on('SIGINT', () => {
-            server.abort();
+            server.abortCurrentCommand();
         });
 
         if (process.stdin.isTTY) {

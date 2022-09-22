@@ -1,6 +1,6 @@
 const { Socket } = require('net');
 const { ZlibConnection } = require('../protocol/connection');
-const { createPacket, parsePacket, serializePacket } = require('../protocol/packet');
+const { createPacket } = require('../protocol/packet');
 const host = require('./host');
 
 /**
@@ -34,7 +34,7 @@ class Controller {
                     host.hosts[packet.id].sendCommand(packet.command);
                 } catch (err) {
                     console.error(err);
-                    this.send(wrapErrorPacket(err))
+                    this.send(wrapErrorPacket(err));
                 }
                 break;
             default:
@@ -54,7 +54,7 @@ class Controller {
 
 /**
  * Wrap error in packet for sending to host
- * @param {Error} err 
+ * @param {Error} err
  */
 function wrapErrorPacket(err) {
     let errPacket = createPacket('control', 'response', 'servererror');
@@ -71,11 +71,17 @@ function handleIncomingController(socket) {
     console.log(`[+] Now controlling the herd from ${socket.remoteAddress}`);
     socket.on('close', () => {
         console.log(`[-] Controller ${socket.remoteAddress} disconnected`);
-        controllers.splice(controllers.findIndex(i => i == controller), 1);
+        controllers.splice(
+            controllers.findIndex((i) => i == controller),
+            1
+        );
     });
     socket.on('error', () => {
         console.log(`[!] Controller ${socket.remoteAddress} forcibly exited`);
-        controllers.splice(controllers.findIndex(i => i == controller), 1);
+        controllers.splice(
+            controllers.findIndex((i) => i == controller),
+            1
+        );
     });
 }
 

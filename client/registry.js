@@ -11,7 +11,7 @@ async function readCommandsIntoArray(categoryName, arr) {
 }
 
 async function loadCommands() {
-    await readCommandsIntoArray('local', commands)
+    await readCommandsIntoArray('local', commands);
     await readCommandsIntoArray('remote', commands);
 }
 
