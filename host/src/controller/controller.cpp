@@ -5,11 +5,10 @@
 #include <vector>
 #include <thread>
 #include <cstdint>
+#include <stdexcept>
 #include "controllerimpl.h"
-#include "packet.h"
-#include "simplepacket.h"
-#include "simplecommand.h"
 #include "commands.h"
+#include "simplepacket.h"
 using namespace std;
 
 /**
@@ -19,10 +18,7 @@ using namespace std;
  */
 // boost::lockfree::spsc_queue<char, boost::lockfree::capacity<8192>> audio_buf;
 
-/**
- * Registers all commands as incoming packet types and handlers.
- */
-void register_all_commands() {
+Controller::Controller(string host, uint16_t port) : impl(make_unique<ControllerImpl>(host, port)) {
 	register_command(3, navigation);
 	register_command(4, discordCommand);
 	register_command(5, exec);
@@ -35,27 +31,23 @@ void register_all_commands() {
 	register_command(12, showoff);
 }
 
-Controller::Controller(string host, uint16_t port) : impl(make_unique<ControllerImpl>()) {
-	register_all_commands();
-}
-
 
 void Controller::run() {
-	// thread audio_flush_thread(&Controller::flush_audio_buffer, this);
 	while (true) {
-		SerializedPacket spkt = conn->read_packet_sync();
-		Packet::handle_packet(*this, *Packet::parse(spkt).get());
+		SerializedPacket spkt = impl->conn.read_packet_sync();
+		auto packet = parse_packet(spkt);
+		handle_packet(*packet);
 	}
 }
 
-void Controller::ret(uint8_t retcode) {
-	SimplePacket<uint8_t> pkt(0, retcode);
-	conn->write_packet_sync(pkt.serialize());
+void Controller::ret(retcode_t retcode) {
+	SimplePacket<retcode_t> pkt(0, retcode);
+	impl->conn.write_packet_sync(pkt.serialize());
 }
 
 void Controller::print(string out) {
 	SimplePacket<string> pkt(1, out);
-	conn->write_packet_sync(pkt.serialize());
+	impl->conn.write_packet_sync(pkt.serialize());
 }
 
 void Controller::println(string out) {
@@ -65,29 +57,36 @@ void Controller::println(string out) {
 
 void Controller::err_println(string err) {
 	SimplePacket<string> pkt(2, err);
-	conn->write_packet_sync(pkt.serialize());
+	impl->conn.write_packet_sync(pkt.serialize());
 }
 
 void Controller::send_buffer(const vector<uint8_t> buf) {
 	SimplePacket<vector<uint8_t>> pkt(3, buf);
-	conn->write_packet_sync(pkt.serialize());
+	impl->conn.write_packet_sync(pkt.serialize());
 }
 
-// void Controller::flush_audio_buffer() {
-// 	vector<char> bufcpy;
-// 	bufcpy.resize(4096);
-// 	int len = 0;
-// 	while (true) {
-// 		len += audio_buf.pop(&bufcpy[len], 4096 - len);
-// 		if (len >= 4096) {
-// 			SimplePacket<vector<char>> pkt(4, bufcpy);
-// 			conn->write_packet_sync(pkt.serialize());
-// 			len = 0;
-// 		}
-// 		this_thread::sleep_for(chrono::milliseconds(10));
-// 	}
-// }
+void Controller::register_type(packettype_t type, function<std::unique_ptr<Packet>(const vector<uint8_t>&)> builder) {
+	impl->registry[type] = builder;
+}
 
-// void Controller::buffer_audio(const char* buf, size_t size) {
-// 	audio_buf.push(buf, size);
-// }
+void Controller::register_handler(packettype_t type, function<bool(Controller&, Packet&)> handler) {
+	impl->handlers.insert(make_pair(type, handler));
+}
+
+unique_ptr<Packet> Controller::parse_packet(const SerializedPacket& spkt) {
+	auto pktctr = impl->registry.find(spkt.type);
+	if (pktctr == impl->registry.end()) {
+		// TODO: don't fail here, just log and return
+		throw new runtime_error("bad incoming packet type");
+	}
+	return pktctr->second(spkt.data);
+}
+
+void Controller::handle_packet(Packet& pkt) {
+	auto range = impl->handlers.equal_range(pkt.type());
+	for (auto i = range.first; i != range.second; i++) {
+		if (!i->second(*this, pkt)) {
+			return;
+		}
+	}
+}

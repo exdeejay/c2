@@ -1,7 +1,7 @@
-#include "basecommand.h"
 #include "util.h"
 #include <iostream>
 #include <Windows.h>
+#include "controller.h"
 using namespace std;
 
 int showoff(Controller& ctrl, unsigned char type) {

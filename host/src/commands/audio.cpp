@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include <portaudio.h>
-#include "basecommand.h"
+#include "controller.h"
 using namespace std;
 
 #define CHECK_ERR(fn) status = fn; if (status != paNoError) { ctrl.err_println(Pa_GetErrorText(status)); return status; }

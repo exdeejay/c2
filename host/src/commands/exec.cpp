@@ -1,6 +1,6 @@
-#include "basecommand.h"
-#include "util.h"
 #include <Windows.h>
+#include "util.h"
+#include "controller.h"
 using namespace std;
 
 int exec(Controller& ctrl, const string cmd, bool wait) {

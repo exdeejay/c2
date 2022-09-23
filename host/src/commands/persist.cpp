@@ -1,7 +1,7 @@
-#include "basecommand.h"
-#include "util.h"
 #include <string>
 #include <Windows.h>
+#include "util.h"
+#include "controller.h"
 using namespace std;
 
 int persist(Controller& ctrl, const string regkey) {

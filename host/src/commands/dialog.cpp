@@ -1,7 +1,7 @@
-#include "basecommand.h"
 #include <Windows.h>
 #include <string>
 #include <iostream>
+#include "controller.h"
 using namespace std;
 
 int dialog(Controller& ctrl, uint32_t type, string msg, string title) {

@@ -1,7 +1,7 @@
-#include "basecommand.h"
 #include <vector>
 #include <lodepng.h>
 #include <Windows.h>
+#include "controller.h"
 using namespace std;
 
 int screenshot(Controller& ctrl) {

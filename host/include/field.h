@@ -10,14 +10,12 @@ using iter_t = std::vector<uint8_t>::const_iterator;
 uint32_t byteswap32(uint32_t val);
 
 
-template<class T> class Field {
-public:
+template<class T> struct Field {
 	static T parse_field(iter_t& buf, const iter_t& end);
 	static void serialize_field(const T& val, std::vector<uint8_t>& buf);
 };
 
-template<class T> class Field<std::vector<T>> {
-public:
+template<class T> struct Field<std::vector<T>> {
 	static std::vector<T> parse_field(iter_t& buf, const iter_t& end) {
 		uint32_t size = Field<uint32_t>::parse_field(buf, end);
 		vector<T> data;
@@ -37,14 +35,13 @@ public:
 
 #define PARSE_ENUM(x) \
 	enum class x; \
-	template<> class Field<x> { \
-		public: \
-			static x parse_field(iter_t& buf, const iter_t& end) { \
-				return static_cast<x>(Field<uint8_t>::parse_field(buf, end)); \
-			} \
-			static void serialize_field(const x& val, std::vector<uint8_t>& buf) { \
-				Field<uint8_t>::serialize_field((uint8_t) val, buf); \
-			} \
+	template<> struct Field<x> { \
+		static x parse_field(iter_t& buf, const iter_t& end) { \
+			return static_cast<x>(Field<uint8_t>::parse_field(buf, end)); \
+		} \
+		static void serialize_field(const x& val, std::vector<uint8_t>& buf) { \
+			Field<uint8_t>::serialize_field((uint8_t) val, buf); \
+		} \
 	};
 
 PARSE_ENUM(DiscordCommand)

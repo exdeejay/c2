@@ -1,4 +1,3 @@
-#include "basecommand.h"
 #include <iostream>
 #include <cstdio>
 #include <cstring>
@@ -6,6 +5,7 @@
 #include <Windows.h>
 #include "util.h"
 #include "field.h"
+#include "controller.h"
 using namespace std;
 
 int pwd(Controller& ctrl) {

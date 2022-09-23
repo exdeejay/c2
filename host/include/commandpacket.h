@@ -1,20 +1,20 @@
 #ifndef SIMPLECOMMAND_H
 #define SIMPLECOMMAND_H
 
-#include <memory>
 #include <vector>
-#include <typeinfo>
+#include <memory>
 #include <functional>
 #include <cstdint>
+#include <utility>
 #include "controller.h"
 #include "packet.h"
 #include "field.h"
 
 
 namespace c2 {
-    template<class...> class FnCaller;
-    template<class T, class... Args> class FnCaller<T, Args...> {
-    public:
+    template<class...> struct FnCaller;
+    template<class T, class... Args> struct FnCaller<T, Args...> {
+    // public:
     //     static std::function<int(Controller&)> bind_fn(
     //         const std::vector<char>& data,
     //         int(*fn)(Controller&, T, Args...)
@@ -31,8 +31,8 @@ namespace c2 {
             return FnCaller<Args...>::bind_fn(data, end, fn, accumulated_args..., Field<T>::parse_field(data, end));
         }
     };
-    template<> class FnCaller<> {
-    public:
+    template<> struct FnCaller<> {
+    // public:
     //     static std::function<int(Controller&)> bind_fn(
     //         const std::vector<char>& data,
     //         int(*fn)(Controller&)
@@ -55,7 +55,7 @@ namespace c2 {
 template<class... Args>
 class CommandPacket : public Packet {
 public:
-    CommandPacket(uint8_t type, int(*proc)(Controller&, Args...), const std::vector<uint8_t>& data) : Packet(type) {
+    CommandPacket(packettype_t type, int(*proc)(Controller&, Args...), const std::vector<uint8_t>& data) : Packet(type) {
         bound_proc = c2::FnCaller<Args...>::bind_fn(data.cbegin(), data.cend(), proc);
     }
 
@@ -68,15 +68,19 @@ public:
         return SerializedPacket(_type, std::vector<uint8_t>>());
     }
 
-    static void build(uint8_t type, int(*proc)(Controller&, Args...)) {
-        Packet::register_type(type, [type, proc](const std::vector<uint8_t>& data) {
+    static std::pair<
+        std::function<std::unique_ptr<Packet>(const std::vector<uint8_t>&)>,
+        std::function<bool(Controller&, Packet&)>
+    > build(packettype_t type, int(*proc)(Controller&, Args...)) {
+        auto builder = [type, proc](const std::vector<uint8_t>& data) {
             return std::make_unique<CommandPacket>(type, proc, data);
-        });
-        Packet::register_handler(type, [](Controller& ctrl, Packet& pkt) {
+        };
+        auto handler = [](Controller& ctrl, Packet& pkt) {
             CommandPacket& cmdpkt = dynamic_cast<CommandPacket&>(pkt);
             ctrl.ret(cmdpkt.execute(ctrl));
             return true;
-        });
+        };
+        return std::make_pair(builder, handler);
     }
 
 private:
