@@ -1,15 +1,22 @@
-const { createPacket } = require('../common/packet');
-const hosts = require('./hosts');
-const controllers = require('./controllers');
+import { createPacket } from '../../common/src/packet';
+import hosts = require('./hosts');
+import controllers = require('./controllers');
 
-class CombinedServer {
+export class CombinedServer {
+    hostList: Map<number, hosts.Host>;
+    controllerList: Map<number, controllers.Controller>;
+    nextHostID: number;
+    nextControllerID: number;
+    hostServer: hosts.HostServer;
+    controlServer: controllers.ControlServer;
+
     /**
      * @param {string} hostIP
      * @param {number} port
      * @param {string} controlHostIP
      * @param {number} controlPort
      */
-    constructor(hostIP, port, controlHostIP, controlPort) {
+    constructor(hostIP: string, port: number, controlHostIP: string, controlPort: number) {
         this.hostList = new Map();
         this.controllerList = new Map();
         this.nextHostID = 0;
@@ -84,5 +91,3 @@ class CombinedServer {
         });
     }
 }
-
-exports.CombinedServer = CombinedServer;

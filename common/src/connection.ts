@@ -1,12 +1,13 @@
-const zlib = require('zlib');
-const { Socket } = require('net');
-const EventEmitter = require('events');
+import zlib = require('zlib');
+import { Socket } from 'net';
+import EventEmitter = require('events');
 
-class ZlibConnection extends EventEmitter {
-    /**
-     * @param {Socket} socket
-     */
-    constructor(socket) {
+export class ZlibConnection extends EventEmitter {
+    _socket: Socket;
+    buffer: Buffer;
+    nextPacketSize: number;
+
+    constructor(socket: Socket) {
         super();
         this._socket = socket;
         this.buffer = null;
@@ -14,18 +15,11 @@ class ZlibConnection extends EventEmitter {
         this._socket.on('data', this.handleData.bind(this));
     }
 
-    /**
-     * @returns {Socket}
-     */
-    socket() {
+    socket(): Socket {
         return this._socket;
     }
 
-    /**
-     * @param {string} eventName
-     * @param {*} listener
-     */
-    on(eventName, listener) {
+    override on(eventName: string, listener: any) {
         if (eventName == 'data') {
             super.on(eventName, listener);
         } else {
@@ -37,10 +31,8 @@ class ZlibConnection extends EventEmitter {
      * @event data
      * @type {Buffer}
      */
-    /**
-     * @param {Buffer} data
-     */
-    handleData(data) {
+    
+    handleData(data: Buffer) {
         if (this.buffer) {
             data = Buffer.concat([this.buffer, data]);
             this.buffer = null;
@@ -67,9 +59,8 @@ class ZlibConnection extends EventEmitter {
 
     /**
      * Write data to connection
-     * @param {Buffer} data
      */
-    write(data) {
+    write(data: Buffer) {
         let compressed = zlib.deflateSync(data);
         let lengthBuf = Buffer.alloc(4);
         lengthBuf.writeUInt32BE(compressed.length);
@@ -77,5 +68,3 @@ class ZlibConnection extends EventEmitter {
         this._socket.write(finalBuf);
     }
 }
-
-exports.ZlibConnection = ZlibConnection;

@@ -1,7 +1,7 @@
 const COMMAND_CHECK = 0;
 const COMMAND_GRAB = 1;
 
-module.exports = function (commands) {
+export = function (commands) {
     commands['discord'] = discord;
 };
 

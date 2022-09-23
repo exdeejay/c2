@@ -9,7 +9,7 @@ let spk = new Speaker({
 	sampleRate: 16000,
 });
 
-module.exports = function (commands) {
+export = function (commands) {
 	commands['audio'] = audio;
 }
 

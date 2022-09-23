@@ -1,15 +1,14 @@
-const net = require('net');
-const { ZlibConnection } = require('../common/connection');
-const { HostProxy } = require('./hostproxy');
-const { ControlBase } = require('./controlbase');
-const { forwardEvents } = require('../common/util');
+import net = require('net');
+import { ZlibConnection } from '../../common/src/connection';
+import { HostProxy } from './hostproxy';
+import { ControlBase } from './controlbase';
+import { forwardEvents } from '../../common/src/util';
 
-class ControlConnection extends ControlBase {
-    /**
-     * @param {string} host
-     * @param {number} port
-     */
-    constructor(ip, port) {
+export class ControlConnection extends ControlBase {
+    ip: string;
+    connection: ZlibConnection;
+
+    constructor(ip: string, port: number) {
         super();
         this.ip = ip;
         this.connection = new ZlibConnection(net.connect(port, ip));
@@ -21,9 +20,8 @@ class ControlConnection extends ControlBase {
 
     /**
      * Handle response packets from server
-     * @param {*} packet
      */
-    handlePacket(packet) {
+    handlePacket(packet: any) {
         this.emit('controlpacket', packet);
         switch (packet['_ptype'].name) {
             case 'servererror':
@@ -54,11 +52,8 @@ class ControlConnection extends ControlBase {
 
     /**
      * Send packet to this connection.
-     * @param {*} packet
      */
-    sendControlPacket(packet) {
+    sendControlPacket(packet: any) {
         this.connection.write(JSON.stringify(packet));
     }
 }
-
-exports.ControlConnection = ControlConnection;

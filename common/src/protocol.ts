@@ -1,4 +1,4 @@
-const fs = require('fs/promises');
+import fs = require('fs/promises');
 
 let loaded = false;
 const host_command = new Map();
@@ -6,21 +6,15 @@ const host_response = new Map();
 const control_command = new Map();
 const control_response = new Map();
 
-/**
- * @typedef {Object} IPacket
- * @property {number} index
- * @property {string} name
- * @property {string} category
- * @property {string} direction
- * @property {Object} data
- */
+export interface IPacket {
+    index: number;
+    name: string;
+    category: string;
+    direction: string;
+    data: any;
+}
 
-/**
- * @param {string} categoryName
- * @param {string} direction
- * @param {Map<string, IPacket>} map
- */
-async function readPacketTypesIntoMap(categoryName, direction, map) {
+async function readPacketTypesIntoMap(categoryName: string, direction: string, map: Map<string, IPacket>) {
     let dirName = `${__dirname}/packets/${categoryName}/${direction}`;
     let files = await fs.readdir(dirName);
     for (const file of files) {
@@ -31,7 +25,7 @@ async function readPacketTypesIntoMap(categoryName, direction, map) {
     }
 }
 
-async function loadPacketTypes() {
+export async function loadPacketTypes() {
     if (!loaded) {
         await readPacketTypesIntoMap('host', 'command', host_command);
         await readPacketTypesIntoMap('host', 'response', host_response);
@@ -41,20 +35,17 @@ async function loadPacketTypes() {
     }
 }
 
-/**
- * @typedef {Object} DuplexPacketTypes
- * @property {Map<string, IPacket>} command
- * @property {Map<string, IPacket>} response
- */
+interface DuplexPacketTypes {
+    command: Map<string, IPacket>;
+    response: Map<string, IPacket>;
+}
 
-/**
- * @typedef {Object} HostControlPacketTypes
- * @property {DuplexPacketTypes} host
- * @property {DuplexPacketTypes} control
- */
+interface HostControlPacketTypes {
+    host: DuplexPacketTypes;
+    control: DuplexPacketTypes;
+}
 
-/** @type {HostControlPacketTypes} */
-exports.packet_types = {
+export const packet_types: HostControlPacketTypes = {
     host: {
         command: host_command,
         response: host_response,
@@ -64,4 +55,3 @@ exports.packet_types = {
         response: control_response,
     },
 };
-exports.loadPacketTypes = loadPacketTypes;

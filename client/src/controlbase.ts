@@ -1,7 +1,10 @@
-const { EventEmitter } = require('events');
-const { createPacket } = require('../common/packet');
+import { EventEmitter } from 'events';
+import { createPacket } from '../../common/src/packet';
 
-class ControlBase extends EventEmitter {
+export class ControlBase extends EventEmitter {
+    hostsList: Map<any, any>;
+    nextHostID: number;
+
     constructor() {
         super();
         this.hostsList = new Map();
@@ -26,9 +29,8 @@ class ControlBase extends EventEmitter {
 
     /**
      * Alias to create host command packet.
-     * @param {string} name
      */
-    commandPacket(name) {
+    commandPacket(name: string) {
         return createPacket('host', 'command', name);
     }
 
@@ -38,13 +40,8 @@ class ControlBase extends EventEmitter {
      * The passed-in callback co-handles any packets that arrive during the command,
      * and it is deregistered once a retcode is received. If it is null, out and err
      * packets are handled automatically.
-     *
-     * @param {number} hostID
-     * @param {*} packet
-     * @param {hostCmdCallback} callback
-     * @returns {number} retcode from host
      */
-    async sendCommandToHost(hostID, packet, callback) {
+    async sendCommandToHost(hostID: number, packet: any, callback: any): number {
         if (!this.hostsList.has(hostID)) {
             throw new Error('invalid host ID');
         }
@@ -74,16 +71,12 @@ class ControlBase extends EventEmitter {
     /**
      * Sends packet to the currently selected host.
      * See `sendCommandToHost()` for more details.
-     *
-     * @param {*} packet
-     * @param {hostCmdCallback} callback
-     * @returns {number} retcode from host
      */
-    async sendHostCommand(packet, callback) {
+    async sendHostCommand(packet: any, callback: any): Promise<number> {
         return await this.sendCommandToHost(0, packet, callback);
     }
 
-    registerHostListener(callback, hostID) {
+    registerHostListener(callback: any, hostID: number) {
         if (hostID === undefined) {
             hostID = 0;
         }
@@ -91,7 +84,7 @@ class ControlBase extends EventEmitter {
         this.hostsList.get(hostID).on('packet', callback);
     }
 
-    removeHostListener(callback, hostID) {
+    removeHostListener(callback: any, hostID: number) {
         if (hostID === undefined) {
             hostID = 0;
         }
@@ -99,5 +92,3 @@ class ControlBase extends EventEmitter {
         this.hostsList.get(hostID).removeListener('packet', callback);
     }
 }
-
-exports.ControlBase = ControlBase;

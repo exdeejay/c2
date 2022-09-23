@@ -1,4 +1,4 @@
-module.exports = function (commands) {
+export = function (commands) {
 	commands['args'] = args;
 }
 

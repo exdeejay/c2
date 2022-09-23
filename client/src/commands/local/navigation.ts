@@ -1,6 +1,6 @@
-const fs = require('fs/promises');
+import fs = require('fs/promises');
 
-module.exports = function (commands) {
+export = function (commands) {
     commands['lls'] = lls;
 	commands['lcd'] = lcd;
 	commands['lpwd'] = lpwd;

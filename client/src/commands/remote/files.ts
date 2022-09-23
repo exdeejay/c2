@@ -1,7 +1,7 @@
-const fs = require('fs/promises');
-const path = require('path');
+import fs = require('fs/promises');
+import path = require('path');
 
-module.exports = function (commands) {
+export = function (commands) {
     commands['download'] = download;
     commands['upload'] = upload;
 };

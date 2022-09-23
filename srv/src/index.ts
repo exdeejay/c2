@@ -1,6 +1,6 @@
-const yargs = require('yargs');
-const { loadPacketTypes } = require('../common/protocol');
-const { CombinedServer } = require('./combinedserver');
+import yargs = require('yargs');
+import { loadPacketTypes } from '../../common/src/protocol';
+import { CombinedServer } from './combinedserver';
 
 async function main() {
     let argv = yargs(process.argv.slice(2))

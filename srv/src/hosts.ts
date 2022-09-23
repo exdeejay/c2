@@ -1,10 +1,10 @@
-const net = require('net');
-const { ZlibConnection } = require('../common/connection');
-const { parsePacket, serializePacket } = require('../common/packet');
-const { EventEmitter } = require('stream');
-const { forwardEvents } = require('../common/util');
+import net = require('net');
+import { ZlibConnection } from '../../common/src/connection';
+import { parsePacket, serializePacket } from '../../common/src/packet';
+import { EventEmitter } from 'stream';
+import { forwardEvents } from '../../common/src/util';
 
-class Host extends EventEmitter {
+export class Host extends EventEmitter {
     /**
      * @param {net.Socket} socket
      */
@@ -28,7 +28,7 @@ class Host extends EventEmitter {
     }
 }
 
-class HostServer extends EventEmitter {
+export class HostServer extends EventEmitter {
     constructor(host, port) {
         super();
         this.serverSocket = net.createServer((socket) => {
@@ -40,14 +40,10 @@ class HostServer extends EventEmitter {
     }
 }
 
-function createServer(host, port, callback) {
+export function createServer(host, port, callback) {
     let hostServer = new HostServer(host, port);
     if (callback !== undefined) {
         hostServer.on('listening', callback);
     }
     return hostServer;
 }
-
-exports.createServer = createServer;
-exports.HostServer = HostServer;
-exports.Host = Host;

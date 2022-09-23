@@ -1,6 +1,6 @@
 let commandMap;
 
-module.exports = function (commands) {
+export = function (commands) {
     commands['help'] = help;
 	commandMap = commands;
 };

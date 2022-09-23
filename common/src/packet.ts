@@ -1,11 +1,6 @@
-const { packet_types } = require('./protocol');
+import { packet_types } from './protocol';
 
-/**
- * @param {string} category
- * @param {string} direction
- * @param {string} name
- */
-function createPacket(category, direction, name) {
+export function createPacket(category:string, direction: string, name: string): any {
     if (!(category in packet_types)) {
         throw new Error('invalid packet category');
     }
@@ -20,13 +15,7 @@ function createPacket(category, direction, name) {
     return { _ptype: packet_types[category][direction].get(name) };
 }
 
-/**
- * @param {Buffer} buffer
- * @param {number} offset
- * @param {Object} packetObj
- * @param {string} type
- */
-function parseField(buffer, offset, packetObj, field, type) {
+function parseField(buffer: Buffer, offset: number, packetObj: any, field: string, type: string) {
     if (type.startsWith('[') && type.endsWith(']')) {
         let startOffset = offset;
         let subtype = type.slice(1, type.length - 1);
@@ -35,7 +24,7 @@ function parseField(buffer, offset, packetObj, field, type) {
         let arr = [];
         for (let i = 0; i < length; i++) {
             let parsed = {};
-            offset += parseField(buffer, offset, parsed, 0, subtype);
+            offset += parseField(buffer, offset, parsed, '0', subtype);
             arr.push(parsed[0]);
         }
         packetObj[field] = arr;
@@ -75,12 +64,7 @@ function parseField(buffer, offset, packetObj, field, type) {
     }
 }
 
-/**
- * @param {Buffer} buffer
- * @param {string} category
- * @param {string} direction
- */
-function parsePacket(category, direction, buffer) {
+export function parsePacket(category: string, direction: string, buffer: Buffer): any {
     if (!(category in packet_types)) {
         throw new Error('invalid packet category');
     }
@@ -127,12 +111,7 @@ function parsePacket(category, direction, buffer) {
     return packet;
 }
 
-/**
- * @param {number[]} bytesArr
- * @param {*} obj
- * @param {string} type
- */
-function serializeField(bytesArr, obj, type) {
+function serializeField(bytesArr: number[], obj: any, type: string) {
     let buf = null;
     let len;
 
@@ -190,12 +169,7 @@ function serializeField(bytesArr, obj, type) {
     }
 }
 
-/**
- * @param {Buffer} buffer
- * @param {string} category
- * @param {string} direction
- */
-function serializePacket(packet) {
+export function serializePacket(packet: any): Buffer {
     let bytesArr = [packet._ptype.index];
     for (let field in packet._ptype.data) {
         serializeField(bytesArr, packet[field], packet._ptype.data[field]);
@@ -204,6 +178,3 @@ function serializePacket(packet) {
     return Buffer.from(bytesArr);
 }
 
-exports.createPacket = createPacket;
-exports.parsePacket = parsePacket;
-exports.serializePacket = serializePacket;

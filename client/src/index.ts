@@ -1,9 +1,9 @@
-const yargs = require('yargs');
-const { loadPacketTypes } = require('../common/protocol');
-const registry = require('./registry');
-const { readline, parseArgs } = require('./readline');
-const { ControlConnection } = require('./controlconnection');
-const { ControlLocal } = require('./controllocal');
+import yargs = require('yargs');
+import { loadPacketTypes } from '../../common/src/protocol';
+import registry = require('./registry');
+import { readline, parseArgs } from './readline';
+import { ControlConnection } from './controlconnection';
+import { ControlLocal } from './controllocal';
 
 async function main() {
     let argv = yargs(process.argv.slice(2))

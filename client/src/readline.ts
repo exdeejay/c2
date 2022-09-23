@@ -1,38 +1,22 @@
-/**
- * @type {Array}
- */
-let buf;
-/**
- * @type {number}
- */
-let idx;
+let buf: string[];
+let idx: number;
 let historyIdx;
 let history = [];
 
-/**
- * @param {string} char
- * @param {number} num
- */
-function writeChars(char, num) {
+function writeChars(char: string, num: number) {
     for (let i = 0; i < num; i++) {
         process.stdout.write(char);
     }
 }
 
-/**
- * @param {number} newIndex
- */
-function jumpTo(newIndex) {
+function jumpTo(newIndex: number) {
     if (idx != newIndex) {
         process.stdout.moveCursor(newIndex - idx, 0);
         idx = newIndex;
     }
 }
 
-/**
- * @param {string} newLine
- */
-function replaceLine(newLine) {
+function replaceLine(newLine: string) {
     let oldLen = buf.length;
     jumpTo(0);
     buf = newLine.split('');
@@ -46,10 +30,7 @@ function replaceLine(newLine) {
     idx = buf.length;
 }
 
-/**
- * @returns {string}
- */
-async function readline() {
+export async function readline(): Promise<string> {
     process.stdin.setRawMode(true);
     historyIdx = -1;
     idx = 0;
@@ -131,11 +112,7 @@ async function readline() {
     });
 }
 
-/**
- * @param {string} line
- * @returns {string[]}
- */
-function parseArgs(line) {
+export function parseArgs(line: string): string[] {
     let args = [];
     let current = [];
     let escaped = false;
@@ -194,6 +171,3 @@ function parseArgs(line) {
     }
     return args;
 }
-
-exports.readline = readline;
-exports.parseArgs = parseArgs;

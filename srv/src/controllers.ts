@@ -1,14 +1,14 @@
-const net = require('net');
-const { EventEmitter } = require('stream');
-const { forwardEvents } = require('../common/util');
-const { ZlibConnection } = require('../common/connection');
-const { createPacket } = require('../common/packet');
+import net = require('net');
+import { EventEmitter } from 'stream';
+import { forwardEvents } from '../../common/src/util';
+import { ZlibConnection } from '../../common/src/connection';
+import { createPacket } from '../../common/src/packet';
 
-class Controller extends EventEmitter {
-    /**
-     * @param {net.Socket} socket
-     */
-    constructor(socket) {
+export class Controller extends EventEmitter {
+    ip: string;
+    connection: ZlibConnection;
+
+    constructor(socket: net.Socket) {
         super();
         this.ip = socket.remoteAddress;
         this.connection = new ZlibConnection(socket);
@@ -46,16 +46,17 @@ class Controller extends EventEmitter {
 
 /**
  * Wrap error in packet for sending to host
- * @param {Error} err
  */
-function wrapErrorPacket(err) {
+function wrapErrorPacket(err: Error) {
     let errPacket = createPacket('control', 'response', 'servererror');
     errPacket.message = err.toString();
     return errPacket; //TODO
 }
 
-class ControlServer extends EventEmitter {
-    constructor(host, port) {
+export class ControlServer extends EventEmitter {
+    serverSocket: net.Server;
+
+    constructor(host: string, port: number) {
         super();
         this.serverSocket = net.createServer(this.handleConnection.bind(this));
         this.serverSocket.listen(port, host);
@@ -75,14 +76,10 @@ class ControlServer extends EventEmitter {
     }
 }
 
-function createServer(host, port, callback) {
+export function createServer(host, port, callback) {
     let controlServer = new ControlServer(host, port);
     if (callback !== undefined) {
         controlServer.on('listening', callback);
     }
     return controlServer;
 }
-
-exports.createServer = createServer;
-exports.ControlServer = ControlServer;
-exports.Controller = Controller;

@@ -1,9 +1,7 @@
-function forwardEvents(eventNames, from, to) {
+export function forwardEvents(eventNames, from, to, ...args: any[]) {
     for (let eventName of eventNames) {
         from.on(eventName, function () {
-            to.emit(eventName, ...arguments);
+            to.emit(eventName, ...args);
         });
     }
 }
-
-exports.forwardEvents = forwardEvents;

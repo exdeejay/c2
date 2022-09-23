@@ -1,8 +1,12 @@
-const { EventEmitter } = require('events');
-const { createPacket } = require('../common/packet');
+import { EventEmitter } from 'events';
+import { createPacket } from '../../common/src/packet';
 
-class HostProxy extends EventEmitter {
-    constructor(remoteID, ip, control) {
+export class HostProxy extends EventEmitter {
+    remoteID: number;
+    ip: string;
+    control: any;
+
+    constructor(remoteID: number, ip: string, control: any) {
         super();
         this.remoteID = remoteID;
         this.ip = ip;
@@ -20,5 +24,3 @@ class HostProxy extends EventEmitter {
         this.control.sendControlPacket(wrappedPkt);
     }
 }
-
-exports.HostProxy = HostProxy;

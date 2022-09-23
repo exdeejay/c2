@@ -3,7 +3,7 @@ const COMMAND_CD = 1;
 const COMMAND_PWD = 2;
 const COMMAND_RM = 3;
 
-module.exports = function (commands) {
+export = function (commands) {
     commands['ls'] = ls;
     commands['cd'] = cd;
     commands['rm'] = rm;

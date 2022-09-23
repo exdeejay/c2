@@ -1,6 +1,6 @@
-const fs = require('fs');
+import fs = require('fs');
 
-module.exports = function (commands) {
+export = function (commands) {
 	commands['screenshot'] = screenshot;
 }
 
