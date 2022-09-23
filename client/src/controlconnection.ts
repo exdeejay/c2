@@ -42,6 +42,9 @@ export class ControlConnection extends ControlBase {
                         break;
                     }
                 }
+                if (remoteHost == null) {
+                    throw new Error('invalid host ID');
+                }
                 remoteHost.emit('packet', packet.data);
                 break;
             default:
@@ -54,6 +57,6 @@ export class ControlConnection extends ControlBase {
      * Send packet to this connection.
      */
     sendControlPacket(packet: any) {
-        this.connection.write(JSON.stringify(packet));
+        this.connection.write(Buffer.from(JSON.stringify(packet)));
     }
 }

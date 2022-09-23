@@ -1,7 +1,9 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "noEmitOnError": true
+        "noEmitOnError": true,
+        "target": "ES2015",
+        "strict": true
     },
     "include": ["./src/**/*"]
 }

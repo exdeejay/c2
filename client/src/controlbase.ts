@@ -1,8 +1,9 @@
 import { EventEmitter } from 'events';
 import { createPacket } from '../../common/src/packet';
+import { Host } from '../../srv/src/hosts';
 
 export class ControlBase extends EventEmitter {
-    hostsList: Map<any, any>;
+    hostsList: Map<number, Host>;
     nextHostID: number;
 
     constructor() {
@@ -41,13 +42,14 @@ export class ControlBase extends EventEmitter {
      * and it is deregistered once a retcode is received. If it is null, out and err
      * packets are handled automatically.
      */
-    async sendCommandToHost(hostID: number, packet: any, callback: any): number {
-        if (!this.hostsList.has(hostID)) {
+    async sendCommandToHost(hostID: number, packet: any, callback: any): Promise<number> {
+        let hostOrUndefined = this.hostsList.get(hostID);
+        if (hostOrUndefined === undefined) {
             throw new Error('invalid host ID');
         }
-        let host = this.hostsList.get(hostID);
+        let host = hostOrUndefined;
         return new Promise((resolve) => {
-            let handler = (responsePkt) => {
+            let handler = (responsePkt: any) => {
                 if (responsePkt._ptype.name == 'retcode') {
                     host.removeListener('packet', handler);
                     resolve(responsePkt.code);
@@ -80,15 +82,23 @@ export class ControlBase extends EventEmitter {
         if (hostID === undefined) {
             hostID = 0;
         }
-        //TODO: bounds checking
-        this.hostsList.get(hostID).on('packet', callback);
+        let hostOrUndefined = this.hostsList.get(hostID)
+        if (hostOrUndefined === undefined) {
+            throw new Error('invalid host ID');
+        }
+        let host = hostOrUndefined;
+        host.on('packet', callback);
     }
 
     removeHostListener(callback: any, hostID: number) {
         if (hostID === undefined) {
             hostID = 0;
         }
-        //TODO: bounds checking
-        this.hostsList.get(hostID).removeListener('packet', callback);
+        let hostOrUndefined = this.hostsList.get(hostID)
+        if (hostOrUndefined === undefined) {
+            throw new Error('invalid host ID');
+        }
+        let host = hostOrUndefined;
+        host.removeListener('packet', callback);
     }
 }

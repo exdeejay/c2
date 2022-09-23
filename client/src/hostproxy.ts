@@ -15,9 +15,8 @@ export class HostProxy extends EventEmitter {
 
     /**
      * Send packet to this host
-     * @param {*} packet
      */
-    sendPacket(packet) {
+    sendPacket(packet: any) {
         let wrappedPkt = createPacket('control', 'command', 'relaycommand');
         wrappedPkt.id = this.remoteID;
         wrappedPkt.command = packet;

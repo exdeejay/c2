@@ -4,7 +4,7 @@ import EventEmitter = require('events');
 
 export class ZlibConnection extends EventEmitter {
     _socket: Socket;
-    buffer: Buffer;
+    buffer: Buffer | null;
     nextPacketSize: number;
 
     constructor(socket: Socket) {
@@ -19,12 +19,13 @@ export class ZlibConnection extends EventEmitter {
         return this._socket;
     }
 
-    override on(eventName: string, listener: any) {
+    on(eventName: string, listener: (...args: any[]) => void) {
         if (eventName == 'data') {
             super.on(eventName, listener);
         } else {
             this._socket.on(eventName, listener);
         }
+        return this;
     }
 
     /**
