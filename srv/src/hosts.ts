@@ -1,14 +1,13 @@
 import net = require('net');
 import { ZlibConnection } from '../../common/src/connection';
-import { parsePacket, serializePacket } from '../../common/src/packet';
 import { EventEmitter } from 'stream';
 import { forwardEvents } from '../../common/src/util';
 
 export class Host extends EventEmitter {
-    /**
-     * @param {net.Socket} socket
-     */
-    constructor(socket) {
+    ip: string | undefined;
+    connection: ZlibConnection;
+
+    constructor(socket: net.Socket) {
         super();
         this.ip = socket.remoteAddress;
         this.connection = new ZlibConnection(socket);
@@ -21,15 +20,16 @@ export class Host extends EventEmitter {
 
     /**
      * Send packet to this host
-     * @param {*} packet
      */
-    sendPacket(packet) {
+    sendPacket(packet: any) {
         this.connection.write(serializePacket(packet));
     }
 }
 
 export class HostServer extends EventEmitter {
-    constructor(host, port) {
+    serverSocket: net.Server;
+
+    constructor(host: string, port: number) {
         super();
         this.serverSocket = net.createServer((socket) => {
             let host = new Host(socket);
@@ -40,7 +40,7 @@ export class HostServer extends EventEmitter {
     }
 }
 
-export function createServer(host, port, callback) {
+export function createServer(host: string, port: number, callback: any) {
     let hostServer = new HostServer(host, port);
     if (callback !== undefined) {
         hostServer.on('listening', callback);

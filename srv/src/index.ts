@@ -1,9 +1,9 @@
 import yargs = require('yargs');
-import { loadPacketTypes } from '../../common/src/protocol';
+import { PacketTypes } from '../../common/src/protocol';
 import { CombinedServer } from './combinedserver';
 
 async function main() {
-    let argv = yargs(process.argv.slice(2))
+    let argv = await yargs(process.argv.slice(2))
         .usage('Usage: $0 [-h ip] [-p port] [--control-host ip] [--control-host port]')
         .default('host', '0.0.0.0')
         .alias('host', 'h')
@@ -13,9 +13,15 @@ async function main() {
         .default('control-port', 35768)
         .help('help').argv;
 
-    await loadPacketTypes();
+    const packetTypes = new PacketTypes();
+    await packetTypes.load();
 
-    new CombinedServer(argv.host, argv.port, argv['control-host'], argv['control-port']);
+    new CombinedServer({
+        host: argv.host,
+        port: argv.port,
+        controlHost: argv['control-host'],
+        controlPort: argv['control-port']
+    });
 }
 
 main();

@@ -2,10 +2,9 @@ import net = require('net');
 import { EventEmitter } from 'stream';
 import { forwardEvents } from '../../common/src/util';
 import { ZlibConnection } from '../../common/src/connection';
-import { createPacket } from '../../common/src/packet';
 
 export class Controller extends EventEmitter {
-    ip: string;
+    ip: string | undefined;
     connection: ZlibConnection;
 
     constructor(socket: net.Socket) {
@@ -21,9 +20,8 @@ export class Controller extends EventEmitter {
 
     /**
      * Handle command received from controller
-     * @param {*} packet
      */
-    handlePacket(packet) {
+    handlePacket(packet: any) {
         this.emit('packet', packet);
         switch (packet._ptype.name) {
             case 'relaycommand':
@@ -37,10 +35,9 @@ export class Controller extends EventEmitter {
 
     /**
      * Send packet to this controller
-     * @param {*} packet
      */
-    sendPacket(packet) {
-        this.connection.write(JSON.stringify(packet));
+    sendPacket(packet: any) {
+        this.connection.write(Buffer.from(JSON.stringify(packet)));
     }
 }
 
@@ -67,16 +64,14 @@ export class ControlServer extends EventEmitter {
      * @event connection
      * @type {Controller}
      */
-    /**
-     * @param {net.Socket} socket
-     */
-    handleConnection(socket) {
+
+    handleConnection(socket: net.Socket) {
         let controller = new Controller(socket);
         this.emit('connection', controller);
     }
 }
 
-export function createServer(host, port, callback) {
+export function createServer(host: string, port: number, callback: any) {
     let controlServer = new ControlServer(host, port);
     if (callback !== undefined) {
         controlServer.on('listening', callback);
