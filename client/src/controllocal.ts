@@ -1,13 +1,13 @@
 import { forwardEvents } from '../../common/src/util';
-import hosts = require('../../srv/src/hosts');
+import { HostServer } from '../../srv/src/hosts';
 import { ControlBase } from './controlbase';
 
 export class ControlLocal extends ControlBase {
-    hostServer: hosts.HostServer;
+    hostServer: HostServer;
 
     constructor(host: string, port: number) {
         super();
-        this.hostServer = hosts.createServer(host, port);
+        this.hostServer = HostServer.createServer(host, port);
         forwardEvents(['listening', 'connection'], this.hostServer, this);
     }
 }

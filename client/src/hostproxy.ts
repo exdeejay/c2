@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import { createPacket } from '../../common/src/packet';
 
 export class HostProxy extends EventEmitter {
     remoteID: number;

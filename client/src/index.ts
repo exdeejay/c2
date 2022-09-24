@@ -1,62 +1,68 @@
 import yargs = require('yargs');
-import { loadPacketTypes } from '../../common/src/protocol';
-import registry = require('./registry');
+import { CommandRegistry } from './registry'; './registry';
 import { readline, parseArgs } from './readline';
 import { ControlConnection } from './controlconnection';
 import { ControlLocal } from './controllocal';
+import { PacketTypes } from '../../common/src/protocol';
+import { ControlBase } from './controlbase';
 
 async function main() {
-    let argv = yargs(process.argv.slice(2))
+    let argv = await yargs(process.argv.slice(2))
         .usage('Usage: $0 [-h ip] [-p port]')
-        .option('host')
+        .demandOption('host')
         .string('host')
         .alias('host', 'h')
         .default('port', 35768)
         .number('port')
         .alias('port', 'p')
         .help('help').argv;
-
-    await loadPacketTypes();
+    
+    const packetTypes = new PacketTypes();
+    await packetTypes.load();
+    const registry = new CommandRegistry();
     await registry.loadCommands();
 
     let local = argv.host === undefined;
-    let control = null;
+    let control: ControlBase | null = null;
     if (local) {
-        control = new ControlLocal('0.0.0.0', 6997);
+        let controlLocal = new ControlLocal('0.0.0.0', 6997);
+        control = controlLocal;
         await new Promise((resolve) => {
-            control.on('listening', resolve);
+            controlLocal.on('listening', resolve);
         });
         console.log(`Local control server started at 0.0.0.0:6997`);
     } else {
-        control = new ControlConnection(argv.host, argv.port);
+        let controlRemote = new ControlConnection(argv.host, argv.port);
+        control = controlRemote;
         try {
             await new Promise((resolve, reject) => {
-                control.on('connect', resolve);
-                control.on('error', reject);
-                control.on('timeout', reject);
+                controlRemote.on('connect', resolve);
+                controlRemote.on('error', reject);
+                controlRemote.on('timeout', reject);
             });
-            control.on('error', (err) => {
+            controlRemote.on('error', (err) => {
                 console.error(`ERROR: Error occurred with remote server (${err})`);
             });
-            control.on('close', () => {
+            controlRemote.on('close', () => {
                 console.error('Server connection closed.');
                 process.exit(0);
             });
             console.log(
-                `Connected to ${control.ip}:${control.connection.socket().remotePort}`
+                `Connected to ${controlRemote.ip}:${controlRemote.connection.socket().remotePort}`
             );
         } catch (err) {
             console.error(`ERROR: could not connect to server (${err})`);
             process.exit(1);
         }
     }
+    let resolvedControl = control!;
 
-    control.on('connection', (host) => {
+    resolvedControl.on('connection', (host) => {
         console.log(`\n[!] Pwned ${host.ip}`);
     });
 
     process.on('SIGINT', () => {
-        control.abortCurrentCommand();
+        resolvedControl.abortCurrentCommand();
     });
 
     if (process.stdin.isTTY) {
@@ -70,7 +76,7 @@ async function main() {
             if (!(args[0] in registry.commands)) {
                 console.log('Unknown command.');
             } else {
-                await registry.commands[args[0]](control, args);
+                await registry.commands[args[0]](resolvedControl, args);
             }
         }
     }

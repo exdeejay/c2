@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import { createPacket } from '../../common/src/packet';
 import { Host } from '../../srv/src/hosts';
 
 export class ControlBase extends EventEmitter {

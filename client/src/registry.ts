@@ -1,20 +1,33 @@
 import fs = require('fs/promises');
 
-let loaded = false;
-export const commands = {};
+type CommandFunc = (control: any, args: any[]) => void;
 
-async function readCommandsIntoArray(categoryName: string, arr: any) {
-    let dirName = `${__dirname}/commands/${categoryName}`;
-    let files = await fs.readdir(dirName);
-    for (let file of files) {
-        require(`${dirName}/${file}`)(arr);
+interface CommandList {
+    [key: string]: CommandFunc;
+};
+
+export class CommandRegistry {
+    loaded: boolean;
+    commands: CommandList;
+
+    constructor(public dirName = `${__dirname}/commands`) {
+        this.loaded = false;
+        this.commands = {};
     }
-}
 
-export async function loadCommands() {
-    if (!loaded) {
-        await readCommandsIntoArray('local', commands);
-        await readCommandsIntoArray('remote', commands);
-        loaded = true;
+    async readCommandsIntoArray(categoryName: string, arr: CommandList) {
+        let dirName = `${this.dirName}/${categoryName}`;
+        let files = await fs.readdir(dirName);
+        for (let file of files) {
+            require(`${dirName}/${file}`)(arr);
+        }
+    }
+
+    async loadCommands() {
+        if (!this.loaded) {
+            await this.readCommandsIntoArray('local', this.commands);
+            await this.readCommandsIntoArray('remote', this.commands);
+            this.loaded = true;
+        }
     }
 }

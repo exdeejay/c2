@@ -1,11 +1,5 @@
 import fs = require('fs/promises');
 
-let loaded = false;
-const host_command = new Map();
-const host_response = new Map();
-const control_command = new Map();
-const control_response = new Map();
-
 type Category = 'host' | 'control';
 type Direction = 'command' | 'response';
 
@@ -57,7 +51,7 @@ export class PacketTypes {
         await this.readPacketTypesIntoMap('host', 'response', this.packetTypes.host.response);
         await this.readPacketTypesIntoMap('control', 'command', this.packetTypes.control.command);
         await this.readPacketTypesIntoMap('control', 'response', this.packetTypes.control.response);
-        loaded = true;
+        this.loaded = true;
     }
 
     async readPacketTypesIntoMap(category: Category, direction: Direction, map: Map<string, PacketType>) {

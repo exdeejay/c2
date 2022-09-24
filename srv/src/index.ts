@@ -16,12 +16,14 @@ async function main() {
     const packetTypes = new PacketTypes();
     await packetTypes.load();
 
-    new CombinedServer({
+    let combinedServer = new CombinedServer(packetTypes, {
         host: argv.host,
         port: argv.port,
         controlHost: argv['control-host'],
         controlPort: argv['control-port']
     });
+    
+    combinedServer.run();
 }
 
 main();

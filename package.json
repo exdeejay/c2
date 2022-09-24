@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@types/yargs": "^17.0.13"
+  }
+}
