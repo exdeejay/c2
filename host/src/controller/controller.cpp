@@ -35,6 +35,7 @@ Controller::~Controller() = default;
 
 
 void Controller::run() {
+	impl->conn.connect();
 	while (true) {
 		SerializedPacket spkt = impl->conn.read_packet_sync();
 		auto packet = parse_packet(spkt);

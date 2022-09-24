@@ -24,8 +24,7 @@ int downloadFile(Controller& ctrl, const string path) {
 	return 0;
 }
 
-int uploadFile(Controller& ctrl, const string path, vector<uint8_t> data) {
-	vector<uint8_t> filebuf = Field<vector<uint8_t>>::parse_field(data.begin(), data.end());
+int uploadFile(Controller& ctrl, const string path, vector<uint8_t> filebuf) {
 	ofstream file(path, ios::binary);
 	if (!file) {
 		return -1;

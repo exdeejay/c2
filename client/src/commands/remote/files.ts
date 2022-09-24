@@ -18,7 +18,7 @@ async function download(server: ControlServer, args: string[]) {
     packet.path = args[1];
     let buffer: Buffer;
     let ret = await server.sendHostCommand(packet, (response) => {
-        if (response.type.name == 'buffer') {
+        if (response._ptype.name == 'buffer') {
             buffer = response.data;
         }
     });

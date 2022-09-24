@@ -9,6 +9,11 @@ interface ControlServerOptions {
     port?: number;
 }
 
+export declare interface ControlServer {
+    on(event: 'connection', listener: (incomingHost: Host) => void): this;
+    on(event: 'listening', listener: () => void): this;
+}
+
 export class ControlServer extends EventEmitter {
     serverSocket: net.Server;
     ip: string;

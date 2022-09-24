@@ -122,9 +122,7 @@ export class PacketTypes {
     
                 case 'buf':
                     let size = buffer.readUInt32BE(offset);
-                    packetObj[field] = buffer
-                        .slice(offset + 4, offset + 4 + size)
-                        .toString('base64');
+                    packetObj[field] = buffer.slice(offset + 4, offset + 4 + size);
                     return size + 4;
             }
         }

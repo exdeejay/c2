@@ -1,9 +1,9 @@
 file(GLOB_RECURSE srcs "src/*.cpp")
-add_library(payload ${srcs})
+add_executable(payload ${srcs})
 target_include_directories(payload PUBLIC "include")
 set(include_dirs "src" "src/commands" "src/connection" "src/controller")
 target_include_directories(payload PRIVATE ${include_dirs})
-target_link_libraries(payload asio lodepng PortAudio snappy zlib)
+target_link_libraries(payload asio lodepng PortAudio snappy zlibstatic)
 
 set_property(TARGET payload PROPERTY WIN32_EXECUTABLE $<IF:$<CONFIG:Debug>,OFF,ON>)
 target_compile_definitions(payload PUBLIC WIN32_LEAN_AND_MEAN)

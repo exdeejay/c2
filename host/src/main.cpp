@@ -15,6 +15,6 @@ int main(int argc, char* argv[]) {
 #endif
 	//TODO: parse arguments?
 	//TODO: handle segfaults?
-	Controller controller("10.0.0.67", 6997);
+	Controller controller("127.0.0.1", 6997);
 	controller.run();
 }
