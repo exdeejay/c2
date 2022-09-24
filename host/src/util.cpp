@@ -13,3 +13,5 @@ string getWin32ErrorString() {
 	LocalFree(msgBuf);
 	return errMsg;
 }
+
+uint32_t byteswap32(uint32_t val) { return _byteswap_ulong(val); }

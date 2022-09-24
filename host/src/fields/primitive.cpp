@@ -1,9 +1,7 @@
 #include "field.h"
-#include <Windows.h>
+#include "util.h"
 #include <iostream>
 using namespace std;
-
-uint32_t byteswap32(uint32_t val) { return _byteswap_ulong(val); }
 
 template<>
 uint8_t Field<uint8_t>::parse_field(iter_t& buf, const iter_t& end) {

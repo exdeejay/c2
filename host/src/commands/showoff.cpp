@@ -6,14 +6,14 @@
 using namespace std;
 
 int showoff(Controller& ctrl, unsigned char type) {
-	int ret;
+	int ret = -1;
 	switch (type) {
 	case ShowoffCommand::gethacked:
 		//ret = getHacked();
 		break;
 	default:
 		//TODO error
-		ret = -1;
+		break;
 	}
 	return ret;
 }

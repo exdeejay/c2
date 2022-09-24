@@ -7,6 +7,7 @@
 #include <zlib.h>
 #include "packet.h"
 #include "field.h"
+#include "util.h"
 #include "packetconnectionimpl.h"
 
 using namespace std;

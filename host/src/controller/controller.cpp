@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <stdexcept>
 #include "controllerimpl.h"
+#include "log.h"
 #include "commands.h"
 #include "simplepacket.h"
 using namespace std;
@@ -36,6 +37,7 @@ Controller::~Controller() = default;
 
 void Controller::run() {
 	impl->conn.connect();
+	DEBUGLOG("Starting packet read loop\n");
 	while (true) {
 		SerializedPacket spkt = impl->conn.read_packet_sync();
 		auto packet = parse_packet(spkt);
@@ -48,9 +50,13 @@ void Controller::ret(retcode_t retcode) {
 	impl->conn.write_packet_sync(pkt.serialize());
 }
 
+void Controller::send_packet(Packet& packet) {
+	impl->conn.write_packet_sync(packet.serialize());
+}
+
 void Controller::print(string out) {
 	SimplePacket<string> pkt(1, out);
-	impl->conn.write_packet_sync(pkt.serialize());
+	send_packet(pkt);
 }
 
 void Controller::println(string out) {
@@ -60,12 +66,12 @@ void Controller::println(string out) {
 
 void Controller::err_println(string err) {
 	SimplePacket<string> pkt(2, err);
-	impl->conn.write_packet_sync(pkt.serialize());
+	send_packet(pkt);
 }
 
 void Controller::send_buffer(const vector<uint8_t> buf) {
 	SimplePacket<vector<uint8_t>> pkt(3, buf);
-	impl->conn.write_packet_sync(pkt.serialize());
+	send_packet(pkt);
 }
 
 void Controller::register_type(packettype_t type, function<std::unique_ptr<Packet>(const vector<uint8_t>&)> builder) {

@@ -30,6 +30,8 @@ public:
 	 */
 	void run();
 
+	void send_packet(Packet& packet);
+
 	/**
 	 * Sends `ret` packet with `retcode`
 	 */

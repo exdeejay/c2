@@ -7,8 +7,6 @@
 
 using iter_t = std::vector<uint8_t>::const_iterator;
 
-uint32_t byteswap32(uint32_t val);
-
 
 template<class T> struct Field {
 	static T parse_field(iter_t& buf, const iter_t& end);
@@ -31,22 +29,5 @@ template<class T> struct Field<std::vector<T>> {
 		}
 	}
 };
-
-
-#define PARSE_ENUM(x) \
-	enum class x; \
-	template<> struct Field<x> { \
-		static x parse_field(iter_t& buf, const iter_t& end) { \
-			return static_cast<x>(Field<uint8_t>::parse_field(buf, end)); \
-		} \
-		static void serialize_field(const x& val, std::vector<uint8_t>& buf) { \
-			Field<uint8_t>::serialize_field((uint8_t) val, buf); \
-		} \
-	};
-
-PARSE_ENUM(DiscordCommand)
-PARSE_ENUM(AudioCommand)
-PARSE_ENUM(ShowoffCommand)
-
 
 #endif

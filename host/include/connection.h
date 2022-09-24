@@ -4,6 +4,7 @@
 #include <asio.hpp>
 #include <string>
 #include <cstdint>
+#include "log.h"
 
 /**
  * Wraps an ASIO TCP connection.
@@ -14,6 +15,7 @@ public:
 		: host(host), port(port), sock(ctx) {}
 
 	void connect() {
+		DEBUGLOG("Connecting to %s:%d...\n", host.c_str(), port);
 		asio::ip::tcp::resolver resolver(ctx);
 		asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(host.c_str(), std::to_string(port).c_str(), ec);
 		asio::connect(sock, endpoints);
