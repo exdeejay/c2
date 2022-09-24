@@ -1,19 +1,23 @@
-const Speaker = require('speaker');
+import Speaker = require('speaker');
+import { Packet } from '../../../../common/src/protocol';
+import { ControlServer } from '../../controlserver';
+import { CommandList } from '../../registry';
 
 /**
  * @type Speaker
  */
-let spk = new Speaker({
-	channels: 1,
-	bitDepth: 16,
-	sampleRate: 16000,
-});
+let spk: Speaker;
 
-export = function (commands) {
+export = function (commands: CommandList) {
 	commands['audio'] = audio;
+	spk = new Speaker({
+		channels: 1,
+		bitDepth: 16,
+		sampleRate: 16000,
+	});
 }
 
-async function audio(server, args) {
+async function audio(server: ControlServer, args: string[]) {
     if (args.length < 2) {
         console.log(`Usage: ${args[0]} <start|stop|save>`);
         return;
@@ -50,7 +54,7 @@ async function audio(server, args) {
 }
 
 
-function audioHandler(packet) {
+function audioHandler(packet: Packet) {
 	if (packet._ptype.name == 'audio') {
 		spk.write(Buffer.from(packet.data, 'base64'));
 	}

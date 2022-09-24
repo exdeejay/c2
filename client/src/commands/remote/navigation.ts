@@ -1,16 +1,19 @@
+import { ControlServer } from "../../controlserver";
+import { CommandList } from "../../registry";
+
 const COMMAND_LS = 0;
 const COMMAND_CD = 1;
 const COMMAND_PWD = 2;
 const COMMAND_RM = 3;
 
-export = function (commands) {
+export = function (commands: CommandList) {
     commands['ls'] = ls;
     commands['cd'] = cd;
     commands['rm'] = rm;
     commands['pwd'] = pwd;
 };
 
-async function ls(server, args) {
+async function ls(server: ControlServer, args: string[]) {
     if (args.length > 2) {
         console.log(`Usage: ${args[0]} [dir]`);
         return;
@@ -26,7 +29,7 @@ async function ls(server, args) {
     await server.sendHostCommand(packet);
 }
 
-async function cd(server, args) {
+async function cd(server: ControlServer, args: string[]) {
     if (args.length != 2) {
         console.log(`Usage: ${args[0]} <dir>`);
         return;
@@ -38,14 +41,14 @@ async function cd(server, args) {
     await server.sendHostCommand(packet);
 }
 
-async function pwd(server, args) {
+async function pwd(server: ControlServer, args: string[]) {
     let packet = server.commandPacket('navigate');
 	packet.command = COMMAND_PWD;
 	packet.path = '';
     await server.sendHostCommand(packet);
 }
 
-async function rm(server, args) {
+async function rm(server: ControlServer, args: string[]) {
     if (args.length != 2) {
         console.log(`Usage: ${args[0]} <file>`);
         return;

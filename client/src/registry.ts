@@ -2,7 +2,7 @@ import fs = require('fs/promises');
 
 type CommandFunc = (control: any, args: any[]) => void;
 
-interface CommandList {
+export interface CommandList {
     [key: string]: CommandFunc;
 };
 

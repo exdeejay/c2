@@ -15,7 +15,7 @@ public:
 
 	void connect() {
 		asio::ip::tcp::resolver resolver(ctx);
-		asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(host.c_str(), to_string(port).c_str(), ec);
+		asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(host.c_str(), std::to_string(port).c_str(), ec);
 		asio::connect(sock, endpoints);
 	}
 

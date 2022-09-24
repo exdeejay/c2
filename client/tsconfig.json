@@ -3,6 +3,7 @@
         "module": "commonjs",
         "noEmitOnError": true,
         "target": "ES2015",
+        "outDir": "./dist",
         "strict": true
     },
     "include": ["./src/**/*"]

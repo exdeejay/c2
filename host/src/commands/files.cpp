@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cstdint>
 #include "controller.h"
 #include "field.h"
 using namespace std;
@@ -11,11 +12,11 @@ int downloadFile(Controller& ctrl, const string path) {
 	if (!file) {
 		return -1;
 	}
-	streamsize size = file.tellg();
+	auto size = file.tellg();
 	file.seekg(0, ios::beg);
 
-	vector<char> buf(size);
-	file.read(buf.data(), size);
+	vector<uint8_t> buf(size);
+	file.read((char*) buf.data(), size);
 	if (!file) {
 		return -2;
 	}
@@ -23,13 +24,13 @@ int downloadFile(Controller& ctrl, const string path) {
 	return 0;
 }
 
-int uploadFile(Controller& ctrl, const string path, vector<char> data) {
-	vector<char> filebuf = Field<vector<char>>::parse_field(data.begin(), data.end());
+int uploadFile(Controller& ctrl, const string path, vector<uint8_t> data) {
+	vector<uint8_t> filebuf = Field<vector<uint8_t>>::parse_field(data.begin(), data.end());
 	ofstream file(path, ios::binary);
 	if (!file) {
 		return -1;
 	}
-	file.write(filebuf.data(), filebuf.size());
+	file.write((char*) filebuf.data(), filebuf.size());
 	if (!file) {
 		return -2;
 	}

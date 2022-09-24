@@ -1,11 +1,14 @@
+import { ControlServer } from "../../controlserver";
+import { CommandList } from "../../registry";
+
 const COMMAND_CHECK = 0;
 const COMMAND_GRAB = 1;
 
-export = function (commands) {
+export = function (commands: CommandList) {
     commands['discord'] = discord;
 };
 
-async function discord(server, args) {
+async function discord(server: ControlServer, args: string[]) {
     if (args.length != 2) {
         console.log(`Usage: ${args[0]} <check|grab>`);
         return;

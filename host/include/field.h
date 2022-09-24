@@ -24,7 +24,7 @@ template<class T> struct Field<std::vector<T>> {
 		}
 		return data;
 	}
-	static void serialize_field(const std::vector<T>& val, std::vector<char>& buf) {
+	static void serialize_field(const std::vector<T>& val, std::vector<uint8_t>& buf) {
 		Field<uint32_t>::serialize_field(val.size(), buf);
 		for (const T& item : val) {
 			Field<T>::serialize_field(item, buf);

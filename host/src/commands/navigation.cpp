@@ -59,7 +59,7 @@ int removeFile(Controller& ctrl, const string path) {
 	return remove(path.c_str());
 }
 
-int navigation(Controller& ctrl, unsigned char cmd, string path) {
+int navigation(Controller& ctrl, uint8_t cmd, string path) {
 	switch (cmd) {
 		case 0:
 			return listFiles(ctrl, path);

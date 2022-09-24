@@ -1,12 +1,14 @@
 import fs = require('fs/promises');
 import path = require('path');
+import { ControlServer } from '../../controlserver';
+import { CommandList } from '../../registry';
 
-export = function (commands) {
+export = function (commands: CommandList) {
     commands['download'] = download;
     commands['upload'] = upload;
 };
 
-async function download(server, args) {
+async function download(server: ControlServer, args: string[]) {
     if (args.length < 2 || args.length > 3) {
         console.log(`Usage: ${args[0]} <remote file> [local path]`);
         return;
@@ -14,7 +16,7 @@ async function download(server, args) {
 
     let packet = server.commandPacket('downloadfile');
     packet.path = args[1];
-    let buffer;
+    let buffer: Buffer;
     let ret = await server.sendHostCommand(packet, (response) => {
         if (response.type.name == 'buffer') {
             buffer = response.data;
@@ -31,14 +33,14 @@ async function download(server, args) {
         localPath = path.basename(args[1]);
     }
     try {
-        await fs.writeFile(localPath, buffer);
+        await fs.writeFile(localPath, buffer!);
         console.log(`${args[1]} -> ${localPath}`);
     } catch (err) {
         console.error(err);
     }
 }
 
-async function upload(server, args) {
+async function upload(server: ControlServer, args: string[]) {
     if (args.length < 2 || args.length > 3) {
         console.log(`Usage: ${args[0]} <local file> [remote path]`);
         return;
@@ -58,7 +60,7 @@ async function upload(server, args) {
         } else {
             console.error('ERROR: could not write file');
         }
-    } catch (err) {
+    } catch (err: any) {
         console.error(err.message);
     }
 }

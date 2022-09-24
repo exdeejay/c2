@@ -13,6 +13,8 @@ using namespace std;
 
 PacketConnection::PacketConnection(string host, uint16_t port) : impl(make_unique<PacketConnectionImpl>(host, port)) {}
 
+PacketConnection::~PacketConnection() = default;
+
 void PacketConnection::connect() {
     impl->conn.connect();
 }

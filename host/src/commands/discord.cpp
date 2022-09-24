@@ -4,6 +4,8 @@
 #include <vector>
 #include <iostream>
 #include "controller.h"
+#include "commands.h"
+
 using namespace std;
 
 template <typename T = uint64_t>

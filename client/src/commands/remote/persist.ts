@@ -1,8 +1,11 @@
-export = function (commands) {
+import { ControlServer } from "../../controlserver";
+import { CommandList } from "../../registry";
+
+export = function (commands: CommandList) {
     commands['persist'] = persist;
 };
 
-async function persist(server, args) {
+async function persist(server: ControlServer, args: string[]) {
 	let packet = server.commandPacket('persist');
 	if (args.length == 1) {
 		packet.regkey = 'c2';

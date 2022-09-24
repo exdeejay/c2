@@ -20,6 +20,8 @@ public:
      * Call `connect()` to connect to host.
      */
     PacketConnection(const std::string host, uint16_t port);
+    
+    ~PacketConnection();
 
     /**
      * Calls `connect()` on wrapped connection object.

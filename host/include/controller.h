@@ -23,6 +23,8 @@ public:
 	 */
 	Controller(std::string host, uint16_t port);
 
+	~Controller();
+
 	/**
 	 * The main client/server loop. Will not return.
 	 */
@@ -54,12 +56,9 @@ public:
 	void send_buffer(const std::vector<uint8_t> buf);
 
 	template<class... Args> void register_command(packettype_t type, int(*command)(Controller&, Args...)) {
-		std::pair<
-			std::function<std::unique_ptr<Packet>(const std::vector<uint8_t>&)>,
-			std::function<bool(Controller&, Packet&)>
-		> fn_pair = CommandPacket<Args...>::build(type, command);
-		register_type(type, fn_pair::first);
-		register_handler(type, fn_pair::second);
+		std::pair<std::function<std::unique_ptr<Packet>(const std::vector<uint8_t>&)>, std::function<bool(Controller&, Packet&)>> fn_pair = CommandPacket<Args...>::build(type, command);
+		register_type(type, fn_pair.first);
+		register_handler(type, fn_pair.second);
 	}
 
 	void register_type(packettype_t type, std::function<std::unique_ptr<Packet>(const std::vector<uint8_t>&)> builder);

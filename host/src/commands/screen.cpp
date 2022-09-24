@@ -1,6 +1,7 @@
 #include <vector>
 #include <lodepng.h>
 #include <Windows.h>
+#include <cstdint>
 #include "controller.h"
 using namespace std;
 
@@ -43,7 +44,7 @@ int screenshot(Controller& ctrl) {
 	unsigned char* png = nullptr;
 	size_t pngSize;
 	lodepng_encode32(&png, &pngSize, pixels, width, height);
-	vector<char> buf(png, png + pngSize);
+	vector<uint8_t> buf(png, png + pngSize);
 	ctrl.send_buffer(buf);
 	free(png);
 

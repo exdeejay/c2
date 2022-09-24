@@ -3,6 +3,7 @@
 
 #include <tuple>
 #include <functional>
+#include <cstdint>
 #include "packet.h"
 #include "field.h"
 
@@ -10,16 +11,16 @@ namespace c2 {
     template<class...> struct Parser;
     template<class T, class... Args> struct Parser<T, Args...> {
         static std::tuple<T, Args...> parse_tuple(
-            std::vector<char>::const_iterator data,
-            const std::vector<char>::const_iterator& end
+            std::vector<uint8_t>::const_iterator data,
+            const std::vector<uint8_t>::const_iterator& end
         ) {
             return std::tuple_cat(std::make_tuple<T>(Field<T>::parse_field(data, end)), Parser<Args...>::parse_tuple(data, end));
         }
     };
     template<> struct Parser<> {
         static std::tuple<> parse_tuple(
-            std::vector<char>::const_iterator data,
-            const std::vector<char>::const_iterator& end
+            std::vector<uint8_t>::const_iterator data,
+            const std::vector<uint8_t>::const_iterator& end
         ) {
             return std::make_tuple<>();
         }
@@ -28,14 +29,14 @@ namespace c2 {
     template<size_t I, class...> struct Serializer;
     template<size_t I, class T, class... Args> struct Serializer<I, T, Args...> {
         template<class... TupArgs>
-        static void serialize_tuple(const std::tuple<TupArgs...>& vals, std::vector<char>& buf) {
+        static void serialize_tuple(const std::tuple<TupArgs...>& vals, std::vector<uint8_t>& buf) {
             Field<T>::serialize_field(std::get<I>(vals), buf);
             Serializer<I + 1, Args...>::serialize_tuple(vals, buf);
         }
     };
     template<size_t I> struct Serializer<I> {
         template<class... TupArgs>
-        static void serialize_tuple(const std::tuple<TupArgs...>& val, std::vector<char>& buf) {}
+        static void serialize_tuple(const std::tuple<TupArgs...>& val, std::vector<uint8_t>& buf) {}
     };
 }
 

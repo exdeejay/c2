@@ -5,6 +5,7 @@
 #include <vector>
 #include <mutex>
 #include <string>
+#include <cstdint>
 #include "connection.h"
 
 class PacketConnectionImpl {
@@ -12,8 +13,8 @@ public:
     PacketConnectionImpl(std::string host, uint16_t port) : conn(host, port) {}
 
     Connection conn;
-    int compressed_len = -1;
-    std::vector<char> buf;
+    uint32_t compressed_len = -1;
+    std::vector<uint8_t> buf;
 	std::mutex writeMutex;
 };
 

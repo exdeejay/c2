@@ -1,20 +1,48 @@
 import { EventEmitter } from 'events';
-import { Host } from '../../srv/src/hosts';
+import { Packet, PacketTypes } from 'c2lib';
+import { forwardEvents } from 'c2lib';
+import { Host } from './hosts';
+import * as net from 'node:net';
 
-export class ControlBase extends EventEmitter {
+interface ControlServerOptions {
+    ip?: string;
+    port?: number;
+}
+
+export class ControlServer extends EventEmitter {
+    serverSocket: net.Server;
+    ip: string;
+    port: number;
     hostsList: Map<number, Host>;
-    nextHostID: number;
+    #nextHostID = 0;
 
-    constructor() {
+    constructor(public packetTypes: PacketTypes, options: ControlServerOptions) {
         super();
+        const defaultOpts = {
+            ip: '0.0.0.0',
+            port: 6996
+        };
+        let opts = { ...defaultOpts, ...options };
+        this.ip = opts.ip;
+        this.port = opts.port;
         this.hostsList = new Map();
-        this.nextHostID = 0;
-        this.on('connection', (host) => {
-            let hostID = this.nextHostID++;
+
+        this.serverSocket = net.createServer((socket) => {
+            let host = new Host(socket, this);
+            let hostID = this.#nextHostID++;
             this.hostsList.set(hostID, host);
             host.on('close', () => {
                 this.hostsList.delete(hostID);
             });
+            this.emit('connection', host);
+        });
+        forwardEvents(['listening'], this.serverSocket, this);
+    }
+
+    listen() {
+        return new Promise(resolve => {
+            this.serverSocket.on('listening', resolve);
+            this.serverSocket.listen(this.port, this.ip);
         });
     }
 
@@ -22,7 +50,7 @@ export class ControlBase extends EventEmitter {
      * Abort any command currently waiting for a host response
      */
     abortCurrentCommand() {
-        let abortPkt = createPacket('host', 'response', 'retcode');
+        let abortPkt = this.packetTypes.createPacket('host', 'response', 'retcode');
         abortPkt.retcode = -999;
         this.emit('packet', abortPkt);
     }
@@ -31,7 +59,7 @@ export class ControlBase extends EventEmitter {
      * Alias to create host command packet.
      */
     commandPacket(name: string) {
-        return createPacket('host', 'command', name);
+        return this.packetTypes.createPacket('host', 'command', name);
     }
 
     /**
@@ -41,19 +69,19 @@ export class ControlBase extends EventEmitter {
      * and it is deregistered once a retcode is received. If it is null, out and err
      * packets are handled automatically.
      */
-    async sendCommandToHost(hostID: number, packet: any, callback: any): Promise<number> {
+    sendCommandToHost(hostID: number, packet: Packet, callback?: (responsePacket: Packet) => void): Promise<number> {
         let hostOrUndefined = this.hostsList.get(hostID);
         if (hostOrUndefined === undefined) {
             throw new Error('invalid host ID');
         }
         let host = hostOrUndefined;
         return new Promise((resolve) => {
-            let handler = (responsePkt: any) => {
+            let handler = (responsePkt: Packet) => {
                 if (responsePkt._ptype.name == 'retcode') {
                     host.removeListener('packet', handler);
                     resolve(responsePkt.code);
                 } else {
-                    if (callback == null) {
+                    if (callback === undefined) {
                         if (responsePkt._ptype.name == 'out') {
                             process.stdout.write(responsePkt.out);
                         } else if (responsePkt._ptype.name == 'err') {
@@ -73,14 +101,11 @@ export class ControlBase extends EventEmitter {
      * Sends packet to the currently selected host.
      * See `sendCommandToHost()` for more details.
      */
-    async sendHostCommand(packet: any, callback: any): Promise<number> {
+    async sendHostCommand(packet: Packet, callback?: (responsePacket: Packet) => void): Promise<number> {
         return await this.sendCommandToHost(0, packet, callback);
     }
 
-    registerHostListener(callback: any, hostID: number) {
-        if (hostID === undefined) {
-            hostID = 0;
-        }
+    registerHostListener(callback: (packet: Packet) => void, hostID = 0) {
         let hostOrUndefined = this.hostsList.get(hostID)
         if (hostOrUndefined === undefined) {
             throw new Error('invalid host ID');
@@ -89,10 +114,7 @@ export class ControlBase extends EventEmitter {
         host.on('packet', callback);
     }
 
-    removeHostListener(callback: any, hostID: number) {
-        if (hostID === undefined) {
-            hostID = 0;
-        }
+    removeHostListener(callback: (packet: Packet) => void, hostID = 0) {
         let hostOrUndefined = this.hostsList.get(hostID)
         if (hostOrUndefined === undefined) {
             throw new Error('invalid host ID');
@@ -100,4 +122,5 @@ export class ControlBase extends EventEmitter {
         let host = hostOrUndefined;
         host.removeListener('packet', callback);
     }
+
 }

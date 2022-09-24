@@ -31,6 +31,8 @@ Controller::Controller(string host, uint16_t port) : impl(make_unique<Controller
 	register_command(12, showoff);
 }
 
+Controller::~Controller() = default;
+
 
 void Controller::run() {
 	while (true) {

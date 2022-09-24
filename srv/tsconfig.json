@@ -1,9 +1,0 @@
-{
-    "compilerOptions": {
-        "module": "commonjs",
-        "noEmitOnError": true,
-        "target": "ES2015",
-        "strict": true
-    },
-    "include": ["./src/**/*"]
-}

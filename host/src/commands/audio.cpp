@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <portaudio.h>
+#include "commands.h"
 #include "controller.h"
 using namespace std;
 

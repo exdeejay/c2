@@ -11,6 +11,8 @@
 #include "field.h"
 
 
+class Controller;
+
 namespace c2 {
     template<class...> struct FnCaller;
     template<class T, class... Args> struct FnCaller<T, Args...> {
@@ -22,12 +24,7 @@ namespace c2 {
     //         return FnCaller<Args...>::bind_fn(data, (void*)fn);
     //     }
     // private:
-        template<class... Accum> static std::function<int(Controller&)> bind_fn(
-            std::vector<char>::const_iterator data,
-            const std::vector<char>::const_iterator& end,
-            void* fn,
-            Accum... accumulated_args
-        ) {
+        template<class... Accum> static std::function<int(Controller&)> bind_fn(std::vector<uint8_t>::const_iterator data, const std::vector<uint8_t>::const_iterator& end, void* fn, Accum... accumulated_args) {
             return FnCaller<Args...>::bind_fn(data, end, fn, accumulated_args..., Field<T>::parse_field(data, end));
         }
     };
@@ -41,8 +38,8 @@ namespace c2 {
     //     }
     // private:
         template<class... Accum> static std::function<int(Controller&)> bind_fn(
-            std::vector<char>::const_iterator data,
-            const std::vector<char>::const_iterator& end,
+            std::vector<uint8_t>::const_iterator data,
+            const std::vector<uint8_t>::const_iterator& end,
             void* fn,
             Accum... accumulated_args
         ) {
@@ -65,13 +62,10 @@ public:
 
     SerializedPacket serialize() const {
         //TODO: implement this
-        return SerializedPacket(_type, std::vector<uint8_t>>());
+        return SerializedPacket(_type, {});
     }
 
-    static std::pair<
-        std::function<std::unique_ptr<Packet>(const std::vector<uint8_t>&)>,
-        std::function<bool(Controller&, Packet&)>
-    > build(packettype_t type, int(*proc)(Controller&, Args...)) {
+    static std::pair<std::function<std::unique_ptr<Packet>(const std::vector<uint8_t>&)>, std::function<bool(Controller&, Packet&)>> build(packettype_t type, int(*proc)(Controller&, Args...)) {
         auto builder = [type, proc](const std::vector<uint8_t>& data) {
             return std::make_unique<CommandPacket>(type, proc, data);
         };
