@@ -1,11 +1,14 @@
 #include <iostream>
 #include <cstdio>
 #include <cstring>
+#include <vector>
 #include <exception>
 #include <Windows.h>
 #include "util.h"
 #include "field.h"
 #include "controller.h"
+#include "datatypes.h"
+#include "simplepacket.h"
 using namespace std;
 
 int pwd(Controller& ctrl) {
@@ -40,18 +43,25 @@ int listFiles(Controller& ctrl, const string path) {
 		return 1;
 	}
 	
-	string output;
+	vector<FileData> files;
 	do {
 		if (ffd.cFileName[0] == '.' &&
 				(ffd.cFileName[1] == '\0' ||
 				(ffd.cFileName[1] == '.' && ffd.cFileName[2] == '\0'))) {
 			continue;
 		}
-		output += reinterpret_cast<char*>(ffd.cFileName);
-		output += "\n";
+		FileData file;
+		file.name = ffd.cFileName;
+		file.attrs = ffd.dwFileAttributes;
+		file.creation_time = combineDWORDs(ffd.ftCreationTime.dwHighDateTime, ffd.ftCreationTime.dwLowDateTime);
+		file.last_access_time = combineDWORDs(ffd.ftLastAccessTime.dwHighDateTime, ffd.ftLastAccessTime.dwLowDateTime);
+		file.last_write_time = combineDWORDs(ffd.ftLastWriteTime.dwHighDateTime, ffd.ftLastWriteTime.dwLowDateTime);
+		file.size = combineDWORDs(ffd.nFileSizeHigh, ffd.nFileSizeLow);
+		files.push_back(file);
 	} while (FindNextFileA(hFind, &ffd) != 0);
 	FindClose(hFind);
-	ctrl.print(output);
+	SimplePacket<vector<FileData>> filesPacket(5, files);
+	ctrl.send_packet(filesPacket);
 	return 0;
 }
 

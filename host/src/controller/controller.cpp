@@ -45,13 +45,13 @@ void Controller::run() {
 	}
 }
 
+void Controller::send_packet(Packet& packet) {
+	impl->conn.write_packet_sync(packet.serialize());
+}
+
 void Controller::ret(retcode_t retcode) {
 	SimplePacket<retcode_t> pkt(0, retcode);
 	impl->conn.write_packet_sync(pkt.serialize());
-}
-
-void Controller::send_packet(Packet& packet) {
-	impl->conn.write_packet_sync(packet.serialize());
 }
 
 void Controller::print(string out) {

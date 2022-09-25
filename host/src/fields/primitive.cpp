@@ -37,6 +37,28 @@ void Field<uint32_t>::serialize_field(const uint32_t& val, vector<uint8_t>& buf)
 }
 
 template<>
+uint64_t Field<uint64_t>::parse_field(iter_t& buf, const iter_t& end) {
+	//TODO bounds checking
+	uint64_t val = 0;
+	for (int i = 0; i < 8; i++) {
+		val <<= 8;
+		val |= *buf++;
+	}
+	return val;
+}
+template<>
+void Field<uint64_t>::serialize_field(const uint64_t& val, vector<uint8_t>& buf) {
+	buf.push_back((val >> 7*8) & 0xFF);
+	buf.push_back((val >> 6*8) & 0xFF);
+	buf.push_back((val >> 5*8) & 0xFF);
+	buf.push_back((val >> 4*8) & 0xFF);
+	buf.push_back((val >> 3*8) & 0xFF);
+	buf.push_back((val >> 2*8) & 0xFF);
+	buf.push_back((val >> 8) & 0xFF);
+	buf.push_back(val & 0xFF);
+}
+
+template<>
 string Field<string>::parse_field(iter_t& buf, const iter_t& end) {
 	//TODO bounds checking
 	uint32_t size = Field<uint32_t>::parse_field(buf, end);

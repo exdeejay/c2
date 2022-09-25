@@ -15,3 +15,7 @@ string getWin32ErrorString() {
 }
 
 uint32_t byteswap32(uint32_t val) { return _byteswap_ulong(val); }
+
+uint64_t combineDWORDs(uint32_t high, uint32_t low) {
+	return static_cast<uint64_t>(high) << 32 | static_cast<uint64_t>(low);
+}

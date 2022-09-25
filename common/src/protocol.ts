@@ -1,4 +1,5 @@
 import fs = require('fs/promises');
+import { FileData } from './datatypes';
 
 type Category = 'host' | 'control';
 type Direction = 'command' | 'response';
@@ -31,7 +32,7 @@ export class PacketTypes {
     packetDir: string;
     packetTypes: HostControlPacketTypes;
 
-    constructor(packetDir: string = `${__dirname}/packets`) {
+    constructor(packetDir: string = `${__dirname}/../packets`) {
         this.loaded = false;
         this.packetDir = packetDir;
         this.packetTypes = {
@@ -112,6 +113,10 @@ export class PacketTypes {
                 case 'uint':
                     packetObj[field] = buffer.readUInt32BE(offset);
                     return 4;
+
+                case 'biguint':
+                    packetObj[field] = buffer.readBigUint64BE(offset);
+                    return 8;
     
                 case 'str':
                     let strsize = buffer.readUInt32BE(offset);
@@ -124,6 +129,25 @@ export class PacketTypes {
                     let size = buffer.readUInt32BE(offset);
                     packetObj[field] = buffer.slice(offset + 4, offset + 4 + size);
                     return size + 4;
+
+                case 'file':
+                    let startOffset = offset;
+                    let parsed = { '0': null };
+                    let partialFile: Partial<FileData> = {};
+                    offset += PacketTypes.parseField(buffer, offset, parsed, '0', 'str');
+                    partialFile.name = parsed[0]!;
+                    offset += PacketTypes.parseField(buffer, offset, parsed, '0', 'uint');
+                    partialFile.attrs = parsed[0]!;
+                    offset += PacketTypes.parseField(buffer, offset, parsed, '0', 'biguint');
+                    partialFile.creationTime = new Date(Number(parsed[0]!));
+                    offset += PacketTypes.parseField(buffer, offset, parsed, '0', 'biguint');
+                    partialFile.lastAccessTime = new Date(Number(parsed[0]!));
+                    offset += PacketTypes.parseField(buffer, offset, parsed, '0', 'biguint');
+                    partialFile.lastWriteTime = new Date(Number(parsed[0]!));
+                    offset += PacketTypes.parseField(buffer, offset, parsed, '0', 'biguint');
+                    partialFile.size = parsed[0]!;
+                    packetObj[field] = partialFile;
+                    return offset - startOffset;
             }
         }
     }
@@ -210,7 +234,7 @@ export class PacketTypes {
                     buf = Buffer.alloc(4);
                     buf.writeUInt32BE(obj);
                     break;
-    
+
                 case 'str':
                     len = Buffer.alloc(4);
                     len.writeUInt32BE(obj.length);

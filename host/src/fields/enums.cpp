@@ -1,5 +1,5 @@
+#include <cstdint>
 #include "field.h"
-
 #include "commands.h"
 
 #define PARSE_ENUM(x) \
