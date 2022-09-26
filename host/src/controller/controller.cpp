@@ -10,6 +10,8 @@
 #include "log.h"
 #include "commands.h"
 #include "simplepacket.h"
+#include <asio.hpp>
+#include <thread>
 using namespace std;
 
 /**
@@ -36,22 +38,30 @@ Controller::~Controller() = default;
 
 
 void Controller::run() {
-	impl->conn.connect();
-	DEBUGLOG("Starting packet read loop\n");
 	while (true) {
-		SerializedPacket spkt = impl->conn.read_packet_sync();
-		auto packet = parse_packet(spkt);
-		handle_packet(*packet);
+		try {
+			impl->conn = make_unique<PacketConnection>(impl->host, impl->port);
+			impl->conn->connect();
+			DEBUGLOG("Starting packet read loop\n");
+			while (true) {
+				SerializedPacket spkt = impl->conn->read_packet_sync();
+				auto packet = parse_packet(spkt);
+				handle_packet(*packet);
+			}
+		} catch (asio::system_error ec) {
+			DEBUGLOG("ASIO system error: %s\n", ec.what());
+			this_thread::sleep_for(1s);
+		}
 	}
 }
 
 void Controller::send_packet(Packet& packet) {
-	impl->conn.write_packet_sync(packet.serialize());
+	impl->conn->write_packet_sync(packet.serialize());
 }
 
 void Controller::ret(retcode_t retcode) {
 	SimplePacket<retcode_t> pkt(0, retcode);
-	impl->conn.write_packet_sync(pkt.serialize());
+	impl->conn->write_packet_sync(pkt.serialize());
 }
 
 void Controller::print(string out) {

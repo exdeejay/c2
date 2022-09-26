@@ -13,9 +13,11 @@
 
 class ControllerImpl {
 public:
-    ControllerImpl(std::string host, uint16_t port) : conn(host, port) {}
+    ControllerImpl(std::string host, uint16_t port) : host(host), port(port) {}
 
-    PacketConnection conn;
+    std::string host;
+    uint16_t port;
+    std::unique_ptr<PacketConnection> conn;
     std::unordered_map<packettype_t, std::function<std::unique_ptr<Packet>(const std::vector<uint8_t>&)>> registry;
     std::multimap<packettype_t, std::function<bool(Controller&, Packet&)>> handlers;
 };
