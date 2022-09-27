@@ -4,6 +4,10 @@
 #include <cstdint>
 #include <string>
 
+#ifdef _WIN32
+	#include <Windows.h>
+#endif
+
 std::string getWin32ErrorString();
 uint64_t combineDWORDs(uint32_t high, uint32_t low);
 
@@ -17,6 +21,7 @@ T byteswap(T val) {
 	return swapped;
 }
 
+#ifdef _WIN32
 string getWin32ErrorString() {
 	DWORD err = GetLastError();
 	char *msgBuf;
@@ -27,6 +32,7 @@ string getWin32ErrorString() {
 	LocalFree(msgBuf);
 	return errMsg;
 }
+#endif
 
 uint64_t combineDWORDs(uint32_t high, uint32_t low) {
 	return static_cast<uint64_t>(high) << 32 | static_cast<uint64_t>(low);

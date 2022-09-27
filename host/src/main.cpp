@@ -1,12 +1,14 @@
-#include <Windows.h>
 #include "controller.h"
 #include "log.h"
+#ifdef _WIN32
+	#include <Windows.h>
+#endif
 using namespace std;
 
 /**
  * Main entry function. Define `WINGUI` to compile into Win32 Subsystem .exe.
  */
-#ifdef WINGUI
+#if defined(_WIN32) && defined(WINGUI)
 int WinMain(HINSTANCE hInst, HINSTANCE prev, PSTR lpCmdLine, int nCmdShow) {
 #else
 int main(int argc, char* argv[]) {
