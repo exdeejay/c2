@@ -1,4 +1,4 @@
-import { FileData } from "c2lib/src/datatypes";
+import { FileData } from "c2lib";
 import { ControlServer } from "../../controlserver";
 import { CommandList } from "../../registry";
 

@@ -114,8 +114,8 @@ export class ControlServer extends EventEmitter {
         });
     }
 
-    ret(): Promise<number> {
-        return this.waitForPacket('ret');
+    async ret(): Promise<number> {
+        return (await this.waitForPacket('ret')).code;
     }
 
     registerHostListener(callback: (packet: Packet) => void, hostID = 0) {
