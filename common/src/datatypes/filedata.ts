@@ -1,5 +1,4 @@
-import { DataType } from "../protocol";
-import { BigUintType, StringType, UintType } from "./primitive";
+import { BigUintType, DataType, StringType, UintType } from ".";
 
 export interface FileData {
     name: string;

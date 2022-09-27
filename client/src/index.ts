@@ -66,7 +66,11 @@ async function main() {
         if (!(args[0] in registry.commands)) {
             console.log('Unknown command.');
         } else {
-            await registry.commands[args[0]](control, args);
+            try {
+                await registry.commands[args[0]](control, args);
+            } catch (err) {
+                console.error(`Error while executing "${args[0]}": ${err}`);
+            }
         }
         rl.prompt();
     });

@@ -1,17 +1,8 @@
 import fs = require('fs/promises');
-import { FileDataType } from './datatypes/filedata';
-import { BigUintType, BooleanType, BufferType, ByteType, CharType, IntType, StringType, UintType } from './datatypes/primitive';
+import { BigUintType, BooleanType, BufferType, ByteType, CharType, DataType, FileDataType, IntType, StringType, UintType } from './datatypes';
 
 type Category = 'host' | 'control';
 type Direction = 'command' | 'response';
-
-export class DataType<T> {
-    constructor(
-        public name: string,
-        public parse: (buf: Buffer) => [number, T],
-        public serialize: (data: T) => Buffer
-    ) {}
-}
 
 export interface Packet {
     [key: string]: any;

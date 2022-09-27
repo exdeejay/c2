@@ -1,4 +1,4 @@
-import { DataType } from "../protocol";
+import { DataType } from ".";
 
 export const CharType = new DataType(
     'char',
