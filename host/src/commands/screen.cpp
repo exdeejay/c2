@@ -32,9 +32,10 @@ int screenshot(Controller& ctrl) {
 	bi.biCompression = BI_RGB;
 
 	GetDIBits(screenDC, hBmp, 0, height, nullptr, (BITMAPINFO*)&bi, DIB_RGB_COLORS);
-	unsigned char* pixels = new unsigned char[bi.biSizeImage];
+	vector<uint8_t> pixels;
+	pixels.resize(bi.biSizeImage);
 	DEBUGLOG("getting DIBits...\n");
-	GetDIBits(screenDC, hBmp, 0, height, pixels, (BITMAPINFO*)&bi, DIB_RGB_COLORS);
+	GetDIBits(screenDC, hBmp, 0, height, &pixels[0], (BITMAPINFO*)&bi, DIB_RGB_COLORS);
 	DEBUGLOG("deleting objects...\n");
 	DeleteObject(hBmp);
 	DeleteObject(bitmapDC);
@@ -50,9 +51,9 @@ int screenshot(Controller& ctrl) {
 	}
 
 	DEBUGLOG("encoding as PNG...\n");
-	unsigned char* png = nullptr;
+	uint8_t* png = nullptr;
 	size_t pngSize;
-	lodepng_encode32(&png, &pngSize, pixels, width, height);
+	lodepng_encode32(&png, &pngSize, &pixels[0], width, height);
 	DEBUGLOG("copying to buffer...\n");
 	vector<uint8_t> buf(png, png + pngSize);
 	DEBUGLOG("freeing PNG object...\n");
