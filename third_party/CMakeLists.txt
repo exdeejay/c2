@@ -4,6 +4,8 @@ target_include_directories(asio INTERFACE "asio/asio/include")
 add_library(lodepng "lodepng/lodepng.cpp")
 target_include_directories(lodepng INTERFACE "lodepng")
 
+cmake_policy(SET CMP0077 NEW)
+
 set(BUILD_SHARED_LIBS OFF)
 #TODO: disable install
 add_subdirectory("portaudio")
