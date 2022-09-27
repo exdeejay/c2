@@ -45,9 +45,9 @@ export class ZlibConnection extends EventEmitter {
             }
 
             if (data.length >= this.nextPacketSize + 4) {
-                let compressed = data.slice(0, this.nextPacketSize + 4);
-                compressed = compressed.slice(4);
-                data = data.slice(this.nextPacketSize + 4);
+                let compressed = data.subarray(0, this.nextPacketSize + 4);
+                compressed = compressed.subarray(4);
+                data = data.subarray(this.nextPacketSize + 4);
                 let decompressed = zlib.inflateSync(compressed);
                 this.emit('data', decompressed);
                 this.nextPacketSize = -1;
