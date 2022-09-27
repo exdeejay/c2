@@ -16,12 +16,9 @@ async function download(server: ControlServer, args: string[]) {
 
     let packet = server.commandPacket('downloadfile');
     packet.path = args[1];
-    let buffer: Buffer;
-    let ret = await server.sendHostCommand(packet, (response) => {
-        if (response._ptype.name == 'buffer') {
-            buffer = response.data;
-        }
-    });
+    server.sendHostCommand(packet);
+    let buffer: Buffer = (await server.waitForPacket('buffer')).data;
+    let ret = await server.ret();
     if (ret != 0) {
         console.error('ERROR: could not read file');
         return;

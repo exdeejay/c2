@@ -12,6 +12,7 @@ interface ControlServerOptions {
 export declare interface ControlServer {
     on(event: 'connection', listener: (incomingHost: Host) => void): this;
     on(event: 'listening', listener: () => void): this;
+    on(event: 'packet', listener: (packet: Packet) => void): this;
 }
 
 export class ControlServer extends EventEmitter {
@@ -41,6 +42,15 @@ export class ControlServer extends EventEmitter {
             });
             this.emit('connection', host);
         });
+        this.on('packet', (packet) => {
+            switch (packet._ptype.name) {
+                case 'out':
+                    console.log(packet.out);
+                case 'err':
+                    console.error(packet.err);
+            }
+        });
+        
         forwardEvents(['listening'], this.serverSocket, this);
     }
 
@@ -74,40 +84,38 @@ export class ControlServer extends EventEmitter {
      * and it is deregistered once a retcode is received. If it is null, out and err
      * packets are handled automatically.
      */
-    sendCommandToHost(hostID: number, packet: Packet, callback?: (responsePacket: Packet) => void): Promise<number> {
+    async sendCommandToHost(hostID: number, packet: Packet): Promise<number> {
         let hostOrUndefined = this.hostsList.get(hostID);
         if (hostOrUndefined === undefined) {
             throw new Error('invalid host ID');
         }
         let host = hostOrUndefined;
-        return new Promise((resolve) => {
-            let handler = (responsePkt: Packet) => {
-                if (responsePkt._ptype.name == 'retcode') {
-                    host.removeListener('packet', handler);
-                    resolve(responsePkt.code);
-                } else {
-                    if (callback === undefined) {
-                        if (responsePkt._ptype.name == 'out') {
-                            process.stdout.write(responsePkt.out);
-                        } else if (responsePkt._ptype.name == 'err') {
-                            console.error(`ERROR: ${responsePkt.err}`);
-                        }
-                    } else {
-                        callback(responsePkt);
-                    }
-                }
-            };
-            host.on('packet', handler);
-            host.sendPacket(packet);
-        });
+        host.sendPacket(packet);
+        return await this.ret();
     }
 
     /**
      * Sends packet to the currently selected host.
      * See `sendCommandToHost()` for more details.
      */
-    async sendHostCommand(packet: Packet, callback?: (responsePacket: Packet) => void): Promise<number> {
-        return await this.sendCommandToHost(0, packet, callback);
+    async sendHostCommand(packet: Packet): Promise<number> {
+        return await this.sendCommandToHost(0, packet);
+    }
+
+    waitForPacket(type: string): Promise<Packet> {
+        return new Promise((resolve) => {
+            let handler = (packet: Packet) => {
+                if (packet._ptype.name === type) {
+                    this.removeListener('packet', handler);
+                    resolve(packet);
+                }
+            };
+            this.on('packet', handler);
+        });
+    }
+
+    ret(): Promise<number> {
+        return this.waitForPacket('ret');
     }
 
     registerHostListener(callback: (packet: Packet) => void, hostID = 0) {

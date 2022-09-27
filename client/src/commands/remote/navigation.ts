@@ -29,29 +29,29 @@ async function ls(server: ControlServer, args: string[]) {
     } else {
         packet.path = '';
     }
-    await server.sendHostCommand(packet, (responsePacket) => {
-        for (let file of responsePacket.files as FileData[]) {
-            let dir = '';
-            if ((file.attrs & FILE_ATTRIBUTE_DIRECTORY) != 0) {
-                dir = '/';
-            }
-            let size = Number(file.size);
-            let unit = '';
-            if (size >= 1024) {
-                size = Math.floor(size / 1024);
-                unit = 'KiB';
-            }
-            if (size >= 1024) {
-                size = Math.floor(size / 1024);
-                unit = 'MiB';
-            }
-            if (size >= 1024) {
-                size = Math.floor(size / 1024);
-                unit = 'GiB';
-            }
-            console.log(`${size}${unit}\t${file.name}${dir}`);
+    await server.sendHostCommand(packet);
+    let responsePacket = await server.waitForPacket('files');
+    for (let file of responsePacket.files as FileData[]) {
+        let dir = '';
+        if ((file.attrs & FILE_ATTRIBUTE_DIRECTORY) != 0) {
+            dir = '/';
         }
-    });
+        let size = Number(file.size);
+        let unit = '';
+        if (size >= 1024) {
+            size = Math.floor(size / 1024);
+            unit = 'KiB';
+        }
+        if (size >= 1024) {
+            size = Math.floor(size / 1024);
+            unit = 'MiB';
+        }
+        if (size >= 1024) {
+            size = Math.floor(size / 1024);
+            unit = 'GiB';
+        }
+        console.log(`${size}${unit}\t${file.name}${dir}`);
+    }
 }
 
 async function cd(server: ControlServer, args: string[]) {

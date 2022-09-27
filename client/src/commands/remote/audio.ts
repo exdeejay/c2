@@ -24,28 +24,30 @@ async function audio(server: ControlServer, args: string[]) {
     }
 
 	let packet = server.commandPacket('audiocommand');
-	let status;
 	switch (args[1]) {
-		case 'start':
-			packet.command = 0;
-			status = await server.sendHostCommand(packet);
-			if (status == 0) {
-				server.registerHostListener(audioHandler);
-				console.log('Audio server started');
+		case 'start': {
+				packet.command = 0;
+				let status = await server.sendHostCommand(packet);
+				if (status == 0) {
+					server.registerHostListener(audioHandler);
+					console.log('Audio server started');
+				}
+				return;
 			}
-			return;
-		case 'stop':
-			packet.command = 1;
-			status = await server.sendHostCommand(packet);
-			server.removeHostListener(audioHandler);
-			if (status == 0) {
-				console.log('Audio server stopped');
+		case 'stop': {
+				packet.command = 1;
+				let status = await server.sendHostCommand(packet);
+				server.removeHostListener(audioHandler);
+				if (status == 0) {
+					console.log('Audio server stopped');
+				}
+				return;
 			}
-			return;
-		case 'list':
-			packet.command = 2;
-			await server.sendHostCommand(packet);
-			return;
+		case 'list': {
+				packet.command = 2;
+				await server.sendHostCommand(packet);
+				return;
+			}
 		case 'save':
 			return;
 		default:
@@ -56,6 +58,6 @@ async function audio(server: ControlServer, args: string[]) {
 
 function audioHandler(packet: Packet) {
 	if (packet._ptype.name == 'audio') {
-		spk.write(Buffer.from(packet.data, 'base64'));
+		spk.write(packet.data);
 	}
 }

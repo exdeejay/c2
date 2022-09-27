@@ -17,7 +17,8 @@ async function discord(server: ControlServer, args: string[]) {
     let packet = server.commandPacket('discordcommand');
     if (args[1] == 'check') {
         packet.command = COMMAND_CHECK;
-		if (await server.sendHostCommand(packet) == 0) {
+        let ret = await server.sendHostCommand(packet);
+		if (ret == 0) {
 			console.log('Discord folder exists at %APPDATA%/discord');
 		} else {
 			console.log('Could not find Discord folder at %APPDATA%/discord');
