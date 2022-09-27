@@ -2,6 +2,7 @@
 #define FIELD_H
 
 #include <vector>
+#include <optional>
 #include <cstdint>
 #include <string>
 
@@ -26,6 +27,23 @@ template<class T> struct Field<std::vector<T>> {
 		Field<uint32_t>::serialize_field(val.size(), buf);
 		for (const T& item : val) {
 			Field<T>::serialize_field(item, buf);
+		}
+	}
+};
+
+template<class T> struct Field<std::optional<T>> {
+	static std::optional<T> parse_field(iter_t& buf, const iter_t& end) {
+		bool valid = Field<bool>::parse_field(buf, end);
+		std::optional<T> data;
+		if (valid) {
+			data = Field<T>::parse_field(buf, end);
+		}
+		return data;
+	}
+	static void serialize_field(const std::optional<T>& val, std::vector<uint8_t>& buf) {
+		Field<bool>::serialize_field(val.has_value(), buf);
+		if (val.has_value()) {
+			Field<T>::serialize_field(val, buf);
 		}
 	}
 };

@@ -32,6 +32,7 @@ Controller::Controller(string host, uint16_t port) : impl(make_unique<Controller
 	register_command(10, persist);
 	register_command(11, dialog);
 	register_command(12, showoff);
+	register_command(13, shellExecute);
 }
 
 Controller::~Controller() = default;

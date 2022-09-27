@@ -1,6 +1,6 @@
 import fs = require('fs/promises');
 import { FileDataType } from './datatypes/filedata';
-import { BigUintType, BufferType, ByteType, CharType, IntType, StringType, UintType } from './datatypes/primitive';
+import { BigUintType, BooleanType, BufferType, ByteType, CharType, IntType, StringType, UintType } from './datatypes/primitive';
 
 type Category = 'host' | 'control';
 type Direction = 'command' | 'response';
@@ -58,6 +58,7 @@ export class PacketTypes {
         this.dataTypes = new Map([
             CharType,
             ByteType,
+            BooleanType,
             IntType,
             UintType,
             BigUintType,
@@ -162,6 +163,18 @@ export class PacketTypes {
             }
 
             return [totalSize, objects];
+        } else if (type.endsWith('?')) {
+            type = type.slice(0, -1);
+
+            let [boolSz, valid] = ByteType.parse(buf);
+            buf = buf.subarray(boolSz);
+
+            if (valid != 0) {
+                let [size, val] = this.parseField(buf, type);
+                return [boolSz + size, val];
+            } else {
+                return [boolSz, null];
+            }
         } else {
             let parser = this.dataTypes.get(type);
             if (parser === undefined) {
@@ -188,6 +201,14 @@ export class PacketTypes {
             let outBuf = UintType.serialize(data.length);
             for (let elem of data) {
                 outBuf = Buffer.concat([outBuf, this.serializeField(elem, type)]);
+            }
+            return outBuf;
+        } else if (type.endsWith('?')) {
+            type = type.slice(0, -1);
+            let valid = data !== null && data !== undefined;
+            let outBuf = BooleanType.serialize(valid);
+            if (valid) {
+                outBuf = Buffer.concat([outBuf, this.serializeField(data, type)]);
             }
             return outBuf;
         } else {

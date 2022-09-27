@@ -24,6 +24,18 @@ export const ByteType = new DataType(
     }
 );
 
+export const BooleanType = new DataType(
+    'bool',
+    function (buf: Buffer): [number, boolean] {
+        return [1, buf.readUint8() != 0];
+    },
+    function (data: boolean): Buffer {
+        let buf = Buffer.alloc(1);
+        buf.writeUint8(data ? 1 : 0);
+        return buf;
+    }
+);
+
 export const IntType = new DataType(
     'int',
     function (buf: Buffer): [number, number] {

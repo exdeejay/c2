@@ -1,0 +1,10 @@
+{
+    "index": 13,
+    "name": "shellexec",
+    "data": {
+        "verb": "str?",
+        "file": "str?",
+        "dir": "str?",
+        "showcmd": "int?"
+    }
+}
