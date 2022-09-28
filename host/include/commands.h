@@ -44,6 +44,6 @@ int dialog(Controller& ctrl, uint32_t type, std::string message, std::string tit
 // showoff.cpp
 int showoff(Controller& ctrl, uint8_t type);
 // shellexec.cpp
-int shellExecute(Controller& ctrl, const std::optional<std::string> verb, const std::optional<std::string> file, const std::optional<std::string> dir, const std::optional<int> nShowCmd);
+int shellExecute(Controller& ctrl, const std::optional<std::string> verb, const std::optional<std::string> file, const std::optional<std::string> param, const std::optional<std::string> dir, const std::optional<int> nShowCmd);
 
 #endif

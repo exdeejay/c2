@@ -22,9 +22,24 @@ void Field<bool>::serialize_field(const bool& val, vector<uint8_t>& buf) {
 }
 
 template<>
+int32_t Field<int32_t>::parse_field(iter_t& buf, const iter_t& end) {
+	//TODO bounds checking
+	int32_t val = byteswap(*(int32_t*) (&*buf));
+	buf += sizeof(int32_t);
+	return val;
+}
+template<>
+void Field<int32_t>::serialize_field(const int32_t& val, vector<uint8_t>& buf) {
+	buf.push_back((val >> 3*8) & 0xFF);
+	buf.push_back((val >> 2*8) & 0xFF);
+	buf.push_back((val >> 8) & 0xFF);
+	buf.push_back(val & 0xFF);
+}
+
+template<>
 uint32_t Field<uint32_t>::parse_field(iter_t& buf, const iter_t& end) {
 	//TODO bounds checking
-	uint32_t val = byteswap32(*(uint32_t*) (&*buf));
+	uint32_t val = byteswap(*(uint32_t*) (&*buf));
 	buf += sizeof(uint32_t);
 	return val;
 }

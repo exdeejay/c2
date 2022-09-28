@@ -19,3 +19,6 @@ set(BUILD_SHARED_LIBS OFF)
 set(SKIP_INSTALL_ALL ON)
 add_subdirectory("zlib")
 target_include_directories(zlibstatic INTERFACE "zlib" "${PROJECT_BINARY_DIR}/third_party/zlib")
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+add_subdirectory("googletest")
