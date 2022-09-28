@@ -1,6 +1,6 @@
 #include <vector>
 #include <lodepng.h>
-#include <Windows.h>
+#include <windows.h>
 #include <cstdint>
 #include "controller.h"
 #include "log.h"

@@ -3,7 +3,7 @@
 #include <cstring>
 #include <vector>
 #include <exception>
-#include <Windows.h>
+#include <windows.h>
 #include "util.h"
 #include "field.h"
 #include "controller.h"

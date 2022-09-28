@@ -2,7 +2,7 @@
 #include "util.h"
 #include "controller.h"
 #ifdef _WIN32
-	#include <Windows.h>
+	#include <windows.h>
 #endif
 using namespace std;
 

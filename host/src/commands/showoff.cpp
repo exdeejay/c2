@@ -1,6 +1,6 @@
 #include "util.h"
 #include <iostream>
-#include <Windows.h>
+#include <windows.h>
 #include "controller.h"
 #include "commands.h"
 using namespace std;

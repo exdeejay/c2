@@ -1,4 +1,4 @@
-#include <Windows.h>
+#include <windows.h>
 #include "util.h"
 #include "controller.h"
 using namespace std;
