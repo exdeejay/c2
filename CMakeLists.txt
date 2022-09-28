@@ -11,8 +11,10 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
 endif()
 
 set (CMAKE_CXX_STANDARD 17)
-add_compile_options(/MT)
-add_compile_definitions(_WIN32_WINNT=0x0601)
+if(WIN32)
+  add_compile_options(/MT)
+  add_compile_definitions(_WIN32_WINNT=0x0601)
+endif()
 
 add_subdirectory("third_party")
 add_subdirectory("host")

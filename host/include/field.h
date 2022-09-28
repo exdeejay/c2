@@ -17,7 +17,7 @@ template<class T> struct Field {
 template<class T> struct Field<std::vector<T>> {
 	static std::vector<T> parse_field(iter_t& buf, const iter_t& end) {
 		uint32_t size = Field<uint32_t>::parse_field(buf, end);
-		vector<T> data;
+		std::vector<T> data;
 		for (size_t i = 0; i < size; i++) {
 			data.push_back(Field<T>::parse_field(buf, end));
 		}

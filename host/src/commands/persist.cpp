@@ -1,10 +1,13 @@
 #include <string>
-#include <Windows.h>
 #include "util.h"
 #include "controller.h"
+#ifdef _WIN32
+	#include <Windows.h>
+#endif
 using namespace std;
 
 int persist(Controller& ctrl, const string regkey) {
+	#ifdef _WIN32
 	PHKEY curr_user_key;
 	LSTATUS result;
 	// result = RegOpenCurrentUser(nullptr, &curr_user_key);
@@ -37,4 +40,5 @@ int persist(Controller& ctrl, const string regkey) {
 		return -3;
 	}
 	return 0;
+	#endif
 }
