@@ -1,5 +1,5 @@
 #include <vector>
-#include <lodepng.h>
+#include <fpng.h>
 #include <windows.h>
 #include <cstdint>
 #include "controller.h"
@@ -50,16 +50,15 @@ int screenshot(Controller& ctrl) {
 		pixels[4*i + 2] = tmp;
 	}
 
+	// lodepng::State state;
+	// state.encoder.add_id = false;
+	// state.encoder.zlibsettings.lazymatching = 0;
+
+	vector<uint8_t> png;
 	DEBUGLOG("encoding as PNG...\n");
-	uint8_t* png = nullptr;
-	size_t pngSize;
-	lodepng_encode32(&png, &pngSize, &pixels[0], width, height);
-	DEBUGLOG("copying to buffer...\n");
-	vector<uint8_t> buf(png, png + pngSize);
-	DEBUGLOG("freeing PNG object...\n");
-	free(png);
-	DEBUGLOG("sending to control server...\n");
-	ctrl.send_buffer(buf);
+	fpng::fpng_encode_image_to_memory(&pixels[0], width, height, 4, png);
+	DEBUGLOG("sending buffer...\n");
+	ctrl.send_buffer(png);
 	DEBUGLOG("done\n");
 
 	return 0;

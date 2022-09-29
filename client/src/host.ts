@@ -7,6 +7,7 @@ import { ControlServer } from './controlserver';
 
 export declare interface Host {
     on(event: 'packet', listener: (packet: Packet) => void): this;
+    on(event: 'cancel', listener: () => void): this;
     on(event: 'close', listener: (hadError: boolean) => void): this;
     on(event: 'error', listener: (err: Error) => void): this;
     on(event: string, listener: (...args: any) => void): this;
@@ -35,7 +36,7 @@ export class Host extends EventEmitter {
     }
 
     waitForPacket(type: string): Promise<Packet> {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             let handler = (packet: Packet) => {
                 if (packet._ptype.name === type) {
                     this.removeListener('packet', handler);
@@ -43,6 +44,7 @@ export class Host extends EventEmitter {
                 }
             };
             this.on('packet', handler);
+            this.on('cancel', reject);
         });
     }
 }

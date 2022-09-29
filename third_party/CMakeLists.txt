@@ -1,8 +1,8 @@
 add_library(asio INTERFACE)
 target_include_directories(asio INTERFACE "asio/asio/include")
 
-add_library(lodepng "lodepng/lodepng.cpp")
-target_include_directories(lodepng INTERFACE "lodepng")
+add_library(fpng "fpng/src/fpng.cpp")
+target_include_directories(fpng PUBLIC "fpng/src")
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 #TODO: disable install

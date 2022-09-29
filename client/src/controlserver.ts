@@ -74,9 +74,7 @@ export class ControlServer extends EventEmitter {
      */
     abortCurrentCommand() {
         if (this.currentHost !== null) {
-            let abortPkt = this.packetTypes.createPacket('host', 'response', 'retcode');
-            abortPkt.retcode = -999;
-            this.currentHost.emit('packet', abortPkt);
+            this.currentHost.emit('cancel');
         }
     }
 
