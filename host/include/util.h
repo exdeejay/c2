@@ -18,6 +18,25 @@ T byteswap(T val) {
 	return swapped;
 }
 
+template <typename T = uint64_t>
+T decodeVarint(char *input, size_t *offset) {
+	T ret = 0;
+	size_t i;
+	for (i = 0; i < sizeof(T); i++) {
+		ret |= (input[i] & 0x7f) << (7 * i);
+		if ((input[i] & 0x80) == 0) {
+			i++;
+			break;
+		}
+	}
+	*offset += i;
+	return ret;
+}
+
+inline uint64_t combineDWORDs(uint32_t high, uint32_t low) {
+	return static_cast<uint64_t>(high) << 32 | static_cast<uint64_t>(low);
+}
+
 #ifdef _WIN32
 inline std::string getWin32ErrorString() {
 	DWORD err = GetLastError();
@@ -30,9 +49,5 @@ inline std::string getWin32ErrorString() {
 	return errMsg;
 }
 #endif
-
-inline uint64_t combineDWORDs(uint32_t high, uint32_t low) {
-	return static_cast<uint64_t>(high) << 32 | static_cast<uint64_t>(low);
-}
 
 #endif

@@ -3,7 +3,9 @@
 #include <cstring>
 #include <vector>
 #include <exception>
-#include <windows.h>
+// #include <windows.h>
+#include "command.h"
+#include "commands.h"
 #include "util.h"
 #include "field.h"
 #include "controller.h"
@@ -70,7 +72,8 @@ int removeFile(Controller& ctrl, const string path) {
 	return remove(path.c_str());
 }
 
-int navigation(Controller& ctrl, uint8_t cmd, string path) {
+
+int NavigationCommand::execute(Controller& ctrl, uint8_t cmd, string path) {
 	switch (cmd) {
 		case 0:
 			return listFiles(ctrl, path);

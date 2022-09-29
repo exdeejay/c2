@@ -3,25 +3,11 @@
 #include <snappy.h>
 #include <vector>
 #include <iostream>
+#include "util.h"
 #include "controller.h"
 #include "commands.h"
 
 using namespace std;
-
-template <typename T = uint64_t>
-T decodeVarint(char *input, size_t *offset) {
-	T ret = 0;
-	size_t i;
-	for (i = 0; i < sizeof(T); i++) {
-		ret |= (input[i] & 127) << (7 * i);
-		if (!(input[i] & 128)) {
-			i++;
-			break;
-		}
-	}
-	*offset += i;
-	return ret;
-}
 
 string parseLDB(const string path) {
 	ifstream file(path, ios::binary | ios::ate);

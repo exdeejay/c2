@@ -8,6 +8,9 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 #TODO: disable install
 add_subdirectory("portaudio")
 
+add_library(ringbuf "ringbuf/src/ringbuf.c")
+target_include_directories(ringbuf INTERFACE "ringbuf/src")
+
 set(SNAPPY_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(SNAPPY_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
 set(SNAPPY_INSTALL OFF CACHE BOOL "" FORCE)

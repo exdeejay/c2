@@ -7,7 +7,7 @@
 #include <string>
 #include <functional>
 #include <utility>
-#include "commandpacket.h"
+#include "command.h"
 
 class ControllerImpl;
 typedef uint8_t retcode_t;
@@ -57,8 +57,10 @@ public:
 	 */
 	void send_buffer(const std::vector<uint8_t> buf);
 
-	template<class... Args> void register_command(packettype_t type, int(*command)(Controller&, Args...)) {
-		std::pair<std::function<std::unique_ptr<Packet>(const std::vector<uint8_t>&)>, std::function<bool(Controller&, Packet&)>> fn_pair = CommandPacket<Args...>::build(type, command);
+	void buffer_audio(const uint8_t* data, size_t len);
+
+	template<class... Args> void register_command(CommandBuilder& builder) {
+		auto fn_pair = builder.build();
 		register_type(type, fn_pair.first);
 		register_handler(type, fn_pair.second);
 	}

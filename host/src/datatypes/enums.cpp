@@ -12,6 +12,6 @@
 		Field<uint8_t>::serialize_field((uint8_t) val, buf); \
 	}
 
-PARSE_ENUM(DiscordCommand)
-PARSE_ENUM(AudioCommand)
-PARSE_ENUM(ShowoffCommand)
+PARSE_ENUM(DiscordCommandEnum)
+PARSE_ENUM(AudioCommandEnum)
+PARSE_ENUM(ShowoffCommandEnum)

@@ -3,7 +3,7 @@ add_executable(payload ${srcs})
 target_include_directories(payload PUBLIC "include")
 set(include_dirs "src" "src/commands" "src/connection" "src/controller")
 target_include_directories(payload PRIVATE ${include_dirs})
-target_link_libraries(payload asio fpng PortAudio snappy zlibstatic)
+target_link_libraries(payload asio fpng PortAudio ringbuf snappy zlibstatic)
 
 target_compile_definitions(payload PUBLIC $<$<CONFIG:Debug>:DEBUG>)
 if(WIN32)

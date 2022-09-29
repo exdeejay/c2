@@ -16,3 +16,6 @@
 [submodule "third_party/fpng"]
 	path = third_party/fpng
 	url = https://github.com/richgel999/fpng
+[submodule "third_party/ringbuf"]
+	path = third_party/ringbuf
+	url = https://github.com/rmind/ringbuf

