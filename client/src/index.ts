@@ -50,10 +50,6 @@ async function main() {
 		control.abortCurrentCommand();
 	});
 
-	process.on('unhandledRejection', (reason, p) => {
-		console.error(`Error: Unhandled rejection: ${reason}`);
-	});
-
 	rl.on('line', async (input) => {
 		let mixedArgs = shellParse(input);
 		let args = mixedArgs.map(arg => {

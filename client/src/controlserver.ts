@@ -41,10 +41,10 @@ export class ControlServer extends EventEmitter {
             host.on('packet', (packet) => {
                 switch (packet._ptype.name) {
                     case 'out':
-                        process.stdout.write(packet.out);
+                        console.log(packet.out);
                         break;
                     case 'err':
-                        process.stderr.write(packet.err);
+                        console.error(packet.err);
                         break;
                 }
             });

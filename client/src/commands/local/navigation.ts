@@ -14,10 +14,7 @@ async function lls(server: ControlServer, args: string[]) {
         path = args[1];
     }
     let files = await fs.readdir(path);
-    for (let f of files) {
-        process.stdout.write(f + '    ');
-    }
-    console.log();
+    console.log(files.join('    '));
 }
 
 function lcd(server: ControlServer, args: string[]) {
