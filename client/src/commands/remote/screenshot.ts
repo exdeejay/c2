@@ -8,7 +8,7 @@ export = function (commands: CommandList) {
 
 async function screenshot(server: ControlServer, args: string[]) {
     let packet = server.commandPacket('screenshot');
-    await server.sendHostCommand(packet);
+    server.sendHostCommand(packet);
 	let response = await server.waitForPacket('buffer');
 	fs.writeFileSync('out.png', response.data);
 	console.log('Wrote image to out.png');

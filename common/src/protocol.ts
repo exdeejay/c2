@@ -119,7 +119,7 @@ export class PacketTypes {
         if (packetType == null) {
             throw new Error('command not specified');
         }
-    
+
         let packet: Packet = {
             _ptype: packetType,
         };

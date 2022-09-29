@@ -42,7 +42,6 @@ export class ZlibConnection extends EventEmitter {
         while (data.length > 0) {
             if (data.length >= 4 && this.nextPacketSize == -1) {
                 this.nextPacketSize = data.readUInt32BE();
-                console.log(`next packet: ${this.nextPacketSize}`);
             }
 
             if (data.length >= this.nextPacketSize + 4) {

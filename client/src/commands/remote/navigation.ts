@@ -29,7 +29,7 @@ async function ls(server: ControlServer, args: string[]) {
     } else {
         packet.path = '';
     }
-    await server.sendHostCommand(packet);
+    server.sendHostCommand(packet);
     let responsePacket = await server.waitForPacket('files');
     for (let file of responsePacket.files as FileData[]) {
         let dir = '';

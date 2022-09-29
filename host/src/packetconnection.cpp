@@ -96,7 +96,7 @@ void PacketConnection::write_packet_sync(const SerializedPacket& spkt) {
 	} while (stream.avail_out == 0);
 	deflateEnd(&stream);
 
-	uint32_t size = byteswap(out.size() - 4);
+	uint32_t size = byteswap((uint32_t) out.size() - 4);
 	out[0] = size & 0xFF;
 	out[1] = (size >> 8) & 0xFF;
 	out[2] = (size >> 16) & 0xFF;

@@ -9,6 +9,7 @@
 #include "controller.h"
 #include "datatypes.h"
 #include "simplepacket.h"
+#include "log.h"
 using namespace std;
 
 int pwd(Controller& ctrl) {

@@ -5,6 +5,13 @@ import { forwardEvents } from 'c2lib';
 import { Packet } from 'c2lib';
 import { ControlServer } from './controlserver';
 
+export declare interface Host {
+    on(event: 'packet', listener: (packet: Packet) => void): this;
+    on(event: 'close', listener: (hadError: boolean) => void): this;
+    on(event: 'error', listener: (err: Error) => void): this;
+    on(event: string, listener: (...args: any) => void): this;
+}
+
 export class Host extends EventEmitter {
     ip: string;
     connection: ZlibConnection;
@@ -25,5 +32,17 @@ export class Host extends EventEmitter {
      */
     sendPacket(packet: Packet) {
         this.connection.write(this.controlServer.packetTypes.serializePacket(packet));
+    }
+
+    waitForPacket(type: string): Promise<Packet> {
+        return new Promise((resolve) => {
+            let handler = (packet: Packet) => {
+                if (packet._ptype.name === type) {
+                    this.removeListener('packet', handler);
+                    resolve(packet);
+                }
+            };
+            this.on('packet', handler);
+        });
     }
 }

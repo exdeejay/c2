@@ -9,12 +9,12 @@ import { CommandList } from '../../registry';
 let spk: Speaker;
 
 export = function (commands: CommandList) {
-	commands['audio'] = audio;
-	spk = new Speaker({
-		channels: 1,
-		bitDepth: 16,
-		sampleRate: 16000,
-	});
+	// commands['audio'] = audio;
+	// spk = new Speaker({
+	// 	channels: 1,
+	// 	bitDepth: 16,
+	// 	sampleRate: 16000,
+	// });
 }
 
 async function audio(server: ControlServer, args: string[]) {
@@ -23,36 +23,36 @@ async function audio(server: ControlServer, args: string[]) {
         return;
     }
 
-	let packet = server.commandPacket('audiocommand');
-	switch (args[1]) {
-		case 'start': {
-				packet.command = 0;
-				let status = await server.sendHostCommand(packet);
-				if (status == 0) {
-					server.registerHostListener(audioHandler);
-					console.log('Audio server started');
-				}
-				return;
-			}
-		case 'stop': {
-				packet.command = 1;
-				let status = await server.sendHostCommand(packet);
-				server.removeHostListener(audioHandler);
-				if (status == 0) {
-					console.log('Audio server stopped');
-				}
-				return;
-			}
-		case 'list': {
-				packet.command = 2;
-				await server.sendHostCommand(packet);
-				return;
-			}
-		case 'save':
-			return;
-		default:
-			console.log(`Usage: ${args[0]} <start|stop|list>`);
-	}
+	// let packet = server.commandPacket('audiocommand');
+	// switch (args[1]) {
+	// 	case 'start': {
+	// 			packet.command = 0;
+	// 			let status = await server.sendHostCommand(packet);
+	// 			if (status == 0) {
+	// 				server.registerHostListener(audioHandler);
+	// 				console.log('Audio server started');
+	// 			}
+	// 			return;
+	// 		}
+	// 	case 'stop': {
+	// 			packet.command = 1;
+	// 			let status = await server.sendHostCommand(packet);
+	// 			server.removeHostListener(audioHandler);
+	// 			if (status == 0) {
+	// 				console.log('Audio server stopped');
+	// 			}
+	// 			return;
+	// 		}
+	// 	case 'list': {
+	// 			packet.command = 2;
+	// 			await server.sendHostCommand(packet);
+	// 			return;
+	// 		}
+	// 	case 'save':
+	// 		return;
+	// 	default:
+	// 		console.log(`Usage: ${args[0]} <start|stop|list>`);
+	// }
 }
 
 
