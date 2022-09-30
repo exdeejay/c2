@@ -3,11 +3,12 @@
 #include <fstream>
 #include <cstdint>
 #include "controller.h"
+#include "commands.h"
 #include "field.h"
 using namespace std;
 
 
-int downloadFile(Controller& ctrl, const string path) {
+int DownloadFileCommand::execute(Controller& ctrl, string path) {
 	ifstream file(path, ios::binary | ios::ate);
 	if (!file) {
 		return -1;
@@ -24,7 +25,7 @@ int downloadFile(Controller& ctrl, const string path) {
 	return 0;
 }
 
-int uploadFile(Controller& ctrl, const string path, vector<uint8_t> filebuf) {
+int UploadFileCommand::execute(Controller& ctrl, string path, vector<uint8_t> filebuf) {
 	ofstream file(path, ios::binary);
 	if (!file) {
 		return -1;

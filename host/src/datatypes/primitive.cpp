@@ -1,5 +1,6 @@
 #include "field.h"
 #include "util.h"
+#include <string>
 #include <iostream>
 using namespace std;
 

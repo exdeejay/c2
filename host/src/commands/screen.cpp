@@ -3,10 +3,11 @@
 #include <windows.h>
 #include <cstdint>
 #include "controller.h"
+#include "commands.h"
 #include "log.h"
 using namespace std;
 
-int screenshot(Controller& ctrl) {
+int ScreenshotCommand::execute(Controller& ctrl) {
 	DEBUGLOG("starting screenshot\n");
 	HDC screenDC = GetDC(nullptr);
 	HDC bitmapDC = CreateCompatibleDC(screenDC);

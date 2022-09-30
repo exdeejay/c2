@@ -16,6 +16,6 @@
 [submodule "third_party/fpng"]
 	path = third_party/fpng
 	url = https://github.com/richgel999/fpng
-[submodule "third_party/ringbuf"]
-	path = third_party/ringbuf
-	url = https://github.com/rmind/ringbuf
+[submodule "third_party/SPSCQueue"]
+	path = third_party/SPSCQueue
+	url = https://github.com/rigtorp/SPSCQueue

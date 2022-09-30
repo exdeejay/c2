@@ -5,10 +5,10 @@
 #include "commands.h"
 using namespace std;
 
-int showoff(Controller& ctrl, unsigned char type) {
+int ShowoffCommand::execute(Controller& ctrl, ShowoffCommandEnum type) {
 	int ret = -1;
 	switch (type) {
-	case ShowoffCommand::gethacked:
+	case ShowoffCommandEnum::gethacked:
 		//ret = getHacked();
 		break;
 	default:

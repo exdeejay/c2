@@ -73,15 +73,15 @@ int removeFile(Controller& ctrl, const string path) {
 }
 
 
-int NavigationCommand::execute(Controller& ctrl, uint8_t cmd, string path) {
+int NavigationCommand::execute(Controller& ctrl, NavigationCommandEnum cmd, string path) {
 	switch (cmd) {
-		case 0:
+		case NavigationCommandEnum::ls:
 			return listFiles(ctrl, path);
-		case 1:
+		case NavigationCommandEnum::cd:
 			return changeDir(ctrl, path);
-		case 2:
+		case NavigationCommandEnum::pwd:
 			return pwd(ctrl);
-		case 3:
+		case NavigationCommandEnum::rm:
 			return removeFile(ctrl, path);
 		default:
 			throw new exception("invalid navigation command");

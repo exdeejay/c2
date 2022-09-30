@@ -10,6 +10,7 @@
 #include "command.h"
 
 class ControllerImpl;
+class CommandBuilder;
 typedef uint8_t retcode_t;
 
 /**
@@ -57,13 +58,12 @@ public:
 	 */
 	void send_buffer(const std::vector<uint8_t> buf);
 
-	void buffer_audio(const uint8_t* data, size_t len);
-
-	template<class... Args> void register_command(CommandBuilder& builder) {
-		auto fn_pair = builder.build();
-		register_type(type, fn_pair.first);
-		register_handler(type, fn_pair.second);
+	template<class T>
+	void register_command() {
+		register_command(std::make_unique<T>());
 	}
+
+	void register_command(std::unique_ptr<CommandBuilder> command);
 
 	void register_type(packettype_t type, std::function<std::unique_ptr<Packet>(const std::vector<uint8_t>&)> builder);
 

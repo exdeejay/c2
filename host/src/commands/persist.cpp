@@ -1,12 +1,13 @@
 #include <string>
 #include "util.h"
+#include "commands.h"
 #include "controller.h"
 #ifdef _WIN32
 	#include <windows.h>
 #endif
 using namespace std;
 
-int persist(Controller& ctrl, const string regkey) {
+int PersistCommand::execute(Controller& ctrl, string regkey) {
 	#ifdef _WIN32
 	PHKEY curr_user_key;
 	LSTATUS result;

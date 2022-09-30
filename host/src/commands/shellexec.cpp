@@ -1,13 +1,14 @@
 #include <string>
 #include <optional>
 #include "controller.h"
+#include "commands.h"
 #ifdef _WIN32
     #include <windows.h>
     #include <shellapi.h>
 #endif
 using namespace std;
 
-int shellExecute(Controller& ctrl, const optional<string> maybeVerb, const optional<string> maybeFile, const optional<string> maybeParams, const optional<string> maybeDir, const optional<int> maybeNShowCmd) {
+int ShellExecuteCommand::execute(Controller& ctrl, const optional<string> maybeVerb, optional<string> maybeFile, optional<string> maybeParams, optional<string> maybeDir, optional<int> maybeNShowCmd) {
     const char* verb = nullptr;
     if (maybeVerb) {
         verb = maybeVerb.value().c_str();

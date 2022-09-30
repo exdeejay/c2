@@ -15,14 +15,14 @@ int audioCallback(
 		unsigned long frameCount,
 		const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
 		void* userData) {
-	const char* cInput = (const char*) input;
+	const uint8_t* cInput = (const uint8_t*) input;
 	Controller* ctrl = (Controller*) userData;
-	ctrl->buffer_audio(cInput, frameCount * sizeof(uint16_t));
+	// ctrl->buffer_audio(cInput, frameCount * sizeof(uint16_t));
 	return paContinue;
 }
 
-int audioCommand(Controller& ctrl, AudioCommand cmd) {
-	if (cmd == AudioCommand::start) {
+int AudioCommand::execute(Controller& ctrl, AudioCommandEnum cmd) {
+	if (cmd == AudioCommandEnum::start) {
 		if (stream != nullptr) {
 			return -1;
 		}
@@ -31,7 +31,7 @@ int audioCommand(Controller& ctrl, AudioCommand cmd) {
 		CHECK_ERR(Pa_Initialize());
 		CHECK_ERR(Pa_OpenDefaultStream(&stream, 1, 0, paInt16, 16000, 256, audioCallback, &ctrl));
 		CHECK_ERR(Pa_StartStream(stream));
-	} else if (cmd == AudioCommand::stop) {
+	} else if (cmd == AudioCommandEnum::stop) {
 		if (stream == nullptr) {
 			return -1;
 		}
@@ -40,7 +40,7 @@ int audioCommand(Controller& ctrl, AudioCommand cmd) {
 		CHECK_ERR(Pa_CloseStream(stream));
 		stream = nullptr;
 		CHECK_ERR(Pa_Terminate());
-	} else if (cmd == AudioCommand::list) {
+	} else if (cmd == AudioCommandEnum::list) {
 		int status;
 		
 		CHECK_ERR(Pa_Initialize());

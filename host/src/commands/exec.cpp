@@ -1,9 +1,10 @@
 #include <windows.h>
 #include "util.h"
 #include "controller.h"
+#include "commands.h"
 using namespace std;
 
-int exec(Controller& ctrl, const string cmd, bool wait) {
+int ExecCommand::execute(Controller& ctrl, string cmd, bool wait) {
 	HANDLE inPipe[2];
 	HANDLE outPipe[2];
 

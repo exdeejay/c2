@@ -12,6 +12,7 @@
 		Field<uint8_t>::serialize_field((uint8_t) val, buf); \
 	}
 
+PARSE_ENUM(NavigationCommandEnum)
 PARSE_ENUM(DiscordCommandEnum)
 PARSE_ENUM(AudioCommandEnum)
 PARSE_ENUM(ShowoffCommandEnum)
