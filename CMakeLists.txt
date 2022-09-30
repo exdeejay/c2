@@ -11,7 +11,7 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
 endif()
 
 if(WIN32 AND MSVC)
-  add_compile_options(/MT)
+  add_compile_options($<IF:$<CONFIG:Debug>,/MTd,/MT>)
   add_compile_definitions(_WIN32_WINNT=0x0601)
 endif()
 

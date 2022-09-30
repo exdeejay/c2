@@ -1,8 +1,11 @@
-#include "field.h"
-#include "util.h"
 #include <string>
 #include <iostream>
+
+#include "field.h"
+#include "util.h"
+
 using namespace std;
+
 
 template<>
 uint8_t Field<uint8_t>::parse_field(iter_t& buf, const iter_t& end) {

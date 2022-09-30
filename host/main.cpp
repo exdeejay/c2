@@ -1,9 +1,9 @@
 #include "controller.h"
 #include "log.h"
+#include "stdplugin.h"
 #ifdef _WIN32
 	#include <windows.h>
 #endif
-using namespace std;
 
 /**
  * Main entry function. Define `WINGUI` to compile into Win32 Subsystem .exe.
@@ -17,5 +17,6 @@ int main(int argc, char* argv[]) {
 	//TODO: handle segfaults?
 	DEBUGLOG("Starting...\n");
 	Controller controller("127.0.0.1", 6997);
+	controller.register_plugin<StdPlugin>();
 	controller.run();
 }

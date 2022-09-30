@@ -100,4 +100,12 @@ public:
     }
 };
 
+#define COMMANDCLASS(num, name, ...) class name##Command : public Command<num, ##__VA_ARGS__>
+
+#define COMMAND(num, name, ...) \
+    COMMANDCLASS(num, name, ##__VA_ARGS__) { \
+    public: \
+        int execute(Controller&, ##__VA_ARGS__) override; \
+    }
+
 #endif

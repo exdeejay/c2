@@ -7,6 +7,7 @@
 #include <string>
 #include <functional>
 #include <utility>
+#include "plugin.h"
 #include "command.h"
 
 class ControllerImpl;
@@ -57,6 +58,13 @@ public:
 	 * Sends `buffer` packet
 	 */
 	void send_buffer(const std::vector<uint8_t> buf);
+
+	template<class T>
+	void register_plugin() {
+		register_plugin(std::make_unique<T>());
+	}
+
+	void register_plugin(std::unique_ptr<Plugin> plugin);
 
 	template<class T>
 	void register_command() {

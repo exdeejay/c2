@@ -8,11 +8,12 @@
 #include <vector>
 #include <memory>
 #include <string>
+
 #include "packet.h"
 #include "packetconnection.h"
 #include "controller.h"
+#include "plugin.h"
 #include "command.h"
-#include "rigtorp/SPSCQueue.h"
 
 class ControllerImpl {
 public:
@@ -21,6 +22,7 @@ public:
     std::string host;
     uint16_t port;
     std::unique_ptr<PacketConnection> conn;
+    std::vector<std::unique_ptr<Plugin>> plugins;
     std::vector<std::unique_ptr<CommandBuilder>> commands;
     std::unordered_map<packettype_t, std::function<std::unique_ptr<Packet>(const std::vector<uint8_t>&)>> registry;
     std::multimap<packettype_t, std::function<bool(Controller&, Packet&)>> handlers;

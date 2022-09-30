@@ -1,16 +1,17 @@
-#include "packetconnection.h"
 #include <vector>
 #include <exception>
 #include <iostream>
 #include <cstdint>
 
 #include <zlib.h>
+#include "packetconnection.h"
+#include "packetconnectionimpl.h"
 #include "packet.h"
 #include "field.h"
 #include "util.h"
-#include "packetconnectionimpl.h"
 
 using namespace std;
+
 
 PacketConnection::PacketConnection(string host, uint16_t port) : impl(make_unique<PacketConnectionImpl>(host, port)) {}
 
