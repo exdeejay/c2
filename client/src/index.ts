@@ -47,7 +47,11 @@ async function main() {
 	});
 
 	process.on('SIGINT', () => {
-		control.abortCurrentCommand();
+		if (control.currentHost !== null) {
+            control.currentHost.emit('cancel');
+        } else {
+			process.exit(0);
+		}
 	});
 
 	rl.on('line', async (input) => {

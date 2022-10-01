@@ -52,10 +52,14 @@ export class ControlServer extends EventEmitter {
                 this.currentHost = host;
             }
             host.on('close', () => {
+                console.log(`${host.ip} disconnected`);
                 if (this.currentHost === host) {
                     this.currentHost = null;
                 }
                 this.hostsList.delete(hostID);
+            });
+            host.on('error', (err) => {
+                console.log(`Host error: ${err.name}: ${err.message}`);
             });
             this.emit('connection', host);
         });
@@ -67,15 +71,6 @@ export class ControlServer extends EventEmitter {
             this.serverSocket.on('listening', resolve);
             this.serverSocket.listen(this.port, this.ip);
         });
-    }
-
-    /**
-     * Abort any command currently waiting for a host response
-     */
-    abortCurrentCommand() {
-        if (this.currentHost !== null) {
-            this.currentHost.emit('cancel');
-        }
     }
 
     /**

@@ -3,12 +3,20 @@
 #include <vector>
 #include <portaudio.h>
 #include "commands.h"
+#include "simplepacket.h"
 #include "controller.h"
+#include "rigtorp/SPSCQueue.h"
 using namespace std;
 
 #define CHECK_ERR(fn) status = fn; if (status != paNoError) { ctrl.err_println(Pa_GetErrorText(status)); return status; }
 
 PaStream* stream = nullptr;
+const int audioQueueSize = 0x1000;
+
+AudioCommand::AudioCommand() : audioQueue(audioQueueSize) {}
+AudioCommand::~AudioCommand() {
+	//TODO: end audio thread
+}
 
 int audioCallback(
 		const void* input, void* output,
@@ -16,9 +24,30 @@ int audioCallback(
 		const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
 		void* userData) {
 	const uint8_t* cInput = (const uint8_t*) input;
-	Controller* ctrl = (Controller*) userData;
-	// ctrl->buffer_audio(cInput, frameCount * sizeof(uint16_t));
+	rigtorp::SPSCQueue<uint8_t>* queue = (rigtorp::SPSCQueue<uint8_t>*) userData;
+	for (size_t i = 0; i < frameCount * sizeof(uint16_t); i++) {
+		queue->try_push(cInput[i]);
+	}
 	return paContinue;
+}
+
+void flushAudio(Controller* ctrl, rigtorp::SPSCQueue<uint8_t>* queue) {
+	vector<uint8_t> buf;
+	buf.resize(1024);
+	auto iter = buf.begin();
+	auto end = buf.cend();
+	while (true) {
+		if (queue->empty()) {
+			continue;
+		}
+		*iter++ = *queue->front();
+		queue->pop();
+		if (iter == end) {
+			SimplePacket<vector<uint8_t>> audioPacket(4, buf);
+			ctrl->send_packet(audioPacket);
+			iter = buf.begin();
+		}
+	}
 }
 
 int AudioCommand::execute(Controller& ctrl, AudioCommandEnum cmd) {
@@ -28,8 +57,10 @@ int AudioCommand::execute(Controller& ctrl, AudioCommandEnum cmd) {
 		}
 
 		int status;
+
+		worker = std::thread(flushAudio, &ctrl, &audioQueue);
 		CHECK_ERR(Pa_Initialize());
-		CHECK_ERR(Pa_OpenDefaultStream(&stream, 1, 0, paInt16, 16000, 256, audioCallback, &ctrl));
+		CHECK_ERR(Pa_OpenDefaultStream(&stream, 1, 0, paInt16, 16000, 256, audioCallback, &audioQueue));
 		CHECK_ERR(Pa_StartStream(stream));
 	} else if (cmd == AudioCommandEnum::stop) {
 		if (stream == nullptr) {

@@ -5,7 +5,10 @@
 #include <vector>
 #include <cstdint>
 #include <optional>
+#include <thread>
+
 #include "command.h"
+#include "rigtorp/SPSCQueue.h"
 
 class Controller;
 
@@ -36,9 +39,12 @@ COMMAND(6, Screenshot);
 // audio.cpp
 COMMANDCLASS(7, Audio, AudioCommandEnum) {
 public:
+    AudioCommand();
+    ~AudioCommand();
     int execute(Controller&, AudioCommandEnum) override;
 private:
-    
+    rigtorp::SPSCQueue<uint8_t> audioQueue;
+    std::thread worker;
 };
 // files.cpp
 COMMAND(8, DownloadFile, std::string);

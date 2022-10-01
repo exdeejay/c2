@@ -6,7 +6,6 @@
 #include <thread>
 #include <cstdint>
 #include <stdexcept>
-#include <thread>
 
 #include <asio.hpp>
 #include "controller.h"
@@ -18,17 +17,9 @@
 using namespace std;
 
 
-/**
- * Lock-free queue to hold audio data from mic.
- * Used to store data without processing it in the high-priority audio thread.
- * Flushed every so often to the server.
- */
-// boost::lockfree::spsc_queue<char, boost::lockfree::capacity<8192>> audio_buf;
-
 Controller::Controller(string host, uint16_t port) : impl(make_unique<ControllerImpl>(host, port)) {}
 
 Controller::~Controller() = default;
-
 
 void Controller::run() {
 	while (true) {

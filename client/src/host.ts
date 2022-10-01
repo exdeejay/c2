@@ -44,7 +44,9 @@ export class Host extends EventEmitter {
                 }
             };
             this.on('packet', handler);
-            this.on('cancel', reject);
+            this.on('cancel', () => {
+                reject();
+            });
         });
     }
 }
