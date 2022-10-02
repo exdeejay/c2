@@ -25,3 +25,6 @@
 [submodule "third_party/libopusenc"]
 	path = third_party/libopusenc
 	url = https://github.com/xiph/libopusenc
+[submodule "third_party/MemoryModule"]
+	path = third_party/MemoryModule
+	url = https://github.com/fancycode/MemoryModule
