@@ -8,6 +8,7 @@
 #include <stdexcept>
 
 #include <asio.hpp>
+#include <windows.h>
 #include "controller.h"
 #include "controllerimpl.h"
 #include "log.h"

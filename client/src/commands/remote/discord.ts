@@ -14,7 +14,7 @@ async function discord(server: ControlServer, args: string[]) {
         return;
     }
 
-    let packet = server.commandPacket('discordcommand');
+    let packet = server.commandPacket('discord');
     if (args[1] == 'check') {
         packet.command = COMMAND_CHECK;
         let ret = await server.sendHostCommand(packet);

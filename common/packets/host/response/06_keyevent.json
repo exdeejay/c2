@@ -1,0 +1,8 @@
+{
+    "index": 6,
+    "name": "keyevent",
+    "data": {
+      "keyDown": "bool",
+      "vkCode": "uint"
+    }
+}

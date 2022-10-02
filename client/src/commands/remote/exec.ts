@@ -13,7 +13,7 @@ async function exec(server: ControlServer, args: string[]) {
 	}
 	let packet = server.commandPacket('exec');
 	packet.cmd = args.slice(1).join(' ');
-	packet.wait = 1;
+	packet.wait = true;
 	await server.sendHostCommand(packet);
 }
 
@@ -27,6 +27,6 @@ async function start(server: ControlServer, args: string[]) {
 	}
 	let packet = server.commandPacket('exec');
 	packet.cmd = args.slice(1).join(' ');
-	packet.wait = 0;
+	packet.wait = false;
 	await server.sendHostCommand(packet);
 }

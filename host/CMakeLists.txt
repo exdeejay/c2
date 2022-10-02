@@ -10,7 +10,7 @@ target_compile_definitions(c2core PUBLIC $<$<CONFIG:Debug>:DEBUG>)
 file(GLOB_RECURSE plugin_srcs "stdplugin/*.cpp")
 add_library(stdplugin ${plugin_srcs})
 target_include_directories(stdplugin PUBLIC "stdplugin")
-target_link_libraries(stdplugin c2core fpng PortAudio SPSCQueue snappy)
+target_link_libraries(stdplugin c2core fpng opus PortAudio SPSCQueue snappy)
 
 add_executable(c2 "main.cpp")
 target_link_libraries(c2 c2core stdplugin)

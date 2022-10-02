@@ -3,6 +3,6 @@
     "name": "exec",
     "data": {
         "cmd": "str",
-        "wait": "byte"
+        "wait": "bool"
     }
 }

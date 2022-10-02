@@ -8,6 +8,14 @@
 
 using iter_t = std::vector<uint8_t>::const_iterator;
 
+template<class T>
+class slice {
+public:
+	slice(T* ptr, size_t size) : ptr(ptr), size(size) {}
+	T* ptr;
+	size_t size;
+};
+
 
 template<class T> struct Field {
 	static T parse_field(iter_t& buf, const iter_t& end);
@@ -27,6 +35,19 @@ template<class T> struct Field<std::vector<T>> {
 		Field<uint32_t>::serialize_field(val.size(), buf);
 		for (const T& item : val) {
 			Field<T>::serialize_field(item, buf);
+		}
+	}
+};
+
+template<class T> struct Field<slice<T>> {
+	static slice<T> parse_field(iter_t& buf, const iter_t& end) {
+		throw new exception("cannot parse slice\n");
+		return slice{nullptr, 0};
+	}
+	static void serialize_field(const slice<T>& val, std::vector<uint8_t>& buf) {
+		Field<uint32_t>::serialize_field(val.size, buf);
+		for (size_t i = 0; i < val.size; i++) {
+			Field<T>::serialize_field(val.ptr[i], buf);
 		}
 	}
 };
