@@ -42,7 +42,7 @@ let mapping: { [key: number]: string } = {
 };
 async function keylog(server: ControlServer, args: string[]) {
     if (args.length != 2 || !['start', 'stop', 'print'].includes(args[1])) {
-        console.log(`Usage: ${args[0]} <start|stop|get>`);
+        console.log(`Usage: ${args[0]} <start|stop|print>`);
         return;
     }
 
